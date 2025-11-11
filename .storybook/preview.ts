@@ -1,3 +1,4 @@
+import './mocks/nextNavigationMock';
 import type { Preview } from "@storybook/nextjs-vite";
 
 const preview: Preview = {
