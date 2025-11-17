@@ -1,4 +1,3 @@
-'use client'
 import { VideoPreviewCard } from "@/app/components/common/VideoPreviewCard/VideoPreviewCard";
 export default function Home() {
   return (
