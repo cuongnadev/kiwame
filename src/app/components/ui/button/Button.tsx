@@ -6,7 +6,7 @@ export interface ButtonProps {
   text?: string;
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'dark';
   size?: 'sm' | 'md' | 'lg';
   radius?: 'none' | 'sm' | 'md' | 'lg' | 'full';
   loading?: boolean;
@@ -27,7 +27,7 @@ export const Button: React.FC<ButtonProps> = ({
   onClick,
   className
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium transition-colors duration-200';
+  const baseStyles = 'inline-flex hover:pointer items-center justify-center gap-2 font-medium transition-colors duration-200';
 
   const sizeStyles = {
     sm: 'px-3 py-1.5 text-sm',
@@ -67,7 +67,14 @@ export const Button: React.FC<ButtonProps> = ({
       text-gray-300
       hover:bg-white/10
     `,
+    dark:`
+      rounded-full
+      bg-[#222] hover:bg-[#444444]
+      text-white
+      py-4
+    `,
     danger: "bg-red-600 text-white hover:bg-red-700",
+    
   }[variant];
 
   return (

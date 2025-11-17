@@ -6,6 +6,7 @@ import { kiwameConfig } from "@/utils/kiwameConfig";
 // See createSupabaseWorkerClient() for a headless client that does not carry user-session context.
 export async function createSupabaseServerClient() {
   const cookieStore = await cookies()
+  console.log(kiwameConfig.supabaseUrl, kiwameConfig.supabaseAnonKey);
 
   return createServerClient(
     kiwameConfig.supabaseUrl,
