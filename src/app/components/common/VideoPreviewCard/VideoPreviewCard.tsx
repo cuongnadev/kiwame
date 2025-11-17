@@ -102,7 +102,7 @@ export const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({
           <p>{channel}</p>
           <div className='flex items-center'>
             <p>{views}</p>
-            <Dot />
+            <Dot/>
             <p>{publishedAt}</p>
           </div>
         </div>
@@ -110,7 +110,7 @@ export const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({
         <Popup
           trigger={
             <Button
-              icon={<EllipsisVertical width={18} height={18} color='black' />}
+              icon={<EllipsisVertical width={18} height={18} className='text-gray-500' />}
               radius='full'
               variant='ghost'
               className='w-[32px] h-[32px] hover:!bg-black/10'
