@@ -1,5 +1,6 @@
-import { Eye, EyeOff, Search, X } from 'lucide-react';
-import React, { ChangeEvent, FocusEvent, forwardRef, KeyboardEvent, useState } from 'react'
+"use client";
+import { Eye, EyeOff, X } from 'lucide-react';
+import React, { ChangeEvent, FocusEvent, forwardRef, KeyboardEvent, useEffect, useState } from 'react'
 
 export interface InputProps {
   id?: string;
@@ -21,14 +22,15 @@ export interface InputProps {
   validate?: (value: string) => string | null;
   className?: string;
   maxLength?: number;
-  variant?: "default" | "search";
+  variant?: "default" | "bare";
   onEnter?: (e: KeyboardEvent<HTMLInputElement>) => void;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: FocusEvent<HTMLInputElement>) => void;
+  onFocus?: (e: FocusEvent<HTMLInputElement>) => void;
 }
 
 const baseInputClasses =
-  "block w-full rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-1 transition";
+  "block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-200 transition";
 
 export const Input: React.FC<InputProps> = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const {
@@ -38,6 +40,7 @@ export const Input: React.FC<InputProps> = forwardRef<HTMLInputElement, InputPro
     value,
     onChange,
     onBlur,
+    onFocus,
     placeholder,
     type = "text",
     required = false,
@@ -63,14 +66,11 @@ export const Input: React.FC<InputProps> = forwardRef<HTMLInputElement, InputPro
   const [localError, setLocalError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (isControlled) setInternalValue(value ?? "");
-  }, [value]);
-
+  }, [value, isControlled]);
 
   const currentError = externalError ?? localError;
-
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
@@ -79,24 +79,25 @@ export const Input: React.FC<InputProps> = forwardRef<HTMLInputElement, InputPro
     if (validate) setLocalError(validate(v));
   };
 
-
   const handleClear = () => {
     if (!isControlled) setInternalValue("");
     onChange?.({ target: { value: "" } } as ChangeEvent<HTMLInputElement>);
     if (validate) setLocalError(validate(""));
   };
 
-
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") onEnter?.(e);
   };
 
-
   const _type = type === "password" && showPassword ? "text" : type;
 
+  const classes =
+    variant === "bare"
+      ? "block w-full bg-transparent border-none focus:ring-0 focus-visible:ring-0 focus:outline-none focus-visible:outline-none text-white"
+      : baseInputClasses;
 
   return (
-    <div className={`w-full ${className}`}>
+    <div className={`w-full`}>
       {label && (
         <label htmlFor={id} className="mb-1 block text-sm font-medium text-slate-700">
           {label} {required && <span className="text-red-500">*</span>}
@@ -107,7 +108,6 @@ export const Input: React.FC<InputProps> = forwardRef<HTMLInputElement, InputPro
       <div className="relative flex items-center gap-2">
         {prefix && <div className="flex items-center pl-1 pr-2 text-sm">{prefix}</div>}
 
-
         <div className="relative flex-1">
           <input
             {...rest}
@@ -117,6 +117,7 @@ export const Input: React.FC<InputProps> = forwardRef<HTMLInputElement, InputPro
             value={isControlled ? value : internalValue}
             onChange={handleChange}
             onBlur={onBlur}
+            onFocus={onFocus}
             placeholder={placeholder}
             type={_type}
             required={required}
@@ -126,17 +127,13 @@ export const Input: React.FC<InputProps> = forwardRef<HTMLInputElement, InputPro
             onKeyDown={handleKeyDown}
             aria-invalid={!!currentError}
             aria-describedby={currentError ? `${id}-error` : helper ? `${id}-helper` : undefined}
-            className={`${baseInputClasses} ${currentError
-              ? "border-red-300 focus:ring-red-200"
-              : "border-slate-200 focus:ring-sky-200"
-              } ${disabled ? "opacity-50 cursor-not-allowed" : ""} pl-9 pr-10`}
+            className={`
+              ${classes}
+              ${currentError && "border-red-300 focus:ring-red-200"}
+              ${disabled ? "opacity-50 cursor-not-allowed" : ""}
+              ${className}
+            `}
           />
-
-
-          {variant === "search" && (
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 cursor-pointer" />
-          )}
-
 
           <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
             {icon && <span className="mr-1">{icon}</span>}
@@ -160,6 +157,7 @@ export const Input: React.FC<InputProps> = forwardRef<HTMLInputElement, InputPro
                 aria-label={showPassword ? "Hide password" : "Show password"}
                 onClick={() => setShowPassword((s) => !s)}
                 className="p-1 rounded hover:bg-slate-100"
+                tabIndex={-1}
               >
                 {showPassword ? (
                   <EyeOff className="w-4 h-4 text-slate-500 cursor-pointer" />

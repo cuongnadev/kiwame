@@ -1,8 +1,9 @@
-'use client'
-import { VideoPreviewCard } from "@/app/components/common/VideoPreviewCard/VideoPreviewCard";
-export default function Home() {
+import React from 'react'
+import { VideoPreviewCard } from '../components/common/VideoPreviewCard/VideoPreviewCard'
+
+export default function GuestHome() {
   return (
-    <div className="w-full grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6 p-6 bg-black">
+    <>
       <VideoPreviewCard videoId="vXoXmV7CEyI" title="Lạc Vào Khu Rừng Hoa - Nắng Ấm Trong Tim - NHẠC REMIX TIKTOK TRIỆU VIEW, Top 20 Nhạc TikTok Hay 2025" channel="BD Media Music" duration="49:30" publishedAt="2 ngày trước" views="103 N lượt xem" thumbnailUrl="https://i.ytimg.com/vi/a4K_P5uqlrE/hqdefault.jpg?sqp=-oaymwEnCPYBEIoBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLBtzaNewlRj0DsH72O2oTZYPTykPg" previewUrl="https://media.istockphoto.com/id/1160913968/vi/video/m%E1%BB%99t-%C4%91%C3%A1m-%C4%91%C3%B4ng-ng%C6%B0%E1%BB%9Di-bi%E1%BB%83u-t%C3%ACnh-%C4%91ang-k%C3%ADch-%C4%91%E1%BB%99ng-%C4%91%C3%ACnh-c%C3%B4ng-ch%E1%BB%91ng-l%E1%BA%A1i-ch%C3%ADnh-ph%E1%BB%A7.mp4?s=mp4-640x640-is&k=20&c=-PN1_NfN4lzDuj2wiK3WPobdmmayO1zf_4AcZH8VuUU=" />
       <VideoPreviewCard videoId="vXoXmV7CEyI" title="ALL IN ONE | Học Sinh Mạnh Nhất Trường Học Ma Pháp | Review Anime Ha" channel="Bo Kin Backup" duration="49:30" publishedAt="3 tháng trước" views="552 N lượt xem" thumbnailUrl="https://i.ytimg.com/vi/vXoXmV7CEyI/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLBcyMR909QKOiCt9P0IOMeDnXIJUQ" previewUrl="https://cdn.pixabay.com/video/2016/10/21/6047-188286517_large.mp4" />
       <VideoPreviewCard videoId="vXoXmV7CEyI" title="PUBG PC I AL_Himass #79 I Game đấu bùng nổ của Himass" channel="Pro Player VN" duration="49:30" publishedAt="1 tháng trước" views="31 N lượt xem" thumbnailUrl="https://i.ytimg.com/vi/r-GR_5DMIqU/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLD8joMnBaMhdQbfWH0KNs19CTYf3A" previewUrl="https://cdn.pixabay.com/video/2020/12/30/60721-499068724_large.mp4" isLive={true} />
@@ -12,6 +13,6 @@ export default function Home() {
       <VideoPreviewCard videoId="vXoXmV7CEyI" title="Lạc Vào Khu Rừng Hoa - Nắng Ấm Trong Tim - NHẠC REMIX TIKTOK TRIỆU VIEW, Top 20 Nhạc TikTok Hay 2025" channel="BD Media Music" duration="49:30" publishedAt="2 ngày trước" views="103 N lượt xem" thumbnailUrl="https://i.ytimg.com/vi/a4K_P5uqlrE/hqdefault.jpg?sqp=-oaymwEnCPYBEIoBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLBtzaNewlRj0DsH72O2oTZYPTykPg" previewUrl="https://media.istockphoto.com/id/1160913968/vi/video/m%E1%BB%99t-%C4%91%C3%A1m-%C4%91%C3%B4ng-ng%C6%B0%E1%BB%9Di-bi%E1%BB%83u-t%C3%ACnh-%C4%91ang-k%C3%ADch-%C4%91%E1%BB%99ng-%C4%91%C3%ACnh-c%C3%B4ng-ch%E1%BB%91ng-l%E1%BA%A1i-ch%C3%ADnh-ph%E1%BB%A7.mp4?s=mp4-640x640-is&k=20&c=-PN1_NfN4lzDuj2wiK3WPobdmmayO1zf_4AcZH8VuUU=" />
       <VideoPreviewCard videoId="vXoXmV7CEyI" title="ALL IN ONE | Học Sinh Mạnh Nhất Trường Học Ma Pháp | Review Anime Ha" channel="Bo Kin Backup" duration="49:30" publishedAt="3 tháng trước" views="552 N lượt xem" thumbnailUrl="https://i.ytimg.com/vi/vXoXmV7CEyI/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLBcyMR909QKOiCt9P0IOMeDnXIJUQ" previewUrl="https://cdn.pixabay.com/video/2016/10/21/6047-188286517_large.mp4" />
       <VideoPreviewCard videoId="vXoXmV7CEyI" title="PUBG PC I AL_Himass #79 I Game đấu bùng nổ của Himass" channel="Pro Player VN" duration="49:30" publishedAt="1 tháng trước" views="31 N lượt xem" thumbnailUrl="https://i.ytimg.com/vi/r-GR_5DMIqU/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLD8joMnBaMhdQbfWH0KNs19CTYf3A" previewUrl="https://cdn.pixabay.com/video/2020/12/30/60721-499068724_large.mp4" isLive={true} />
-    </div>
-  );
+    </>
+  )
 }

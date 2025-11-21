@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { kiwameConfig } from "@/utils/kiwameConfig";
+import { kiwameConfig } from "@/config/kiwame.config";
 
 // Use this client for calls that originate from the server in the context of a user session.
 // See createSupabaseWorkerClient() for a headless client that does not carry user-session context.

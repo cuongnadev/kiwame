@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { kiwameConfig } from "@/utils/kiwameConfig";
+import { kiwameConfig } from "@/config/kiwame.config";
 
 // Use this client for calls that originate from the server OUTSIDE the context of a user session.
 // See createSupabaseServerClient() for a server-side client that that executes user-originated operations.
