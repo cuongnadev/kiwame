@@ -1,3 +1,4 @@
+"use client"
 import { Bookmark, Dot, EllipsisVertical, Play } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -31,7 +32,7 @@ export const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({
   thumbnailUrl,
   previewUrl,
   isLive = false,
-  avatar = '/apple-touch-icon.png'
+  avatar = '/apple-icon.png'
 }: VideoPreviewCardProps) => {
   const [hovered, setHovered] = useState(false);
   const hoverTimeout = useRef<NodeJS.Timeout>(null)

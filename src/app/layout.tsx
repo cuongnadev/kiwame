@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins, Inter  } from "next/font/google";
 import "./globals.css";
-import Layout from "./components/ui/layout/Layout";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -22,10 +21,10 @@ export const metadata: Metadata = {
   description: "Watch and follow livestreams, and discover videos tailored to your interests.",
     icons: {
     icon: "/favicon-32x32.png",
-    apple: "/apple-touch-icon.png",
+    apple: "/apple-icon.png",
     shortcut: "/favicon-16x16.png",
   },
-  manifest: "/site.webmanifest",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -38,9 +37,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${poppins.variable} antialiased`}
       >
-        <Layout>
-          {children}
-        </Layout>
+        {children}
       </body>
     </html>
   );
