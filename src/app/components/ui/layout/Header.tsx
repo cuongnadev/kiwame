@@ -1,22 +1,24 @@
 import {
-  Menu, Bell, CircleUserRound, Plus, ChevronRight,
+  Menu, Bell, CircleUserRound, Plus,
 } from "lucide-react"
-import { Button } from "../button/Button"
 import Link from "next/link"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { Button } from "@/app/components/ui/button/Button"
 import logo from "@/assets/images/logo.png"
 import logoText from "@/assets/images/logo_text.png"
-import { Popup } from "../popup/Popup"
-import { menuItems, miscMenuItems, nestedMenuItems } from "@/constants/menu.constants"
-import { Search } from "../search/Search"
-import { useRouter } from "next/navigation"
+import { Popup } from "@/app/components/ui/popup/Popup"
+import { Search } from "@/app/components/ui/search/Search"
+import { menuItems, studioItems } from "@/constants/menu.constants"
+import { UserMenu } from "./UserMenu"
+import { User } from "@supabase/supabase-js"
 
 interface HeaderProps {
   onMenuClick: () => void,
-  isLogin?: boolean,
+  user: User | null,
 }
 
-export default function Header({ onMenuClick, isLogin }: HeaderProps) {
+export default function Header({ onMenuClick, user }: HeaderProps) {
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -70,14 +72,36 @@ export default function Header({ onMenuClick, isLogin }: HeaderProps) {
         <Search />
         {/* Right */}
         <div className="flex items-center gap-2">
-          <Button
-            icon={<Plus size={20} />}
-            variant="dark"
-            onClick={() => { }}
-            radius="full"
-            text="Tạo"
-            className="py-2.5!"
-          />
+          <Popup
+            trigger={
+              <Button
+                icon={<Plus size={20} />}
+                variant="dark"
+                onClick={() => { }}
+                radius="full"
+                text="Tạo"
+                className="py-2.5!"
+              />
+            }
+            position="bottom"
+            className="min-w-44!"
+          >
+            <div className="p-2 text-white space-y-1">
+              {/* Section 1 */}
+              {studioItems.map((item, i) => (
+                <Link
+                  key={i}
+                  href={item.href}
+                  className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg cursor-pointer"
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </Link>
+              ))}
+            </div>
+          </Popup>
+
+          {/* notifications */}
           <Button
             icon={<Bell size={20} />}
             variant="ghost"
@@ -85,7 +109,9 @@ export default function Header({ onMenuClick, isLogin }: HeaderProps) {
             radius="full"
             className="p-3!"
           />
-          {isLogin &&
+
+          {/* user menu */}
+          {user &&
             <Popup
               trigger={
                 <Button
@@ -96,92 +122,16 @@ export default function Header({ onMenuClick, isLogin }: HeaderProps) {
                   className="p-3!"
                 />
               }
-              position="menu-left"
+              position="bottom-left"
             >
-              <div className="p-2 text-white space-y-1 w-60">
-
-                {/* Info */}
-                <div className="px-3 py-2 border-b border-white/10">
-                  <p className="font-semibold">Tên người dùng</p>
-                  <p className="text-sm text-gray-400">email@gmail.com</p>
-                </div>
-
-                {/* Section 1 */}
-                {menuItems.map((item, i) => {
-                  if (item.label === "Đăng xuất") {
-                    return (
-                      <div
-                        key={i}
-                        onClick={handleLogout}
-                        className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg"
-                      >
-                        {item.icon}
-                        <span>{item.label}</span>
-                      </div>
-                    )
-                  } else {
-                    return (
-                      <Link
-                        key={i}
-                        href={item.href}
-                        className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg"
-                      >
-                        {item.icon}
-                        <span>{item.label}</span>
-                      </Link>
-                    )
-                  }
-                })}
-
-                {/* Section 2 (nested popup items) */}
-                {nestedMenuItems.map((item, i) => (
-                  <Popup
-                    key={i}
-                    position="left"
-                    trigger={
-                      <div className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg cursor-pointer">
-                        {item.icon}
-                        <span>{item.label}</span>
-                        {item.showChevron &&
-                          <ChevronRight size={16} className="ml-auto text-gray-400" />
-                        }
-                      </div>
-                    }
-                  >
-                    <div className="p-2 space-y-1">
-                      {item.children.map((child, idx) => (
-                        <div
-                          key={idx}
-                          className="px-3 py-2 hover:bg-white/10 rounded-md cursor-pointer"
-                        >
-                          {child.label}
-                        </div>
-                      ))}
-                    </div>
-                  </Popup>
-                ))}
-
-                {/* Section 3 */}
-                {miscMenuItems.map((item, i) => (
-                  <Link
-                    key={i}
-                    href={item.href}
-                    className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg"
-                  >
-                    {item.icon}
-                    <span>{item.label}</span>
-                  </Link>
-                ))}
-
-              </div>
-
+              <UserMenu menu={menuItems} onLogout={handleLogout} user={user}/>
             </Popup>
           }
-          {!isLogin &&
+          {!user &&
             <Button
               icon={<CircleUserRound size={20} />}
               variant="dark"
-              onClick={() => { }}
+              onClick={() => router.push('/login')}
               radius="full"
               text="Đăng nhập"
               className="py-2.5!"

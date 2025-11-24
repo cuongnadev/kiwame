@@ -1,3 +1,4 @@
+import { SpeedCycleIcon } from "@/app/components/ui/icons/SpeedCycleIcon";
 import {
   UserRound, LogOut, Video, Database,
   Monitor, Languages, MapPinned,
@@ -9,35 +10,51 @@ import {
   CircleUserRound, Music,
   Gamepad2, Newspaper, Trophy,
   BadgeQuestionMark, MessageCircleReply,
-  Flag
+  Flag,
+  Radio,
+  SquarePen,
+  PanelTopBottomDashed,
+  ChevronRight,
+  SlidersHorizontal
 } from "lucide-react"
+import { ReactNode } from "react";
 
-export const menuItems = [
+export interface MenuChild {
+  label: string;
+  value: string;
+}
+
+export interface MenuItem {
+  icon: ReactNode;
+  label: string;
+  href?: string;
+  showChevron?: boolean;
+  children?: MenuChild[];
+}
+
+export const menuItems: MenuItem[] = [
   {
-    icon: <UserRound size={18} />,
+    icon: <UserRound color="white" size={18} />,
     label: "Chuyển đổi tài khoản",
     href: "/switch-account",
   },
   {
-    icon: <LogOut size={18} />,
+    icon: <LogOut color="white" size={18} />,
     label: "Đăng xuất",
     href: "/logout",
   },
   {
-    icon: <Video size={18} />,
+    icon: <Video color="white" size={18} />,
     label: "Video của bạn",
     href: "/your-videos",
   },
   {
-    icon: <Database size={18} />,
+    icon: <Database color="white" size={18} />,
     label: "Dữ liệu của bạn",
     href: "/your-data",
   },
-]
-
-export const nestedMenuItems = [
   {
-    icon: <Monitor size={18} />,
+    icon: <Monitor color="white" size={18} />,
     label: "Giao diện thiết bị",
     showChevron: true,
     children: [
@@ -47,7 +64,7 @@ export const nestedMenuItems = [
     ]
   },
   {
-    icon: <Languages size={18} />,
+    icon: <Languages color="white" size={18} />,
     label: "Ngôn ngữ",
     showChevron: true,
     children: [
@@ -57,7 +74,7 @@ export const nestedMenuItems = [
     ]
   },
   {
-    icon: <MapPinned size={18} />,
+    icon: <MapPinned color="white" size={18} />,
     label: "Địa điểm",
     showChevron: true,
     children: [
@@ -66,26 +83,23 @@ export const nestedMenuItems = [
       { label: "Hàn Quốc", value: "kr" },
     ]
   },
-]
 
-export const miscMenuItems = [
   {
-    icon: <Settings size={18} />,
+    icon: <Settings color="white" size={18} />,
     label: "Cài đặt",
     href: "/settings",
   },
   {
-    icon: <HelpCircle size={18} />,
+    icon: <HelpCircle color="white" size={18} />,
     label: "Trợ giúp",
     href: "/help",
   },
   {
-    icon: <MessageSquareMore size={18} />,
+    icon: <MessageSquareMore color="white" size={18} />,
     label: "Gửi ý kiến phản hồi",
     href: "/feedback",
   },
 ]
-
 
 export const mainMenuItems = [
   { icon: Home, label: 'Trang chủ', href: '/' },
@@ -119,4 +133,31 @@ export const systemMenuItems = [
   { icon: BadgeQuestionMark, label: 'Trợ giúp', href: '/help' },
   { icon: MessageCircleReply, label: 'Gửi phản hồi', href: '/feedback' },
   { icon: Flag, label: 'Nhật ký báo cáo', href: '/report-history' },
+]
+
+export const studioItems = [
+  { icon: <SquarePlay width={20} height={20} />, label: 'Tải video lên', href: '/studio/upload' },
+  { icon: <Radio width={20} height={20} />, label: 'Phát trực tiếp', href: '/studio/live' },
+  { icon: <SquarePen width={20} height={20} />, label: 'Tạo bài đăng', href: '/studio/post' },
+]
+
+export const videoSettingsItems = [
+  {
+    icon_1: <PanelTopBottomDashed color="white" className='w-5 h-5  my-[-16px] ' />,
+    label_1: 'Phụ đề',
+    icons_2: <ChevronRight color="white" className='w-5 h-5  my-[-16px] ' />,
+    label_2: 'Tiếng Việt'
+  },
+  {
+    icon_1: <SpeedCycleIcon className='w-5 h-5 text-white my-[-16px]' />,
+    label_1: 'Tốc độ phát',
+    icons_2: <ChevronRight color="white" className='w-5 h-5  my-[-16px] ' />,
+    label_2: 'Chuẩn'
+  },
+  {
+    icon_1: <SlidersHorizontal color="white" className='w-5 h-5  my-[-16px] ' />,
+    label_1: 'Chất lượng',
+    icons_2: <ChevronRight color="white" className='w-5 h-5  my-[-16px] ' />,
+    label_2: 'Tự động'
+  },
 ]
