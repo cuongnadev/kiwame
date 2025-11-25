@@ -4,10 +4,10 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react'
 import { LiveIcon } from '@/app/components/ui/icons/LiveIcon';
-import { Button } from '../../ui/button/Button';
-import { Popup } from '../../ui/popup/Popup';
-import { ShareIcon } from '../../ui/icons/ShareIcon';
-import { VideoPlayer } from '../videoPlayer/VideoPlayer';
+import { Button } from '@/app/components/ui/button/Button';
+import { Popup } from '@/app/components/ui/popup/Popup';
+import { ShareIcon } from '@/app/components/ui/icons/ShareIcon';
+import { VideoPlayer } from '@/app/components/common/videoPlayer/VideoPlayer';
 
 interface VideoPreviewCardProps {
   videoId: string;
@@ -36,10 +36,10 @@ export const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({
 }: VideoPreviewCardProps) => {
   const [hovered, setHovered] = useState(false);
   const hoverTimeout = useRef<NodeJS.Timeout>(null)
-  // const router = useRouter();
+  const router = useRouter();
 
   const handleClick = () => {
-    // router.push(`/watch/${videoId}`);
+    router.push(`/watch/${videoId}`);
   }
 
   const handleMouseEnter = () => {
@@ -120,10 +120,10 @@ export const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({
 
           position='right'
         >
-          <div className='flex items-center py-2 px-4 gap-2 hover:bg-white/10'>
+          <div className='flex items-center py-2 px-4 gap-2 hover:bg-white/10 text-white'>
             <Bookmark className='w-5 h-5  my-[-16px]' /> Lưu vào danh sách phát
           </div>
-          <div className='flex items-center py-2 px-4 gap-2 hover:bg-white/10'>
+          <div className='flex items-center py-2 px-4 gap-2 hover:bg-white/10 text-white'>
             <ShareIcon className='w-5 h-5 fill-white my-[-16px]' /> Chia sẻ
           </div>
         </Popup>

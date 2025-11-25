@@ -6,9 +6,14 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'i.ytimg.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatar.iran.liara.run',
+        pathname: '/**',
       }
-    ]
-  }
+    ],
+  },
 };
 
 export default nextConfig;

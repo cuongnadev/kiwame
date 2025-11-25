@@ -1,9 +1,9 @@
 'use client';
 import React, { useRef, useState } from 'react';
-import { Play, Volume2, VolumeX, Maximize2, Minimize2, Pause, Settings, ChevronLeft, ChevronRight, ChevronLast, ChevronFirst, ClosedCaption, PanelTopBottomDashed, SlidersHorizontal, Rewind } from 'lucide-react';
-import { Button } from '../../ui/button/Button';
-import { Popup } from '../../ui/popup/Popup';
-import { SpeedCycleIcon } from '../../ui/icons/SpeedCycleIcon';
+import { Play, Volume2, VolumeX, Maximize2, Minimize2, Pause, Settings, ClosedCaption, Rewind } from 'lucide-react';
+import { Button } from '@/app/components/ui/button/Button';
+import { Popup } from '@/app/components/ui/popup/Popup';
+import { videoSettingsItems } from '@/constants/menu.constants';
 
 interface VideoPlayerProps {
   videoUrl: string;
@@ -18,7 +18,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -63,7 +63,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         className="w-full h-full object-cover"
         onClick={togglePlay}
         onTimeUpdate={handleTimeUpdate}
-        muted={preview || muted}
+        muted={muted}
         playsInline
         autoPlay={preview}
       />
@@ -117,34 +117,18 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               }
               position='top'
             >
-              <div className='flex items-center justify-between py-2 px-4 gap-2 hover:bg-white/10'>
-                <div className='flex items-center gap-1'>
-                  <PanelTopBottomDashed className='w-5 h-5  my-[-16px]' />
-                  <p className='leading-[18px]'>Phụ đề</p>
+              {videoSettingsItems.map((item, index) => (
+                <div key={index} className='flex items-center justify-between py-2 px-4 gap-2 hover:bg-white/10'>
+                  <div className='flex items-center gap-1'>
+                    {item.icon_1}
+                    <p className='leading-[18px] text-white'>{item.label_1}</p>
+                  </div>
+                  <div className='flex items-center gap-1'>
+                    <p className='leading-[18px] text-white'>{item.label_2}</p>
+                    {item.icons_2}
+                  </div>
                 </div>
-                <div className='flex items-center gap-1'>
-                  <p className='leading-[18px]'>Tiếng Việt</p>
-                  <ChevronRight className='w-5 h-5  my-[-16px]' />
-                </div>
-              </div>
-              <div className='flex items-center justify-between py-2 px-4 gap-2 hover:bg-white/10'>
-                <div className='flex items-center gap-1'>
-                  <SpeedCycleIcon className='w-5 h-5 fill-white my-[-16px]' />
-                  <p className='leading-[18px]'>Tốc độ phát</p>
-                </div>
-                <div className='flex items-center gap-1'>
-                  <p className='leading-[18px]'>Chuẩn</p>
-                  <ChevronRight className='w-5 h-5  my-[-16px]' />
-                </div>
-              </div>
-              <div className='flex items-center justify-between py-2 px-4 gap-2 hover:bg-white/10'>
-                <div className='flex items-center gap-1'>
-                  <SlidersHorizontal className='w-5 h-5 fill-white my-[-16px]' /> Chất lượng
-                </div>
-                <div className='flex items-center gap-1'>
-                  Tự động <ChevronRight className='w-5 h-5  my-[-16px]' />
-                </div>
-              </div>
+              ))}
             </Popup>
             <Button
               variant='ghost'
