@@ -1,9 +1,9 @@
 'use client'
-import { use, useEffect, useState } from "react"
-import Header from "@/app/(main)/layout/Header"
-import Sidebar from "@/app/(main)/layout/Sidebar"
-import { createSupabaseBrowserClient } from "@/lib/supabase/client"
-import { User } from "@supabase/supabase-js"
+import React, { use, useEffect, useState } from 'react'
+import { User } from '@supabase/supabase-js'
+import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+import Header from '@/app/(main)/layout/Header'
+import SidebarLiveStreaming from '@/app/studio/channel/layout/SidebarLiveStreaming'
 
 export default function Layout({ children, params }: { children: React.ReactNode, params: Promise<{ channel: string }> }) {
   const channel = decodeURIComponent(use(params).channel);
@@ -28,12 +28,11 @@ export default function Layout({ children, params }: { children: React.ReactNode
   }, [])
 
   const toggleSidebar = () => setSidebarExpanded(!sidebarExpanded)
-
   return (
     <div className="flex flex-col h-screen bg-[#0f0f0f]">
-      <Header onMenuClick={toggleSidebar} user={user} channel={channel}/>
+      <Header onMenuClick={toggleSidebar} user={user} isStudio={true} channel={channel} className="shadow-md shadow-black/40" isLive={false}/>
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar expanded={sidebarExpanded} user={user} />
+        <SidebarLiveStreaming expanded={sidebarExpanded} user={user} channel={channel} />
 
         <main className="w-full grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 px-6 py-4 bg-[#0f0f0f] overflow-y-auto overflow-x-hidden scrollbar-main">
           {children}

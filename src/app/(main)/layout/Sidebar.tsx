@@ -6,12 +6,15 @@ import {
   ChevronRight
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 interface SidebarProps {
   expanded?: boolean;
   user: User | null;
 }
 
 export default function Sidebar({ expanded, user }: SidebarProps) {
+  const pathname = usePathname();
+
   return (
     <aside className={`flex flex-col bg-[#0f0f0f] transition-all duration-300 ease-in-out ${expanded ? 'w-64' : 'w-20'} group/sidebar`}>
       {/* Main menu */}
@@ -21,7 +24,7 @@ export default function Sidebar({ expanded, user }: SidebarProps) {
             <Link
               key={item.label}
               href={item.href}
-              className={`flex items-center ${!expanded && "justify-center"} gap-4 rounded-lg px-3 ${!expanded ? "py-4" : "py-2"} text-[#f1f1f1] hover:bg-[#222] transition-colors group relative`}
+              className={`flex items-center ${!expanded && "justify-center"} gap-4 rounded-lg px-3 ${!expanded ? "py-4" : "py-2"} text-[#f1f1f1] hover:bg-[#222] ${(pathname === item.href) && 'bg-[#222]'} transition-colors group relative`}
               title={expanded ? '' : item.label}
             >
               <div className="relative flex flex-col items-center">
@@ -45,7 +48,7 @@ export default function Sidebar({ expanded, user }: SidebarProps) {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="flex items-center justify-between rounded-lg px-3 py-2 text-[#f1f1f1] hover:bg-[#222] transition-colors"
+                  className={`flex items-center justify-between rounded-lg px-3 py-2 text-[#f1f1f1] hover:bg-[#222] ${(pathname === item.href) && 'bg-[#222]'} transition-colors`}
                   title={item.label}
                 >
                   <div className="flex items-center gap-4">
@@ -70,7 +73,7 @@ export default function Sidebar({ expanded, user }: SidebarProps) {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="flex items-center justify-between rounded-lg px-3 py-2 text-[#f1f1f1] hover:bg-[#222] transition-colors"
+                  className={`flex items-center justify-between rounded-lg px-3 py-2 text-[#f1f1f1] hover:bg-[#222] ${(pathname === item.href) && 'bg-[#222]'} transition-colors`}
                   title={item.label}
                 >
                   <div className="flex items-center gap-4">
@@ -129,8 +132,6 @@ export default function Sidebar({ expanded, user }: SidebarProps) {
           </>
         }
       </nav>
-
-
     </aside>
   )
 }
