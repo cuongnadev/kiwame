@@ -5,10 +5,15 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '*',
+        hostname: 'i.ytimg.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatar.iran.liara.run',
+        pathname: '/**',
       }
-    ]
-  }
+    ],
+  },
 };
 
 export default nextConfig;

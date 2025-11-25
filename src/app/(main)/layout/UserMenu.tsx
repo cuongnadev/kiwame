@@ -9,9 +9,12 @@ export interface UserMenuProps {
   menu: MenuItem[];
   onLogout: () => void;
   user: User | null;
+  channel?: string;
+  isStudio?: boolean;
+  onToGoChannel?: () => void;
 }
 
-export function UserMenu({ menu, onLogout, user }: UserMenuProps) {
+export function UserMenu({ menu, onLogout, user , channel, isStudio = false, onToGoChannel }: UserMenuProps) {
   const [currentMenu, setCurrentMenu] = useState<MenuItem[] | MenuChild[]>(menu);
   const [history, setHistory] = useState<(MenuItem[] | MenuChild[])[]>([]);
 
@@ -47,7 +50,8 @@ export function UserMenu({ menu, onLogout, user }: UserMenuProps) {
       ) : (
         <div className='p-2 border-b border-white/10'>
           <p className="font-semibold">Tên người dùng</p>
-          <p className="text-sm text-gray-400">{user?.email}</p>
+          <p className="text-sm text-gray-400">{isStudio ? channel :user?.email}</p>
+          <span className='text-sm font-medium text-blue-400 cursor-pointer' onClick={onToGoChannel}>Xem kênh của bạn</span>
         </div>
       )}
 
@@ -82,16 +86,16 @@ export function UserMenu({ menu, onLogout, user }: UserMenuProps) {
             );
           }
 
-          return (
-            <Link
-              key={index}
-              href={item.href ?? '#'}
-              className='flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg cursor-pointer'
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </Link>
-          );
+            return (
+              <Link
+                key={index}
+                href={item.href ?? '#'}
+                className='flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg cursor-pointer'
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </Link>
+            );
         }
 
         return (
