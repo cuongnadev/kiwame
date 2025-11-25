@@ -22,7 +22,7 @@ export default function Sidebar({ expanded, user }: SidebarProps) {
               key={item.label}
               href={item.href}
               className={`flex items-center ${!expanded && "justify-center"} gap-4 rounded-lg px-3 ${!expanded ? "py-4" : "py-2"} text-[#f1f1f1] hover:bg-[#222] transition-colors group relative`}
-              title={expanded ? '' : item.label}
+              title={item.label}
             >
               <div className="relative flex flex-col items-center">
                 <item.icon size={24} className="flex-shrink-0" />
