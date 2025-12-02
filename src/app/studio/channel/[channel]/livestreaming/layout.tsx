@@ -34,7 +34,7 @@ export default function Layout({ children, params }: { children: React.ReactNode
       <div className="flex flex-1 overflow-hidden">
         <SidebarLiveStreaming expanded={sidebarExpanded} user={user} channel={channel} />
 
-        <main className="w-full grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 px-6 py-4 bg-[#0f0f0f] overflow-y-auto overflow-x-hidden scrollbar-main">
+        <main className="w-full grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 bg-[#0f0f0f] overflow-y-auto overflow-x-hidden scrollbar-main">
           {children}
         </main>
       </div>

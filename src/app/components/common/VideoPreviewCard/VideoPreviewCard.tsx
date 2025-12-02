@@ -14,7 +14,7 @@ interface VideoPreviewCardProps {
   title: string;
   channel: string;
   views: string;
-  publishedAt: string;
+  publishedAt?: string;
   duration?: string;
   thumbnailUrl?: string;
   previewUrl?: string;
@@ -65,7 +65,7 @@ export const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({
         {hovered && previewUrl ? (
           <VideoPlayer
             videoUrl={previewUrl}
-            preview={false}
+            preview={true}
           />
         ) : (
           <Image
@@ -103,8 +103,12 @@ export const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({
           <p>{channel}</p>
           <div className='flex items-center'>
             <p>{views}</p>
-            <Dot/>
-            <p>{publishedAt}</p>
+            {publishedAt && (
+              <>
+                <Dot />
+                <p>{publishedAt}</p>
+              </>
+            )}
           </div>
         </div>
 

@@ -1,0 +1,25 @@
+services:
+  srs-origin:
+    image: ossrs/srs:6
+    container_name: srs_origin
+    ports:
+      - "1935:1935"       # RTMP
+      - "1985:1985"       # API webhook
+      - "8080:8080"       # HLS / HTTP
+      - "8000:8000/udp"   # WebRTC
+    volumes:
+      - ./conf/srs_origin.conf:/usr/local/srs/conf/srs.conf
+    restart: unless-stopped
+
+  srs-edge:
+    image: ossrs/srs:6
+    container_name: srs_edge
+    depends_on:
+      - srs-origin
+    ports:
+      - "1936:1935"
+      - "8081:8080"
+      - "8001:8000/udp"
+    volumes:
+      - ./conf/srs_edge.conf:/usr/local/srs/conf/srs.conf
+    restart: unless-stopped
