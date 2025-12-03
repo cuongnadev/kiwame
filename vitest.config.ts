@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference types="vitest/config" />
 import { defineConfig } from "vitest/config";
 import * as path from "node:path";

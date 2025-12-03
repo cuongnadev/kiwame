@@ -1,4 +1,3 @@
-import { Button } from "@/app/components/ui/button/Button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -43,7 +42,7 @@ export default function NavigationTabs({ activeTab, setActiveTab, type, channel 
                             setActiveTab(activeTab = tab.id)
                         }}
                         href={`/${channel}/${tab.id === 'home' ? '' : tab.id}`}
-                        className={`text-white hover:border-b-2 hover:border-white/90 px-0 py-3 font-semibold 
+                        className={`text-white hover:border-b-2 hover:border-white/90 px-0 py-3 font-semibold
                         ${activeTab === tab.id ? 'border-b-2 border-white text-white' : 'opacity-80'}`}
                         title={tab.label}
                     >
@@ -55,7 +54,7 @@ export default function NavigationTabs({ activeTab, setActiveTab, type, channel 
                         role="button"
                         tabIndex={0}
                         onClick={() => handlePostTabClick(tab.id)}
-                        className={`text-white hover:border-b-2 hover:border-white/90 px-0 py-3 font-semibold cursor-pointer 
+                        className={`text-white hover:border-b-2 hover:border-white/90 px-0 py-3 font-semibold cursor-pointer
                         ${activeTab === tab.id ? 'border-b-2 border-white text-white' : 'opacity-80'}`}
                         title={tab.label}
                     >

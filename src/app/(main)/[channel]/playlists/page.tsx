@@ -1,9 +1,8 @@
 'use client';
-import { Button } from "@/app/components/ui/button/Button";
 import { useEffect, useState } from "react";
 
 export default function PlayListsPage(){
-    const [videoList, setVideoList] = useState([]); 
+    const [videoList, setVideoList] = useState([]);
         useEffect(() => {
             // setVideoList
         }, []);
