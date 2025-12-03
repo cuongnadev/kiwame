@@ -1,16 +1,18 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { Copy, Check, Radio, Flag, EyeOff, Eye, Info, SquarePen, Save } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Flag, EyeOff, Eye, Info, SquarePen, Save } from "lucide-react";
 import { Button } from "../ui/button/Button";
 import { Input } from "../ui/input/Input";
 import { Select } from "../ui/input/Select";
 import { Textarea } from "../ui/input/Textarea";
 import { kiwameConfig } from "@/config/kiwame.config";
+import CopyButton from "./CopyButton";
+import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
+import { VideoView } from "./VideoView";
 import { startStream } from "@/services/stream.service";
+import { Stream } from "@/types/stream";
 
 export default function StreamPlayer() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [key, setKey] = useState("");
   const [error, setError] = useState("");
 
   const [viewCount] = useState(10);
@@ -21,36 +23,39 @@ export default function StreamPlayer() {
   const [privacy, setPrivacy] = useState("Công khai");
   const [description, setDescription] = useState("Chúc các bạn xem stream vui vẻ.");
   const [delay, setDelay] = useState("Thấp");
-  const [copied, setCopied] = useState(false);
   const [visible, setVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const copy = async (text: string) => {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const [currentStream, setCurrentStream] = useState<Stream | null>(null)
+  const [token, setToken] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    (async () => {
+    const initStream = async () => {
       try {
-        const res = await fetch("/api/live/key");
-        const data = await res.json();
-
-        if (!data.success) throw new Error("Không lấy được key");
-
-        const key = data.key;
-        setKey(key);
-
-        const signaling = kiwameConfig.srsSignaling;
-
-        const result = await startStream(signaling, key, videoRef)
-        if (!result.success) setError(result.error || "Không thể kết nối đến SRS server. Kiểm tra lại biến môi trường.");
+        setLoading(true);
+        const result = await startStream("kiwame_room");
+        setCurrentStream(result);
       } catch (err) {
-        setError((err as Error).message || "Đã xảy ra lỗi khi lấy key hoặc kết nối stream.");
+        const message = err instanceof Error ? err.message : "Lỗi không xác định";
+        setError(message);
+        console.error("Stream init error:", err);
+      } finally {
+        setLoading(false);
       }
-    })();
+    };
+
+    initStream();
   }, []);
+
+  useEffect(() => {
+    if (currentStream?.roomName) {
+      fetch(`/api/live/token?room=${currentStream.roomName}&role=viewer`)
+        .then((res) => res.json())
+        .then((res) => setToken(res.token))
+        .catch(console.error);
+    }
+  }, [currentStream?.roomName]);
 
   if (error) {
     return (
@@ -69,13 +74,31 @@ export default function StreamPlayer() {
         <div className="flex-1 flex flex-col bg-[#181818]">
           <div className="flex items-start relative">
             <div className="flex-1 relative bg-black">
-              <video ref={videoRef} autoPlay playsInline muted className="w-full aspect-video object-contain bg-black" />
-              <div className="absolute top-2.5 left-2.5 flex gap-2 items-center">
+              <div className="flex-1 bg-card border border-border overflow-hidden shadow-lg w-full aspect-video object-contain">
+                <div className="relative w-full aspect-video">
+                  {!currentStream ? (
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-black flex items-center justify-center">
+                      <p className="text-gray-400">Đang tạo phòng live...</p>
+                    </div>
+                  ) : (
+                    <LiveKitRoom
+                      serverUrl={kiwameConfig.nextPublicLivekitURL}
+                      token={token!}
+                      connect={true}
+                      className="absolute inset-0 w-full h-full"
+                    >
+                      <VideoView />
+                      <RoomAudioRenderer volume={0.7} />
+                    </LiveKitRoom>
+                  )}
+                </div>
+              </div>
+              {/* <div className="absolute top-2.5 left-2.5 flex gap-2 items-center">
                 <Button text="LIVE" icon={<Radio size={18} />} size="sm" variant="danger" />
                 <div className="bg-black/70 backdrop-blur px-2.5 py-1.5 rounded text-sm">
                   {viewCount.toLocaleString()} đang xem
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="flex flex-2 p-4 pb-0 items-start justify-between gap-4">
@@ -168,16 +191,10 @@ export default function StreamPlayer() {
 
             <div className="flex flex-col gap-4">
               <div className="bg-[#272727] rounded-lg p-4 space-y-3">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">URL máy chủ (RTMP)</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">URL máy chủ</p>
                 <div className="flex items-center justify-between bg-[#1a1a1a] rounded px-3 py-2">
-                  <code className="text-sm font-mono text-gray-300">{kiwameConfig.srsRtmp}</code>
-                  <Button
-                    icon={copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                    variant="dark"
-                    size="sm"
-                    onClick={() => copy(kiwameConfig.srsRtmp)}
-                    className="p-2.5!"
-                  />
+                  <code className="text-sm font-mono text-gray-300">{currentStream?.whipUrl}</code>
+                  <CopyButton value={currentStream?.whipUrl} />
                 </div>
               </div>
 
@@ -185,7 +202,7 @@ export default function StreamPlayer() {
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Khóa phát trực tiếp</p>
                 <div className="flex items-center justify-between bg-[#1a1a1a] rounded px-3 py-2">
                   <code className="text-sm font-mono text-gray-300">
-                    {visible ? key : "••••••••"}
+                    {visible ? currentStream?.streamKey : "••••••••"}
                   </code>
                   <div className="flex items-center gap-2">
                     <Button
@@ -195,14 +212,16 @@ export default function StreamPlayer() {
                       onClick={() => setVisible(!visible)}
                       className="p-2.5!"
                     />
-                    <Button
-                      icon={copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                      variant="dark"
-                      size="sm"
-                      onClick={() => copy(key)}
-                      className="p-2.5!"
-                    />
+                    <CopyButton value={currentStream?.streamKey} />
                   </div>
+                </div>
+              </div>
+
+              <div className="bg-[#272727] rounded-lg p-4 space-y-3">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Room name</p>
+                <div className="flex items-center justify-between bg-[#1a1a1a] rounded px-3 py-2">
+                  <code className="text-sm font-mono text-gray-300">{currentStream?.roomName}</code>
+                  <CopyButton value={currentStream?.roomName} />
                 </div>
               </div>
             </div>
@@ -280,6 +299,6 @@ export default function StreamPlayer() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

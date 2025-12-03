@@ -6,10 +6,10 @@ export const kiwameConfig = {
 
   // Streaming (SRS)
   streamSecret: process.env.STREAM_SECRET ?? "",
-  srsIp: process.env.NEXT_PUBLIC_SRS_IP ?? "",
-  srsApi: process.env.NEXT_PUBLIC_SRS_API ?? "",
-  srsRtmp: process.env.NEXT_PUBLIC_SRS_RTMP ?? "",
-  srsSignaling: process.env.NEXT_PUBLIC_SRS_SIGNALING ?? "",
-  srsPlayback: process.env.NEXT_PUBLIC_SRS_PLAYBACK ?? "",
-  srsVOD: process.env.NEXT_PUBLIC_SRS_VOD ?? "",
+  
+  nextPublicLivekitURL: process.env.NEXT_PUBLIC_LIVEKIT_URL ?? "",
+
+  livekitURL: process.env.LIVEKIT_URL ?? "",
+  livekitApiKey: process.env.LIVEKIT_API_KEY ?? "",
+  livekitApiSecret: process.env.LIVEKIT_API_SECRET ?? "",
 };

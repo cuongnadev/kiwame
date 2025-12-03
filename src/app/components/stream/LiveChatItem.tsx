@@ -1,3 +1,4 @@
+"use client";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale"; // Thêm locale tiếng Việt
 import { Heart, MessageCircle, Pin, Gift } from "lucide-react";
@@ -102,3 +103,4 @@ export default function LiveChatItem({ comment }: { comment: Comment }) {
     </div>
   );
 }
+

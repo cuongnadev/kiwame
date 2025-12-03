@@ -11,6 +11,8 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@livekit/components-react": "^2.9.16",
+    "@livekit/components-styles": "^1.2.0",
     "@supabase/auth-ui-react": "0.4.7",
     "@supabase/ssr": "0.7.0",
     "@supabase/supabase-js": "2.75.0",
@@ -18,6 +20,8 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
+    "livekit-client": "^2.16.0",
+    "livekit-server-sdk": "^2.14.2",
     "lucide-react": "0.548.0",
     "next": "15.5.5",
     "react": "19.2.0",
