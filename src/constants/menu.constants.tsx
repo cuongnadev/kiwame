@@ -46,7 +46,7 @@ export interface MenuItem {
   children?: MenuChild[];
 }
 
-export const getMenuItems = (channel: string): MenuItem[] => [
+export const getMenuItems = (channel?: string | null): MenuItem[] => [
   {
     icon: <UserRound color="white" size={18} />,
     label: "Chuyển đổi tài khoản",
@@ -60,7 +60,7 @@ export const getMenuItems = (channel: string): MenuItem[] => [
   {
     icon: <Image src={logo} height={18} width={18} alt="Kiwame" />,
     label: "Kiwame Studio",
-    href: `/studio/channel/${channel}`,
+    href: channel ? `/studio/channel/${channel}` : undefined,
   },
   {
     icon: <Database color="white" size={18} />,
@@ -115,11 +115,11 @@ export const getMenuItems = (channel: string): MenuItem[] => [
   },
 ]
 
-export const getMenuItemsWithStudio = (channel: string): MenuItem[] => [
+export const getMenuItemsWithStudio = (channel?: string | null): MenuItem[] => [
   {
     icon: <SquareUser color="white" size={18} />,
     label: "Kênh của bạn",
-    href: `/${channel}`,
+    href: channel ? `/${channel}` : undefined,
   },
   {
     icon: <Image src={logo} height={18} width={18} alt="Kiwame" />,
@@ -153,22 +153,22 @@ export const getMenuItemsWithStudio = (channel: string): MenuItem[] => [
   },
 ]
 
-export const getStudioMenuItems = (channel: string): MenuItem[] => [
-  { icon: <LayoutDashboard color="white" size={24} />, label: 'Tổng quan', href: `/studio/channel/${channel}` },
-  { icon: <YourVideoIcon className="text-white" />, label: 'Nội dung', href: `/studio/channel/${channel}/upload` },
-  { icon: <AnalyticsIcon className="text-white" />, label: 'Số liệu phân tích', href: `/studio/channel/${channel}/analytics` },
-  { icon: <AudienceIcon className="text-white" />, label: 'Cộng đồng', href: `/studio/channel/${channel}/comments` },
-  { icon: <ListBulletIcon className="text-white" />, label: 'Phụ đề', href: `/studio/channel/${channel}/translations` },
-  { icon: <RecordIcon className="text-white" />, label: 'Phát hiện nội dung', href: `/studio/channel/${channel}/copyright` },
-  { icon: <BadgeDollarSign color="white" size={24} />, label: 'Kiếm tiền', href: `/studio/channel/${channel}/monetization` },
-  { icon: <SparkIcon className="text-white" />, label: 'Tùy chỉnh', href: `/studio/channel/${channel}/editing` },
-  { icon: <MusicNoteSquareIcon className="text-white" />, label: 'Thư viện âm thanh', href: `/studio/channel/${channel}/music` },
+export const getStudioMenuItems = (channel?: string | null): MenuItem[] => [
+  { icon: <LayoutDashboard color="white" size={24} />, label: 'Tổng quan', href: channel ? `/studio/channel/${channel}` : undefined },
+  { icon: <YourVideoIcon className="text-white" />, label: 'Nội dung', href: channel ? `/studio/channel/${channel}/upload` : undefined },
+  { icon: <AnalyticsIcon className="text-white" />, label: 'Số liệu phân tích', href: channel ? `/studio/channel/${channel}/analytics` : undefined },
+  { icon: <AudienceIcon className="text-white" />, label: 'Cộng đồng', href: channel ? `/studio/channel/${channel}/comments` : undefined },
+  { icon: <ListBulletIcon className="text-white" />, label: 'Phụ đề', href: channel ? `/studio/channel/${channel}/translations` : undefined },
+  { icon: <RecordIcon className="text-white" />, label: 'Phát hiện nội dung', href: channel ? `/studio/channel/${channel}/copyright` : undefined },
+  { icon: <BadgeDollarSign color="white" size={24} />, label: 'Kiếm tiền', href: channel ? `/studio/channel/${channel}/monetization` : undefined },
+  { icon: <SparkIcon className="text-white" />, label: 'Tùy chỉnh', href: channel ? `/studio/channel/${channel}/editing` : undefined },
+  { icon: <MusicNoteSquareIcon className="text-white" />, label: 'Thư viện âm thanh', href: channel ? `/studio/channel/${channel}/music` : undefined },
 ]
 
-export const getLiveMenuItems = (channel: string): MenuItem[] => [
-  { icon: <Radio width={20} height={20} />, label: 'Phát trực tiếp', href: `/studio/channel/${channel}/livestreaming` },
-  { icon: <Camera width={20} height={20} />, label: 'Webcam', href: `/studio/channel/${channel}/livestreaming/webcam` },
-  { icon: <ManagerIcon className="text-white" />, label: 'Quản lý', href: `/studio/channel/${channel}/livestreaming/management` },
+export const getLiveMenuItems = (channel?: string | null): MenuItem[] => [
+  { icon: <Radio width={20} height={20} />, label: 'Phát trực tiếp', href: channel ? `/studio/channel/${channel}/livestreaming` : undefined },
+  { icon: <Camera width={20} height={20} />, label: 'Webcam', href: channel ? `/studio/channel/${channel}/livestreaming/webcam` : undefined },
+  { icon: <ManagerIcon className="text-white" />, label: 'Quản lý', href: channel ? `/studio/channel/${channel}/livestreaming/management` : undefined },
 ]
 
 export const mainMenuItems = [
@@ -205,10 +205,10 @@ export const systemMenuItems = [
   { icon: Flag, label: 'Nhật ký báo cáo', href: '/report-history' },
 ]
 
-export const getStudioItems = (channel: string): MenuItem[] => [
-  { icon: <SquarePlay width={20} height={20} />, label: 'Tải video lên', href: `/studio/channel/${channel}/upload` },
-  { icon: <Radio width={20} height={20} />, label: 'Phát trực tiếp', href: `/studio/channel/${channel}/livestreaming` },
-  { icon: <SquarePen width={20} height={20} />, label: 'Tạo bài đăng', href: `/${channel}/posts` },
+export const getStudioItems = (channel?: string | null): MenuItem[] => [
+  { icon: <SquarePlay width={20} height={20} />, label: 'Tải video lên', href: channel ? `/studio/channel/${channel}/upload` : undefined },
+  { icon: <Radio width={20} height={20} />, label: 'Phát trực tiếp', href: channel ? `/studio/channel/${channel}/livestreaming` : undefined },
+  { icon: <SquarePen width={20} height={20} />, label: 'Tạo bài đăng', href: channel ? `/${channel}/posts` : undefined },
 ]
 
 export const videoSettingsItems = [

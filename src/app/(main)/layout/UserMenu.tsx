@@ -9,12 +9,13 @@ export interface UserMenuProps {
   menu: MenuItem[];
   onLogout: () => void;
   user: User | null;
-  channel?: string;
+  channel?: string | null;
   isStudio?: boolean;
   onToGoChannel?: () => void;
+  onMenuClick: (item: MenuItem) => void;
 }
 
-export function UserMenu({ menu, onLogout, user , channel, isStudio = false, onToGoChannel }: UserMenuProps) {
+export function UserMenu({ menu, onLogout, user , channel, isStudio = false, onToGoChannel, onMenuClick }: UserMenuProps) {
   const [currentMenu, setCurrentMenu] = useState<MenuItem[] | MenuChild[]>(menu);
   const [history, setHistory] = useState<(MenuItem[] | MenuChild[])[]>([]);
 
@@ -87,14 +88,14 @@ export function UserMenu({ menu, onLogout, user , channel, isStudio = false, onT
           }
 
             return (
-              <Link
+              <div
                 key={index}
-                href={item.href ?? '#'}
+                onClick={() => onMenuClick(item)}
                 className='flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg cursor-pointer'
               >
                 {item.icon}
                 <span>{item.label}</span>
-              </Link>
+              </div>
             );
         }
 

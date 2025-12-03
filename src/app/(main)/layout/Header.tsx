@@ -10,30 +10,43 @@ import logo from "@/assets/images/logo.png"
 import logoText from "@/assets/images/logo_text.png"
 import { Popup } from "@/app/components/ui/popup/Popup"
 import { Search } from "@/app/components/ui/search/Search"
-import { getMenuItems, getMenuItemsWithStudio, getStudioItems } from "@/constants/menu.constants"
+import { getMenuItems, getMenuItemsWithStudio, getStudioItems, MenuItem } from "@/constants/menu.constants"
 import { UserMenu } from "./UserMenu"
 import clsx from "clsx"
+import { useState } from "react"
 
 interface HeaderProps {
   onMenuClick: () => void,
   user: User | null,
   isStudio?: boolean,
-  channel: string,
+  channel?: string | null,
   className?: string,
   isLive?: boolean,
 }
 
 export default function Header({ onMenuClick, user, isStudio = false, channel, className, isLive = true }: HeaderProps) {
   const router = useRouter();
+  const [showCreateChannelModal, setShowCreateChannelModal] = useState<boolean>(false);
   const menuItems = getMenuItems(channel);
   const menuItemsStudio = getMenuItemsWithStudio(channel);
   const studioItems = getStudioItems(channel);
 
+  const handleMenuClick = (item: MenuItem) => {
+    if (!item.href) {
+      setShowCreateChannelModal(true);
+      return;
+    }
+
+    router.push(item.href);
+  }
+
   const handleToGoChannel = () => {
     if (channel) {
       router.push(`/${channel}`);
+    } else {
+      setShowCreateChannelModal(true);
     }
-  }
+  };
 
   const handleLogout = async () => {
     try {
@@ -50,6 +63,10 @@ export default function Header({ onMenuClick, user, isStudio = false, channel, c
       alert('Something went wrong.');
     }
   };
+
+  if (showCreateChannelModal) {
+    alert("Chưa có channel");
+  }
 
   return (
     <header className={clsx(className, `sticky top-0 z-40 w-full bg-[#0f0f0f] px-4.5 py-3 `)}>
@@ -109,14 +126,14 @@ export default function Header({ onMenuClick, user, isStudio = false, channel, c
                 <div className="p-2 text-white space-y-1">
                   {/* Section 1 */}
                   {studioItems.map((item, i) => (
-                    <Link
+                    <div
                       key={i}
-                      href={item.href!}
+                      onClick={() => handleMenuClick(item)}
                       className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg cursor-pointer"
                     >
                       {item.icon}
                       <span>{item.label}</span>
-                    </Link>
+                    </div>
                   ))}
                 </div>
               </Popup>
@@ -145,7 +162,7 @@ export default function Header({ onMenuClick, user, isStudio = false, channel, c
               }
               position="bottom-left"
             >
-              <UserMenu menu={isStudio ? menuItemsStudio : menuItems} onLogout={handleLogout} onToGoChannel={handleToGoChannel} user={user} channel={channel} isStudio={isStudio} />
+              <UserMenu menu={isStudio ? menuItemsStudio : menuItems} onLogout={handleLogout} onToGoChannel={handleToGoChannel} onMenuClick={handleMenuClick} user={user} channel={channel} isStudio={isStudio} />
             </Popup>
           }
           {!user &&

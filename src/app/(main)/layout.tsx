@@ -5,20 +5,30 @@ import Sidebar from "@/app/(main)/layout/Sidebar"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { User } from "@supabase/supabase-js"
 
-export default function Layout({ children, params }: { children: React.ReactNode, params: Promise<{ channel: string }> }) {
-  const channel = decodeURIComponent(use(params).channel);
+export default function Layout({ children }: { children: React.ReactNode }) {
   const [sidebarExpanded, setSidebarExpanded] = useState(true)
   const [user, setUser] = useState<User | null>(null)
+  const [channel, setChannel] = useState<string | null>(null)
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient()
 
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user ?? null)
+    const getUserAndChannel = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user ?? null);
+
+      if (!user) return;
+
+      const { data: channelData } = await supabase
+        .from("channels")
+        .select("name")
+        .eq("owner_id", user.id)
+        .single();
+
+      setChannel(channelData?.name ?? null);
     }
 
-    getUser()
+    getUserAndChannel()
 
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null)
