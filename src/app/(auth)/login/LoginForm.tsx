@@ -6,16 +6,18 @@ import { Button } from "@/app/components/ui/button/Button";
 import { GoogleIcon } from "@/app/components/ui/icons/GoogleIcon";
 import { Input } from "@/app/components/ui/input/Input";
 import { Facebook, LockKeyhole, Mail } from "lucide-react";
+import { useToast } from "@/app/components/ui/toast/ToastContext";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
   const router = useRouter();
 
   const handleLogin = async () => {
-    if (!email || !password) return alert("Please enter email and password");
+    if (!email || !password) return showToast("Please enter both email and password.", 'warning');
 
     setLoading(true);
 
@@ -28,14 +30,15 @@ export default function LoginForm() {
       const data = await res.json();
 
       if (!data.success) {
-        alert(data.error || 'Login failed');
+        showToast(data.error || 'Invalid email or password.', 'error');
         return;
       }
 
+      showToast('Login successful! Redirecting...', 'success');
       router.push('/');
     } catch (err) {
       console.error(err);
-      alert('Something went wrong.');
+      showToast('Unable to connect to the server. Please try again later.', 'error');
     } finally {
       setLoading(false);
     }

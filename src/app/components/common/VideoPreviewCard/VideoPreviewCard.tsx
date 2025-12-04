@@ -97,7 +97,7 @@ export const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({
       </div>
 
       <div className='flex items-start gap-2'>
-        <Image src={avatar} width={400} height={400} alt={avatar} className='w-[40px] h-[40px] rounded-full' />
+        <Image src={avatar} width={400} height={400} alt={avatar} className='w-[40px] h-[40px] rounded-full' priority />
         <div className='flex-1 text-ms text-gray-600'>
           <p className='font-bold line-clamp-2'>{title}</p>
           <p>{channel}</p>

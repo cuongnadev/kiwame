@@ -1,7 +1,7 @@
 "use client"
 
 import { guestMenuItems, mainMenuItems, systemMenuItems, titleMenu, userMenuItems } from "@/constants/menu.constants";
-import { User } from "@supabase/supabase-js";
+import { AppUser } from "@/hooks/useAppUser";
 import {
   ChevronRight
 } from "lucide-react";
@@ -9,7 +9,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 interface SidebarProps {
   expanded?: boolean;
-  user: User | null;
+  user: AppUser | null;
 }
 
 export default function Sidebar({ expanded, user }: SidebarProps) {

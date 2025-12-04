@@ -59,6 +59,7 @@ export default function LiveChatItem({ comment }: { comment: Comment }) {
               width={36}
               height={36}
               className="rounded-full object-cover border border-white/20"
+              priority
             />
           ) : (
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-sm font-bold text-white">

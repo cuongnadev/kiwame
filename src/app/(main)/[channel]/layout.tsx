@@ -10,6 +10,7 @@ export default function Layout(
   const channel = decodeURIComponent(use(params).channel);
   const [activeTab, setActiveTab] = useState('');
   const pathname = usePathname();
+
   useEffect(() => {
 
     if (!pathname) return;
@@ -22,6 +23,7 @@ export default function Layout(
       setActiveTab("posts");
     }
   }, [pathname, channel]);
+
   return (
     <div className="bg-[#0f0f0f] -translate-x-4">
       <ProfileHeader channel={channel} />

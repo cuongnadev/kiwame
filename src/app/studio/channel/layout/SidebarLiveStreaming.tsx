@@ -1,12 +1,12 @@
-import { getLiveMenuItems, systemMenuItems } from '@/constants/menu.constants';
-import { User } from '@supabase/supabase-js'
+import React from 'react'
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React from 'react'
+import { AppUser } from '@/hooks/useAppUser';
+import { getLiveMenuItems, systemMenuItems } from '@/constants/menu.constants';
 
 interface SidebarLiveStreamingProps {
   expanded: boolean,
-  user: User | null,
+  user: AppUser | null,
   channel: string,
 }
 

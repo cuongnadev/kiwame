@@ -1,4 +1,6 @@
 export const kiwameConfig = {
+  nextPublicSiteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "",
+  
   // Supabase
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
   supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
@@ -6,7 +8,7 @@ export const kiwameConfig = {
 
   // Streaming (SRS)
   streamSecret: process.env.STREAM_SECRET ?? "",
-  
+
   nextPublicLivekitURL: process.env.NEXT_PUBLIC_LIVEKIT_URL ?? "",
 
   livekitURL: process.env.LIVEKIT_URL ?? "",

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { kiwameConfig } from "@/config/kiwame.config";
 
 export const AuthService = {
   register: async (email: string, password: string) => {
@@ -8,6 +9,9 @@ export const AuthService = {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${kiwameConfig.nextPublicSiteUrl}/api/auth/callback`
+      }
     });
 
     if (error) return NextResponse.json({ success: false, error: error.message });

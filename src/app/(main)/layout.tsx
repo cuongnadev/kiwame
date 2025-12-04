@@ -1,47 +1,41 @@
 'use client'
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import Header from "@/app/(main)/layout/Header"
 import Sidebar from "@/app/(main)/layout/Sidebar"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
-import { User } from "@supabase/supabase-js"
+import { useAppUser } from "@/hooks/useAppUser"
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [sidebarExpanded, setSidebarExpanded] = useState(true)
-  const [user, setUser] = useState<User | null>(null)
   const [channel, setChannel] = useState<string | null>(null)
 
+  const { user, loading } = useAppUser()
+
   useEffect(() => {
+    if (!user) return;
+
     const supabase = createSupabaseBrowserClient()
 
-    const getUserAndChannel = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user ?? null);
-
-      if (!user) return;
-
+    const getChannel = async () => {
       const { data: channelData } = await supabase
         .from("channels")
         .select("name")
         .eq("owner_id", user.id)
-        .single();
+        .maybeSingle();
 
       setChannel(channelData?.name ?? null);
     }
 
-    getUserAndChannel()
-
-    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => listener.subscription.unsubscribe()
-  }, [])
+    getChannel();
+  }, [user])
 
   const toggleSidebar = () => setSidebarExpanded(!sidebarExpanded)
 
+  if (loading) return null
+
   return (
     <div className="flex flex-col h-screen bg-[#0f0f0f]">
-      <Header onMenuClick={toggleSidebar} user={user} channel={channel}/>
+      <Header onMenuClick={toggleSidebar} user={user} channel={channel} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar expanded={sidebarExpanded} user={user} />
 

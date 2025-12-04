@@ -1,31 +1,13 @@
 'use client'
-import React, { use, useEffect, useState } from 'react'
+import React, { use, useState } from 'react'
 import SidebarStudio from '@/app/studio/channel/layout/SidebarStudio'
-import { User } from '@supabase/supabase-js'
-import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import Header from '@/app/(main)/layout/Header'
+import { useAppUser } from '@/hooks/useAppUser'
 
 export default function Layout({ children, params }: { children: React.ReactNode, params: Promise<{ channel: string }> }) {
   const channel = decodeURIComponent(use(params).channel);
   const [sidebarExpanded, setSidebarExpanded] = useState(true)
-  const [user, setUser] = useState<User | null>(null)
-
-  useEffect(() => {
-    const supabase = createSupabaseBrowserClient()
-
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user ?? null)
-    }
-
-    getUser()
-
-    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => listener.subscription.unsubscribe()
-  }, [])
+  const { user, loading } = useAppUser()
 
   const toggleSidebar = () => setSidebarExpanded(!sidebarExpanded)
   return (

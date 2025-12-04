@@ -6,16 +6,23 @@ import { Button } from '@/app/components/ui/button/Button';
 import { GoogleIcon } from '@/app/components/ui/icons/GoogleIcon';
 import { Input } from '@/app/components/ui/input/Input';
 import { Facebook, LockKeyhole, LockKeyholeOpen, Mail } from 'lucide-react';
+import { useToast } from '@/app/components/ui/toast/ToastContext';
 
 export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
   const router = useRouter();
 
   const handleRegister = async () => {
-    if (password !== confirmPassword) return alert("Passwords don't match");
+    if (!email || !password || !confirmPassword) {
+      return showToast('Please fill in all required fields.', 'warning');
+    }
+
+    if (password !== confirmPassword) return showToast('Passwords do not match.', 'error');
+
     setLoading(true);
 
     try {
@@ -26,15 +33,25 @@ export default function RegisterForm() {
       });
       const data = await res.json();
 
-      if (data.success) {
-        alert("Registration successful! Please check your email to confirm your account.");
-        router.push('/login');
-      } else {
-        alert(data.error || 'Register failed');
+      if (!data.success) {
+        showToast(
+          data.error || 'Registration failed. Please try again.',
+          'error'
+        );
+        return;
       }
+
+      showToast(
+        'Registration successful! Please complete your profile.',
+        'success'
+      );
+      router.push('/complete-profile');
     } catch (err) {
       console.error(err);
-      alert('Something went wrong.');
+      showToast(
+        'Unable to connect to the server. Please try again later.',
+        'error'
+      );
     } finally {
       setLoading(false);
     }

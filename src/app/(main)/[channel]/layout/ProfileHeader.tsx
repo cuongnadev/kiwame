@@ -23,6 +23,7 @@ export default function ProfileHeader({ channel }: ProfileHeaderProps) {
           width={128}
           height={128}
           className="w-full h-full rounded-full object-cover"
+          priority
         />
       </div>
 

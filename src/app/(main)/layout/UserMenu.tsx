@@ -1,14 +1,13 @@
 'use client';
 import { MenuChild, MenuItem } from '@/constants/menu.constants'
-import { User } from '@supabase/supabase-js';
+import { AppUser } from '@/hooks/useAppUser';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import Link from 'next/link';
 import React, { useState } from 'react'
 
 export interface UserMenuProps {
   menu: MenuItem[];
   onLogout: () => void;
-  user: User | null;
+  user: AppUser | null;
   channel?: string | null;
   isStudio?: boolean;
   onToGoChannel?: () => void;
@@ -50,7 +49,7 @@ export function UserMenu({ menu, onLogout, user , channel, isStudio = false, onT
         </div>
       ) : (
         <div className='p-2 border-b border-white/10'>
-          <p className="font-semibold">Tên người dùng</p>
+          <p className="font-semibold">{user?.full_name}</p>
           <p className="text-sm text-gray-400">{isStudio ? channel :user?.email}</p>
           <span className='text-sm font-medium text-blue-400 cursor-pointer' onClick={onToGoChannel}>Xem kênh của bạn</span>
         </div>

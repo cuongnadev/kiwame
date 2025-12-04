@@ -1,14 +1,13 @@
-import React from 'react'
-import Link from 'next/link'
+import React from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
-import { User } from '@supabase/supabase-js'
-import { getStudioMenuItems, systemMenuItems } from '@/constants/menu.constants'
 import { usePathname } from 'next/navigation';
-
+import { AppUser } from '@/hooks/useAppUser';
+import { getStudioMenuItems, systemMenuItems } from '@/constants/menu.constants';
 
 interface SidebarStudioProps {
   expanded: boolean,
-  user: User | null,
+  user: AppUser | null,
   channel: string,
 }
 
@@ -27,6 +26,7 @@ export default function SidebarStudio({ expanded, user, channel }: SidebarStudio
             height={expanded ? 100 : 40}
             alt="Kiwame Logo"
             className='rounded-full'
+            priority
           />
         </Link>
 

@@ -118,3 +118,33 @@ a:hover {
     background: #7d7d7d;
   }
 }
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(50px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes toast-progress {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.3s ease-out;
+}
+
+.animate-toast-progress {
+  animation: toast-progress 3s linear forwards;
+}
