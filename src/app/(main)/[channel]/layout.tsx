@@ -3,23 +3,26 @@ import { use, useState, useEffect } from "react";
 import NavigationTabs from "./layout/NavigationTabs"
 import ProfileHeader from "./layout/ProfileHeader"
 import { usePathname } from "next/navigation";
+import { useAppUser } from "@/hooks/useAppUser";
 
 export default function Layout(
-  { children, params }: { children: React.ReactNode, params: Promise<{ channel: string }> }
+  { children }: { children: React.ReactNode }
 ) {
-  const channel = decodeURIComponent(use(params).channel);
   const [activeTab, setActiveTab] = useState('');
   const pathname = usePathname();
+  const { user, loading } = useAppUser();
+
+  const channel = user?.channel?.name || null;
 
   useEffect(() => {
 
     if (!pathname) return;
 
-    if (pathname === `/${channel}`) {
+    if (pathname === `/@${channel}`) {
       setActiveTab("home");
     }
 
-    if (pathname.startsWith(`/${channel}/posts`)) {
+    if (pathname.startsWith(`/@${channel}/posts`)) {
       setActiveTab("posts");
     }
   }, [pathname, channel]);

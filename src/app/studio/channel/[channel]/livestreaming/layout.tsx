@@ -1,25 +1,48 @@
-'use client'
-import React, { use, useState } from 'react'
-import Header from '@/app/(main)/layout/Header'
-import SidebarLiveStreaming from '@/app/studio/channel/layout/SidebarLiveStreaming'
-import { useAppUser } from '@/hooks/useAppUser'
+"use client";
 
-export default function Layout({ children, params }: { children: React.ReactNode, params: Promise<{ channel: string }> }) {
-  const channel = decodeURIComponent(use(params).channel);
-  const [sidebarExpanded, setSidebarExpanded] = useState(true)
-  const { user, loading } = useAppUser()
+import { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import Header from "@/app/(main)/layout/Header";
+import { useAppUser } from "@/hooks/useAppUser";
+import SidebarLiveStreaming from "../../layout/SidebarLiveStreaming";
 
-  const toggleSidebar = () => setSidebarExpanded(!sidebarExpanded)
+export default function LiveStreamingLayout({ children }: { children: React.ReactNode }) {
+  const params = useParams();
+
+  const channel = decodeURIComponent(params.channel as string);
+
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const { user, loading } = useAppUser();
+
+  const channelName = user?.channel?.name || "Phát trực tiếp";
+
+  const toggleSidebar = () => setSidebarExpanded((prev) => !prev);
+
+  if (loading) return null;
+
   return (
-    <div className="flex flex-col h-screen bg-[#0f0f0f]">
-      <Header onMenuClick={toggleSidebar} user={user} isStudio={true} channel={channel} className="shadow-md shadow-black/40" isLive={false} />
-      <div className="flex flex-1 overflow-hidden">
-        <SidebarLiveStreaming expanded={sidebarExpanded} user={user} channel={channel} />
+    <>
+      <div className="flex flex-col h-screen bg-[#0f0f0f]">
+        <Header
+          onMenuClick={toggleSidebar}
+          user={user}
+          channel={channel}
+          type="studio"
+          className="shadow-2xl shadow-red-900/20 border-b border-red-500/20"
+        />
 
-        <main className="w-full grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 bg-[#0f0f0f] overflow-y-auto overflow-x-hidden scrollbar-main">
-          {children}
-        </main>
+        <div className="flex flex-1 overflow-hidden">
+          <SidebarLiveStreaming
+            expanded={sidebarExpanded}
+            user={user}
+            channel={channelName}
+          />
+
+          <main className="w-full bg-[#0f0f0f]">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
-  )
+    </>
+  );
 }

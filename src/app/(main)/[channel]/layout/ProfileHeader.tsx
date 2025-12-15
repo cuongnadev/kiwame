@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface ProfileHeaderProps {
-  channel: string;
+  channel: string | null;
 }
 
 export default function ProfileHeader({ channel }: ProfileHeaderProps) {

@@ -1,137 +1,110 @@
-"use client"
+"use client";
 
-import { guestMenuItems, mainMenuItems, systemMenuItems, titleMenu, userMenuItems } from "@/constants/menu.constants";
-import { AppUser } from "@/hooks/useAppUser";
+import { SidebarItem } from "./SidebarItem";
 import {
-  ChevronRight
-} from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+  mainMenuItems,
+  getUserMenuItems,
+  guestMenuItems,
+  exploreMenuItems,
+  systemMenuItems,
+} from "@/constants/menu.constants";
+import { AppUser } from "@/hooks/useAppUser";
+
 interface SidebarProps {
-  expanded?: boolean;
+  expanded: boolean;
   user: AppUser | null;
+  channel: string | null;
+  openCreateChannel: () => void;
 }
 
-export default function Sidebar({ expanded, user }: SidebarProps) {
-  const pathname = usePathname();
+export default function Sidebar({ expanded, user, channel, openCreateChannel }: SidebarProps) {
+  const userMenuItems = getUserMenuItems(channel);
 
   return (
-    <aside className={`flex flex-col bg-[#0f0f0f] transition-all duration-300 ease-in-out ${expanded ? 'w-64' : 'w-20'} group/sidebar`}>
-      {/* Main menu */}
-      <nav className={`flex-1 ${!expanded ? "px-1" : "px-3"}  overflow-y-auto overflow-x-hidden scrollbar-hover min-h-0`}>
-        <div className={`space-y-1 py-4`}>
+    <aside className={`flex flex-col bg-[#0f0f0f] transition-all duration-300 ${expanded ? 'w-64' : 'w-20'} group/sidebar`}>
+      <nav className={`flex-1 overflow-y-auto scrollbar-hover ${expanded ? 'px-3' : 'px-1'} py-4 space-y-6`}>
+        <div className="space-y-1">
           {mainMenuItems.map((item) => (
-            <Link
+            <SidebarItem
               key={item.label}
-              href={item.href}
-              className={`flex items-center ${!expanded && "justify-center"} gap-4 rounded-lg px-3 ${!expanded ? "py-4" : "py-2"} text-[#f1f1f1] hover:bg-[#222] ${(pathname === item.href) && 'bg-[#222]'} transition-colors group relative`}
-              title={expanded ? '' : item.label}
-            >
-              <div className="relative flex flex-col items-center">
-                <item.icon size={24} className="flex-shrink-0" />
-                {!expanded && <span className="text-[10px] text-nowrap">{item.label}</span>}
-                {item.hasNotification && (
-                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full" />
-                )}
-              </div>
-              {expanded && <span className="text-base text-nowrap">{item.label}</span>}
-            </Link>
+              item={item}
+              expanded={expanded}
+              user={user}
+              channel={channel}
+              openCreateChannel={openCreateChannel}
+            />
           ))}
         </div>
 
-        {/* User menu */}
         {expanded && user && (
           <>
-            <div className="border-t border-[#222]" />
-            <div className="space-y-1 py-4">
+            <hr className="border-[#222] my-2" />
+            <div className="space-y-1">
               {userMenuItems.map((item) => (
-                <Link
+                <SidebarItem
                   key={item.label}
-                  href={item.href}
-                  className={`flex items-center justify-between rounded-lg px-3 py-2 text-[#f1f1f1] hover:bg-[#222] ${(pathname === item.href) && 'bg-[#222]'} transition-colors`}
-                  title={item.label}
-                >
-                  <div className="flex items-center gap-4">
-                    {item.icon && (
-                      <item.icon size={24} className="flex-shrink-0" />
-                    )}
-                    <span className="text-base text-nowrap">{item.label}</span>
-                    {item.showChevron && <ChevronRight size={16} className="text-[#818181]" />}
-                  </div>
-                </Link>
+                  item={item}
+                  expanded={expanded}
+                  user={user}
+                  channel={channel}
+                  openCreateChannel={openCreateChannel}
+                />
               ))}
             </div>
           </>
         )}
 
-        {/* Guest menu */}
         {expanded && !user && (
           <>
-            <div className="border-t border-[#222]" />
-            <div className="space-y-1 py-4">
+            <hr className="border-[#222] my-2" />
+            <div className="space-y-1">
               {guestMenuItems.map((item) => (
-                <Link
+                <SidebarItem
                   key={item.label}
-                  href={item.href}
-                  className={`flex items-center justify-between rounded-lg px-3 py-2 text-[#f1f1f1] hover:bg-[#222] ${(pathname === item.href) && 'bg-[#222]'} transition-colors`}
-                  title={item.label}
-                >
-                  <div className="flex items-center gap-4">
-                    {item.icon && (
-                      <item.icon size={24} className="flex-shrink-0" />
-                    )}
-                    <span className="text-base text-nowrap">{item.label}</span>
-                  </div>
-                </Link>
+                  item={item}
+                  expanded={expanded}
+                  user={user}
+                  channel={channel}
+                  openCreateChannel={openCreateChannel}
+                />
               ))}
             </div>
           </>
         )}
 
-        {expanded &&
+        {expanded && (
           <>
-            {/* Title menu */}
-            < div className="border-t border-[#222]" />
-            <h2 className="pt-3.5 px-4 text-base text-[#f1f1f1]">Khám phá</h2>
-            <div className="space-y-1 py-4">
-              {titleMenu.map((item) => (
-                <Link
+            <hr className="border-[#222] my-2" />
+            <h2 className="px-4 text-sm font-semibold text-[#aaa]">Khám phá</h2>
+            <div className="space-y-1">
+              {exploreMenuItems.map((item) => (
+                <SidebarItem
                   key={item.label}
-                  href={item.href}
-                  className="flex items-center justify-between rounded-lg px-3 py-2 text-[#f1f1f1] hover:bg-[#222] transition-colors"
-                  title={item.label}
-                >
-                  <div className="flex items-center gap-4">
-                    {item.icon && (
-                      <item.icon size={24} className="flex-shrink-0" />
-                    )}
-                    <span className="text-base text-nowrap">{item.label}</span>
-                  </div>
-                </Link>
+                  item={item}
+                  expanded={expanded}
+                  user={user}
+                  channel={channel}
+                  openCreateChannel={openCreateChannel}
+                />
               ))}
             </div>
-            {/* System menu */}
-            <div className="border-t border-[#222]" />
-            <div className="space-y-1 py-4">
+
+            <hr className="border-[#222] my-2" />
+            <div className="space-y-1">
               {systemMenuItems.map((item) => (
-                <Link
+                <SidebarItem
                   key={item.label}
-                  href={item.href}
-                  className="flex items-center justify-between rounded-lg px-3 py-2 text-[#f1f1f1] hover:bg-[#222] transition-colors"
-                  title={item.label}
-                >
-                  <div className="flex items-center gap-4">
-                    {item.icon && (
-                      <item.icon size={24} className="flex-shrink-0" />
-                    )}
-                    <span className="text-base text-nowrap">{item.label}</span>
-                  </div>
-                </Link>
+                  item={item}
+                  expanded={expanded}
+                  user={user}
+                  channel={channel}
+                  openCreateChannel={openCreateChannel}
+                />
               ))}
             </div>
           </>
-        }
+        )}
       </nav>
     </aside>
-  )
+  );
 }

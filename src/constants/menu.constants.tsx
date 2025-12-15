@@ -1,5 +1,6 @@
-import logo from "@/assets/images/logo.png"
-import { SpeedCycleIcon } from "@/app/components/ui/icons/SpeedCycleIcon";
+import Image from "next/image";
+import { ReactNode } from "react";
+import logo from "@/assets/images/logo.png";
 import {
   UserRound, LogOut, Database,
   Monitor, Languages, MapPinned,
@@ -22,16 +23,10 @@ import {
   BadgeDollarSign,
   Camera
 } from "lucide-react"
-import Image from "next/image";
-import { ReactNode } from "react";
-import { YourVideoIcon } from "@/app/components/ui/icons/YourVideoIcon";
-import { AnalyticsIcon } from "@/app/components/ui/icons/AnalyticsIcon";
-import { AudienceIcon } from "@/app/components/ui/icons/AudienceIcon";
-import { ListBulletIcon } from "@/app/components/ui/icons/ListBulletIcon";
-import { RecordIcon } from "@/app/components/ui/icons/RecordIcon";
-import { SparkIcon } from "@/app/components/ui/icons/SparkIcon";
-import { MusicNoteSquareIcon } from "@/app/components/ui/icons/MusicNoteSquareIcon";
-import { ManagerIcon } from "@/app/components/ui/icons/ManagerIcon";
+import { YourVideoIcon, AnalyticsIcon, AudienceIcon, ListBulletIcon, RecordIcon, SparkIcon, MusicNoteSquareIcon, ManagerIcon, SpeedCycleIcon } from "@/app/components/ui/icons";
+import { AppUser } from "@/hooks/useAppUser";
+
+export type AccessRequirement = 'auth' | 'channel' | 'premium' | 'admin' | null;
 
 export interface MenuChild {
   label: string;
@@ -39,52 +34,121 @@ export interface MenuChild {
 }
 
 export interface MenuItem {
-  icon: ReactNode;
+  icon?: ReactNode;
   label: string;
   href?: string;
+  require?: AccessRequirement | AccessRequirement[];
+  fallbackModal?: 'createChannel' | 'login' | 'upgrade';
   showChevron?: boolean;
   children?: MenuChild[];
 }
 
-export const getMenuItems = (channel?: string | null): MenuItem[] => [
-  {
-    icon: <UserRound color="white" size={18} />,
-    label: "Chuyển đổi tài khoản",
-    href: "/switch-account",
-  },
-  {
-    icon: <LogOut color="white" size={18} />,
-    label: "Đăng xuất",
-    href: "/logout",
-  },
-  {
-    icon: <Image src={logo} height={18} width={18} alt="Kiwame" />,
-    label: "Kiwame Studio",
-    href: channel ? `/studio/channel/${channel}` : undefined,
-  },
+export const canAccess = (
+  item: MenuItem,
+  user: AppUser | null,
+  channel: string | null,
+): { allowed: boolean; modal?: string } => {
+  if (!item.require) return { allowed: true };
+
+  const reqs = Array.isArray(item.require) ? item.require : [item.require];
+
+  for (const r of reqs) {
+    if (r === 'auth' && !user) return { allowed: false, modal: 'login' };
+    if (r === 'channel' && !channel) return { allowed: false, modal: 'createChannel' };
+  }
+
+  return { allowed: true };
+};
+
+// === MAIN MENU ===
+export const mainMenuItems: MenuItem[] = [
+  { icon: <Home size={24} />, label: "Trang chủ", href: "/" },
+  { icon: <Zap size={24} />, label: "Shorts", href: "/shorts" },
+  { icon: <TvMinimalPlay size={24} />, label: "Kênh đăng ký", href: "/subscriptions", require: 'auth' },
+];
+
+// === USER MENU (đã đăng nhập) ===
+export const getUserMenuItems = (channel?: string | null): MenuItem[] => [
+  { icon: <CircleUserRound size={24} />, label: "Bạn", href: "/account", showChevron: true },
+  { icon: <ClockFading size={24} />, label: "Lịch sử xem", href: "/watch-later" },
+  { icon: <ListVideo size={24} />, label: "Danh sách phát", href: "/playlists" },
+  { icon: <SquarePlay size={24} />, label: "Video của bạn", href: channel ? `/studio/channel/${channel}/upload` : undefined, require: 'channel' },
+  { icon: <Clock size={24} />, label: "Xem sau", href: "/playlists/watch-later" },
+  { icon: <ThumbsUp size={24} />, label: "Video đã thích", href: "/playlists/liked" },
+];
+
+// === GUEST MENU ===
+export const guestMenuItems: MenuItem[] = [
+  { icon: <CircleUserRound size={24} />, label: "Đăng nhập để xem thêm", href: "/login" },
+  { icon: <ClockFading size={24} />, label: "Lịch sử xem", href: "/watch-later" },
+];
+
+// === KHÁM PHÁ ===
+export const exploreMenuItems: MenuItem[] = [
+  { icon: <Music size={24} />, label: "Âm nhạc", href: "/music" },
+  { icon: <Gamepad2 size={24} />, label: "Trò chơi", href: "/games" },
+  { icon: <Newspaper size={24} />, label: "Tin tức", href: "/news" },
+  { icon: <Trophy size={24} />, label: "Thể thao", href: "/sports" },
+];
+
+// === HỆ THỐNG ===
+export const systemMenuItems: MenuItem[] = [
+  { icon: <Settings size={24} />, label: "Cài đặt", href: "/settings" },
+  { icon: <BadgeQuestionMark size={24} />, label: "Trợ giúp", href: "/help" },
+  { icon: <MessageCircleReply size={24} />, label: "Gửi phản hồi", href: "/feedback" },
+  { icon: <Flag size={24} />, label: "Nhật ký báo cáo", href: "/report-history" },
+];
+
+// === STUDIO MENU ===
+export const getStudioMenuItems = (channel?: string | null): MenuItem[] => [
+  { icon: <LayoutDashboard size={24} />, label: "Tổng quan", href: channel ? `/studio/channel/${channel}` : undefined, require: 'channel' },
+  { icon: <YourVideoIcon className="w-6 h-6" />, label: "Nội dung", href: channel ? `/studio/channel/${channel}/upload` : undefined, require: 'channel' },
+  { icon: <AnalyticsIcon className="w-6 h-6" />, label: "Số liệu phân tích", href: channel ? `/studio/channel/${channel}/analytics` : undefined, require: 'channel' },
+  { icon: <AudienceIcon className="w-6 h-6" />, label: "Cộng đồng", href: channel ? `/studio/channel/${channel}/comments` : undefined, require: 'channel' },
+  { icon: <ListBulletIcon className="w-6 h-6" />, label: "Phụ đề", href: channel ? `/studio/channel/${channel}/translations` : undefined, require: 'channel' },
+  { icon: <RecordIcon className="w-6 h-6" />, label: "Phát hiện nội dung", href: channel ? `/studio/channel/${channel}/copyright` : undefined, require: 'channel' },
+  { icon: <BadgeDollarSign size={24} />, label: "Kiếm tiền", href: channel ? `/studio/channel/${channel}/monetization` : undefined, require: 'channel' },
+  { icon: <SparkIcon className="w-6 h-6" />, label: "Tùy chỉnh", href: channel ? `/studio/channel/${channel}/editing` : undefined, require: 'channel' },
+  { icon: <MusicNoteSquareIcon className="w-6 h-6" />, label: "Thư viện âm thanh", href: channel ? `/studio/channel/${channel}/music` : undefined, require: 'channel' },
+];
+
+// === LIVESTREAM MENU ===
+export const getLiveMenuItems = (channel?: string | null): MenuItem[] => [
+  { icon: <Radio size={24} />, label: "Phát trực tiếp", href: channel ? `/studio/channel/${channel}/livestreaming` : undefined, require: 'channel' },
+  { icon: <Camera size={24} />, label: "Webcam", href: channel ? `/studio/channel/${channel}/livestreaming/webcam` : undefined, require: 'channel' },
+  { icon: <ManagerIcon className="w-6 h-6" />, label: "Quản lý", href: channel ? `/studio/channel/${channel}/livestreaming/management` : undefined, require: 'channel' },
+];
+
+// === NÚT TẠO (Create Button) ===
+export const getCreateMenuItems = (channel?: string | null): MenuItem[] => [
+  { icon: <SquarePlay size={20} />, label: "Tải video lên", href: channel ? `/studio/channel/${channel}/upload` : undefined, require: 'channel' },
+  { icon: <Radio size={20} />, label: "Phát trực tiếp", href: channel ? `/studio/channel/${channel}/livestreaming` : undefined, require: 'channel' },
+  { icon: <SquarePen size={20} />, label: "Tạo bài đăng", href: channel ? `/${channel}/posts` : undefined, require: 'channel' },
+];
+
+// === USER DROPDOWN MENU (Header) ===
+export const getUserDropdownMenu = (channel?: string | null): MenuItem[] => [
+  { icon: <SquareUser size={18} />, label: "Kênh của bạn", href: channel ? `${channel}` : undefined, require: 'channel' },
+  { icon: <UserRound size={18} />, label: "Chuyển đổi tài khoản", href: "/switch-account" },
+  { icon: <LogOut size={18} />, label: "Đăng xuất", href: "/logout" },
+  { icon: <Image src={logo} width={18} height={18} alt="Kiwame" />, label: "Kiwame", href: "/" },
+  { icon: <Image src={logo} width={18} height={18} alt="Studio" />, label: "Kiwame Studio", href: channel ? `/studio/channel/${channel}` : undefined, require: 'channel' },
   {
     icon: <Database color="white" size={18} />,
     label: "Dữ liệu của bạn",
     href: "/your-data",
   },
   {
-    icon: <Monitor color="white" size={18} />,
-    label: "Giao diện thiết bị",
-    showChevron: true,
-    children: [
+    icon: <Monitor size={18} />, label: "Giao diện thiết bị", showChevron: true, children: [
       { label: "Tối", value: "dark" },
       { label: "Sáng", value: "light" },
       { label: "Theo hệ thống", value: "system" },
     ]
   },
   {
-    icon: <Languages color="white" size={18} />,
-    label: "Ngôn ngữ",
-    showChevron: true,
-    children: [
+    icon: <Languages size={18} />, label: "Ngôn ngữ", showChevron: true, children: [
       { label: "Tiếng Việt", value: "vi" },
       { label: "English", value: "en" },
-      { label: "日本語", value: "jp" },
     ]
   },
   {
@@ -97,12 +161,7 @@ export const getMenuItems = (channel?: string | null): MenuItem[] => [
       { label: "Hàn Quốc", value: "kr" },
     ]
   },
-
-  {
-    icon: <Settings color="white" size={18} />,
-    label: "Cài đặt",
-    href: "/settings",
-  },
+  { icon: <Settings size={18} />, label: "Cài đặt", href: "/settings" },
   {
     icon: <HelpCircle color="white" size={18} />,
     label: "Trợ giúp",
@@ -113,103 +172,7 @@ export const getMenuItems = (channel?: string | null): MenuItem[] => [
     label: "Gửi ý kiến phản hồi",
     href: "/feedback",
   },
-]
-
-export const getMenuItemsWithStudio = (channel?: string | null): MenuItem[] => [
-  {
-    icon: <SquareUser color="white" size={18} />,
-    label: "Kênh của bạn",
-    href: channel ? `/${channel}` : undefined,
-  },
-  {
-    icon: <Image src={logo} height={18} width={18} alt="Kiwame" />,
-    label: "Kiwame",
-    href: `/`,
-  },
-  {
-    icon: <UserRound color="white" size={18} />,
-    label: "Chuyển đổi tài khoản",
-    href: "/switch-account",
-  },
-  {
-    icon: <LogOut color="white" size={18} />,
-    label: "Đăng xuất",
-    href: "/logout",
-  },
-  {
-    icon: <Monitor color="white" size={18} />,
-    label: "Giao diện thiết bị",
-    showChevron: true,
-    children: [
-      { label: "Tối", value: "dark" },
-      { label: "Sáng", value: "light" },
-      { label: "Theo hệ thống", value: "system" },
-    ]
-  },
-  {
-    icon: <MessageSquareMore color="white" size={18} />,
-    label: "Gửi ý kiến phản hồi",
-    href: "/feedback",
-  },
-]
-
-export const getStudioMenuItems = (channel?: string | null): MenuItem[] => [
-  { icon: <LayoutDashboard color="white" size={24} />, label: 'Tổng quan', href: channel ? `/studio/channel/${channel}` : undefined },
-  { icon: <YourVideoIcon className="text-white" />, label: 'Nội dung', href: channel ? `/studio/channel/${channel}/upload` : undefined },
-  { icon: <AnalyticsIcon className="text-white" />, label: 'Số liệu phân tích', href: channel ? `/studio/channel/${channel}/analytics` : undefined },
-  { icon: <AudienceIcon className="text-white" />, label: 'Cộng đồng', href: channel ? `/studio/channel/${channel}/comments` : undefined },
-  { icon: <ListBulletIcon className="text-white" />, label: 'Phụ đề', href: channel ? `/studio/channel/${channel}/translations` : undefined },
-  { icon: <RecordIcon className="text-white" />, label: 'Phát hiện nội dung', href: channel ? `/studio/channel/${channel}/copyright` : undefined },
-  { icon: <BadgeDollarSign color="white" size={24} />, label: 'Kiếm tiền', href: channel ? `/studio/channel/${channel}/monetization` : undefined },
-  { icon: <SparkIcon className="text-white" />, label: 'Tùy chỉnh', href: channel ? `/studio/channel/${channel}/editing` : undefined },
-  { icon: <MusicNoteSquareIcon className="text-white" />, label: 'Thư viện âm thanh', href: channel ? `/studio/channel/${channel}/music` : undefined },
-]
-
-export const getLiveMenuItems = (channel?: string | null): MenuItem[] => [
-  { icon: <Radio width={20} height={20} />, label: 'Phát trực tiếp', href: channel ? `/studio/channel/${channel}/livestreaming` : undefined },
-  { icon: <Camera width={20} height={20} />, label: 'Webcam', href: channel ? `/studio/channel/${channel}/livestreaming/webcam` : undefined },
-  { icon: <ManagerIcon className="text-white" />, label: 'Quản lý', href: channel ? `/studio/channel/${channel}/livestreaming/management` : undefined },
-]
-
-export const mainMenuItems = [
-  { icon: Home, label: 'Trang chủ', href: '/' },
-  { icon: Zap, label: 'Shorts', href: '/shorts' },
-  { icon: TvMinimalPlay, label: 'Kênh đăng ký', href: '/subscriptions', hasNotification: true },
 ];
-
-export const userMenuItems = [
-  { icon: null, label: 'Bạn', href: '/account', showChevron: true },
-  { icon: ClockFading, label: 'Lịch sử xem', href: '/watch-later' },
-  { icon: ListVideo, label: 'Danh sách phát', href: '/playlists' },
-  { icon: SquarePlay, label: 'Video của bạn', href: '/channel' },
-  { icon: Clock, label: 'Xem sau', href: '/playlist/watch-later' },
-  { icon: ThumbsUp, label: 'Video đã thích', href: '/playlist/liked' },
-];
-
-export const guestMenuItems = [
-  { icon: CircleUserRound, label: 'Bạn', href: '/you-not-login-yet' },
-  { icon: ClockFading, label: 'Lịch sử xem', href: '/watch-later' },
-];
-
-export const titleMenu = [
-  { icon: Music, label: 'Âm nhạc', href: '/music' },
-  { icon: Gamepad2, label: 'Trò chơi', href: '/games' },
-  { icon: Newspaper, label: 'Tin tức', href: '/news' },
-  { icon: Trophy, label: 'Thể thao', href: '/sports' }
-]
-
-export const systemMenuItems = [
-  { icon: Settings, label: 'Cài đặt', href: '/settings' },
-  { icon: BadgeQuestionMark, label: 'Trợ giúp', href: '/help' },
-  { icon: MessageCircleReply, label: 'Gửi phản hồi', href: '/feedback' },
-  { icon: Flag, label: 'Nhật ký báo cáo', href: '/report-history' },
-]
-
-export const getStudioItems = (channel?: string | null): MenuItem[] => [
-  { icon: <SquarePlay width={20} height={20} />, label: 'Tải video lên', href: channel ? `/studio/channel/${channel}/upload` : undefined },
-  { icon: <Radio width={20} height={20} />, label: 'Phát trực tiếp', href: channel ? `/studio/channel/${channel}/livestreaming` : undefined },
-  { icon: <SquarePen width={20} height={20} />, label: 'Tạo bài đăng', href: channel ? `/${channel}/posts` : undefined },
-]
 
 export const videoSettingsItems = [
   {

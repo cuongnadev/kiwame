@@ -55,7 +55,6 @@ export default function CompleteProfileForm() {
 
       const res = await fetch('/api/profile', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: formData,
       });
 

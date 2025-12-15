@@ -3,8 +3,8 @@ import StreamPlayer from "@/app/components/stream/StreamPlayer";
 
 export default function LivePage() {
   return (
-    <div className="flex h-full overflow-hidden text-white">
-      <div className="flex-1 flex flex-col h-full overflow-hidden p-6">
+    <div className="flex h-full text-white">
+      <div className="flex-1 flex flex-col h-full p-6">
         <StreamPlayer />
       </div>
 

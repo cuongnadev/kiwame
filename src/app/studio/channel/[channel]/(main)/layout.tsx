@@ -1,25 +1,47 @@
-'use client'
-import React, { use, useState } from 'react'
-import SidebarStudio from '@/app/studio/channel/layout/SidebarStudio'
-import Header from '@/app/(main)/layout/Header'
-import { useAppUser } from '@/hooks/useAppUser'
+"use client";
 
-export default function Layout({ children, params }: { children: React.ReactNode, params: Promise<{ channel: string }> }) {
-  const channel = decodeURIComponent(use(params).channel);
-  const [sidebarExpanded, setSidebarExpanded] = useState(true)
-  const { user, loading } = useAppUser()
+import { useState } from "react";
+import { useParams } from "next/navigation";
+import Header from "@/app/(main)/layout/Header";
+import { useAppUser } from "@/hooks/useAppUser";
+import SidebarStudio from "@/app/studio/channel/layout/SidebarStudio";
 
-  const toggleSidebar = () => setSidebarExpanded(!sidebarExpanded)
+export default function StudioLayout({ children }: { children: React.ReactNode }) {
+  const params = useParams();
+  const channel = decodeURIComponent(params.channel as string);
+
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const { user, loading } = useAppUser();
+
+  const channelName = user?.channel?.name;
+
+  const toggleSidebar = () => setSidebarExpanded((prev) => !prev);
+
+  if (loading) return null;
+
   return (
-    <div className="flex flex-col h-screen bg-[#0f0f0f]">
-      <Header onMenuClick={toggleSidebar} user={user} isStudio={true} channel={channel} className="shadow-md shadow-black/40" />
-      <div className="flex flex-1 overflow-hidden">
-        <SidebarStudio expanded={sidebarExpanded} user={user} channel={channel} />
+    <>
+      <div className="flex flex-col h-screen bg-[#0f0f0f]">
+        <Header
+          onMenuClick={toggleSidebar}
+          user={user}
+          channel={channelName ?? channel}
+          type="studio"
+          className="shadow-lg shadow-black/50"
+        />
 
-        <main className="w-full grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 px-6 py-4 bg-[#0f0f0f] overflow-y-auto overflow-x-hidden scrollbar-main">
-          {children}
-        </main>
+        <div className="flex flex-1 overflow-hidden">
+          <SidebarStudio
+            expanded={sidebarExpanded}
+            user={user}
+            channel={channelName ?? channel}
+          />
+
+          <main className="flex-1 overflow-y-auto scrollbar-main px-6 py-4 bg-[#0f0f0f]">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
-  )
+    </>
+  );
 }

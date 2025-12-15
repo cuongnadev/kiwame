@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Flag, EyeOff, Eye, Info, SquarePen, Save } from "lucide-react";
+import { Flag, EyeOff, Eye, Info, SquarePen, Save, Radio } from "lucide-react";
 import { Button } from "../ui/button/Button";
 import { Input } from "../ui/input/Input";
 import { Select } from "../ui/input/Select";
@@ -11,6 +11,7 @@ import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
 import { VideoView } from "./VideoView";
 import { startStream } from "@/services/stream.service";
 import { Stream } from "@/types/stream";
+import StreamCleanup from "./StreamCleanup";
 
 export default function StreamPlayer() {
   const [error, setError] = useState("");
@@ -34,7 +35,7 @@ export default function StreamPlayer() {
     const initStream = async () => {
       try {
         setLoading(true);
-        const result = await startStream("kiwame_room");
+        const result = await startStream();
         setCurrentStream(result);
       } catch (err) {
         const message = err instanceof Error ? err.message : "Lỗi không xác định";
@@ -87,18 +88,19 @@ export default function StreamPlayer() {
                       connect={true}
                       className="absolute inset-0 w-full h-full"
                     >
+                      <StreamCleanup />
                       <VideoView />
                       <RoomAudioRenderer volume={0.7} />
                     </LiveKitRoom>
                   )}
                 </div>
               </div>
-              {/* <div className="absolute top-2.5 left-2.5 flex gap-2 items-center">
+              <div className="absolute top-2.5 left-2.5 flex gap-2 items-center">
                 <Button text="LIVE" icon={<Radio size={18} />} size="sm" variant="danger" />
                 <div className="bg-black/70 backdrop-blur px-2.5 py-1.5 rounded text-sm">
                   {viewCount.toLocaleString()} đang xem
                 </div>
-              </div> */}
+              </div>
             </div>
 
             <div className="flex flex-2 p-4 pb-0 items-start justify-between gap-4">
