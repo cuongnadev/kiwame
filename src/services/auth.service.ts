@@ -14,10 +14,10 @@ export const AuthService = {
       }
     });
 
-    if (error) return NextResponse.json({ success: false, error: error.message });
+    if (error) return NextResponse.json({ success: false, error: error.message }, { status: 400 });
 
 
-    return NextResponse.json({ success: true, data: data.user });
+    return NextResponse.json({ success: true, data: data.user }, { status: 201 });
   },
 
   login: async (email: string, password: string, rememberMe: boolean) => {
@@ -28,13 +28,13 @@ export const AuthService = {
       password,
     });
 
-    if (error) return NextResponse.json({ success: false, error: error.message });
+    if (error) return NextResponse.json({ success: false, error: error.message }, { status: 401 });
 
     if (!data.user?.email_confirmed_at) {
-      return NextResponse.json({ success: false, error: "Please confirm your email first." });
+      return NextResponse.json({ success: false, error: "Please confirm your email first." }, { status: 403 });
     }
 
-    const response = NextResponse.json({ success: true });
+    const response = NextResponse.json({ success: true }, { status: 200 });
     if (rememberMe) {
       response.cookies.set({
         name: "sb_session",
@@ -62,7 +62,7 @@ export const AuthService = {
   logout: async () => {
     const supabase = await createSupabaseServerClient();
     await supabase.auth.signOut();
-    const response = NextResponse.json({ success: true });
+    const response = NextResponse.json({ success: true }, { status: 200 });
     response.cookies.delete({
       name: "sb_session",
       path: "/",

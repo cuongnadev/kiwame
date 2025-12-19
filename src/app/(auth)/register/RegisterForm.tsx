@@ -7,6 +7,7 @@ import { GoogleIcon } from '@/app/components/ui/icons/GoogleIcon';
 import { Input } from '@/app/components/ui/input/Input';
 import { Facebook, LockKeyhole, LockKeyholeOpen, Mail } from 'lucide-react';
 import { useToast } from '@/app/components/ui/toast/ToastContext';
+import { getFirstZodError } from '@/helper/get-first-zod-error';
 
 export default function RegisterForm() {
   const [email, setEmail] = useState("");
@@ -17,27 +18,21 @@ export default function RegisterForm() {
   const router = useRouter();
 
   const handleRegister = async () => {
-    if (!email || !password || !confirmPassword) {
-      return showToast('Please fill in all required fields.', 'warning');
-    }
-
-    if (password !== confirmPassword) return showToast('Passwords do not match.', 'error');
-
+    if (loading) return;
     setLoading(true);
 
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, confirmPassword }),
       });
-      const data = await res.json();
 
-      if (!data.success) {
-        showToast(
-          data.error || 'Registration failed. Please try again.',
-          'error'
-        );
+
+      if (!res.ok) {
+        const data = await res.json();
+        const message = getFirstZodError(data.error);
+        showToast(message ?? "Registration failed", "error");
         return;
       }
 
@@ -86,6 +81,7 @@ export default function RegisterForm() {
           placeholder="Email address"
           prefix={<Mail className="text-gray-400" />}
           className="!border-none !outline-none bg-white/5 text-gray-100 placeholder-gray-400 focus:ring-purple-300"
+          required
         />
 
         <Input
@@ -96,6 +92,7 @@ export default function RegisterForm() {
           prefix={<LockKeyholeOpen className="text-gray-400" />}
           className="!border-none !outline-none bg-white/5 text-gray-100 placeholder-gray-400 focus:ring-purple-300"
           showPasswordToggle
+          required
         />
 
         <Input
@@ -106,6 +103,7 @@ export default function RegisterForm() {
           prefix={<LockKeyhole className="text-gray-400" />}
           className="!border-none !outline-none bg-white/5 text-gray-100 placeholder-gray-400 focus:ring-purple-300"
           showPasswordToggle
+          required
         />
       </div>
 
@@ -113,7 +111,7 @@ export default function RegisterForm() {
         onClick={handleRegister}
         text="Register"
         className="w-full bg-purple-500 hover:bg-purple-600 text-white"
-        disabled={!email || !password || password !== confirmPassword || loading}
+        disabled={!email || !password || !confirmPassword || loading}
       />
 
       <div className="flex items-center w-full gap-4 my-2">

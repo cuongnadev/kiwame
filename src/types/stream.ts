@@ -1,5 +1,5 @@
 export interface Stream {
-  roomName: string
-  whipUrl: string
-  streamKey: string
+  room_name: string
+  whip_url: string
+  stream_key: string
 }
