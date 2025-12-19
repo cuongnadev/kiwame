@@ -7,6 +7,7 @@ import { Button } from '@/app/components/ui/button/Button';
 import { Input } from '@/app/components/ui/input/Input';
 import { LockKeyhole, User, UploadCloud } from 'lucide-react';
 import { useToast } from '@/app/components/ui/toast/ToastContext';
+import { getFirstZodError } from '@/helper/get-first-zod-error';
 
 export default function CompleteProfileForm() {
   const [username, setUsername] = useState('');
@@ -35,13 +36,7 @@ export default function CompleteProfileForm() {
   };
 
   const handleSubmit = async () => {
-    if (!username || !fullName) {
-      return showToast(
-        'Username and Full Name are required.',
-        'error'
-      );
-    }
-
+    if (loading) return;
     setLoading(true);
 
     try {
@@ -58,11 +53,11 @@ export default function CompleteProfileForm() {
         body: formData,
       });
 
-      const data = await res.json();
-
-      if (!data.success) {
+      if (!res.ok) {
+        const data = await res.json();
+        const message = getFirstZodError(data.error);
         showToast(
-          data.error || 'Failed to complete your profile. Please try again.',
+          message ?? 'Profile completion failed',
           'error'
         );
         return;
@@ -108,6 +103,7 @@ export default function CompleteProfileForm() {
           placeholder="Username"
           prefix={<LockKeyhole className="text-gray-400" />}
           className="!border-none !outline-none bg-white/5 text-gray-100 placeholder-gray-400"
+          required
         />
 
         <Input
@@ -116,6 +112,7 @@ export default function CompleteProfileForm() {
           placeholder="Full Name"
           prefix={<User className="text-gray-400" />}
           className="!border-none !outline-none bg-white/5 text-gray-100 placeholder-gray-400"
+          required
         />
 
         <div

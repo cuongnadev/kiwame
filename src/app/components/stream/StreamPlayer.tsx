@@ -9,13 +9,10 @@ import { kiwameConfig } from "@/config/kiwame.config";
 import CopyButton from "./CopyButton";
 import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
 import { VideoView } from "./VideoView";
-import { startStream } from "@/services/stream.service";
 import { Stream } from "@/types/stream";
 import StreamCleanup from "./StreamCleanup";
 
-export default function StreamPlayer() {
-  const [error, setError] = useState("");
-
+export default function StreamPlayer({ initialStream }: { initialStream: Stream }) {
   const [viewCount] = useState(10);
   const [title, setTitle] = useState("Restream hôm qua.............................");
   const [category, setCategory] = useState("Trò chơi");
@@ -27,47 +24,16 @@ export default function StreamPlayer() {
   const [visible, setVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const [currentStream, setCurrentStream] = useState<Stream | null>(null)
   const [token, setToken] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const initStream = async () => {
-      try {
-        setLoading(true);
-        const result = await startStream();
-        setCurrentStream(result);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Lỗi không xác định";
-        setError(message);
-        console.error("Stream init error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initStream();
-  }, []);
-
-  useEffect(() => {
-    if (currentStream?.roomName) {
-      fetch(`/api/live/token?room=${currentStream.roomName}&role=viewer`)
+    if (initialStream?.room_name) {
+      fetch(`/api/live/token?room=${initialStream.room_name}&role=viewer`)
         .then((res) => res.json())
         .then((res) => setToken(res.token))
         .catch(console.error);
     }
-  }, [currentStream?.roomName]);
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[#0f0f0f]">
-        <div className="bg-red-900/50 border border-red-800 rounded-lg p-6 text-red-400 max-w-md">
-          <h2 className="text-xl font-bold mb-2">Lỗi kết nối</h2>
-          <p className="text-sm">{error}</p>
-        </div>
-      </div>
-    );
-  }
+  }, [initialStream?.room_name]);
 
   return (
     <div className="w-full h-full flex flex-col group/sidebar">
@@ -77,22 +43,16 @@ export default function StreamPlayer() {
             <div className="flex-1 relative bg-black">
               <div className="flex-1 bg-card border border-border overflow-hidden shadow-lg w-full aspect-video object-contain">
                 <div className="relative w-full aspect-video">
-                  {!currentStream ? (
-                    <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-black flex items-center justify-center">
-                      <p className="text-gray-400">Đang tạo phòng live...</p>
-                    </div>
-                  ) : (
-                    <LiveKitRoom
-                      serverUrl={kiwameConfig.nextPublicLivekitURL}
-                      token={token!}
-                      connect={true}
-                      className="absolute inset-0 w-full h-full"
-                    >
-                      <StreamCleanup />
-                      <VideoView />
-                      <RoomAudioRenderer volume={0.7} />
-                    </LiveKitRoom>
-                  )}
+                  <LiveKitRoom
+                    serverUrl={kiwameConfig.nextPublicLivekitURL}
+                    token={token!}
+                    connect={true}
+                    className="absolute inset-0 w-full h-full"
+                  >
+                    <StreamCleanup />
+                    <VideoView />
+                    <RoomAudioRenderer volume={0.7} />
+                  </LiveKitRoom>
                 </div>
               </div>
               <div className="absolute top-2.5 left-2.5 flex gap-2 items-center">
@@ -195,8 +155,8 @@ export default function StreamPlayer() {
               <div className="bg-[#272727] rounded-lg p-4 space-y-3">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">URL máy chủ</p>
                 <div className="flex items-center justify-between bg-[#1a1a1a] rounded px-3 py-2">
-                  <code className="text-sm font-mono text-gray-300">{currentStream?.whipUrl}</code>
-                  <CopyButton value={currentStream?.whipUrl} />
+                  <code className="text-sm font-mono text-gray-300">{initialStream?.whip_url}</code>
+                  <CopyButton value={initialStream?.whip_url} />
                 </div>
               </div>
 
@@ -204,7 +164,7 @@ export default function StreamPlayer() {
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Khóa phát trực tiếp</p>
                 <div className="flex items-center justify-between bg-[#1a1a1a] rounded px-3 py-2">
                   <code className="text-sm font-mono text-gray-300">
-                    {visible ? currentStream?.streamKey : "••••••••"}
+                    {visible ? initialStream?.stream_key : "••••••••"}
                   </code>
                   <div className="flex items-center gap-2">
                     <Button
@@ -214,7 +174,7 @@ export default function StreamPlayer() {
                       onClick={() => setVisible(!visible)}
                       className="p-2.5!"
                     />
-                    <CopyButton value={currentStream?.streamKey} />
+                    <CopyButton value={initialStream?.stream_key} />
                   </div>
                 </div>
               </div>
@@ -222,8 +182,8 @@ export default function StreamPlayer() {
               <div className="bg-[#272727] rounded-lg p-4 space-y-3">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Room name</p>
                 <div className="flex items-center justify-between bg-[#1a1a1a] rounded px-3 py-2">
-                  <code className="text-sm font-mono text-gray-300">{currentStream?.roomName}</code>
-                  <CopyButton value={currentStream?.roomName} />
+                  <code className="text-sm font-mono text-gray-300">{initialStream?.room_name}</code>
+                  <CopyButton value={initialStream?.room_name} />
                 </div>
               </div>
             </div>

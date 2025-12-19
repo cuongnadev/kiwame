@@ -7,6 +7,7 @@ import { GoogleIcon } from "@/app/components/ui/icons/GoogleIcon";
 import { Input } from "@/app/components/ui/input/Input";
 import { Facebook, LockKeyhole, Mail } from "lucide-react";
 import { useToast } from "@/app/components/ui/toast/ToastContext";
+import { getFirstZodError } from "@/helper/get-first-zod-error";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -17,8 +18,7 @@ export default function LoginForm() {
   const router = useRouter();
 
   const handleLogin = async () => {
-    if (!email || !password) return showToast("Please enter both email and password.", 'warning');
-
+    if (loading) return;
     setLoading(true);
 
     try {
@@ -27,10 +27,11 @@ export default function LoginForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, rememberMe }),
       });
-      const data = await res.json();
 
-      if (!data.success) {
-        showToast(data.error || 'Invalid email or password.', 'error');
+      if (!res.ok) {
+        const data = await res.json();
+        const message = getFirstZodError(data.error);
+        showToast(message ?? "Login failed", "error");
         return;
       }
 
@@ -104,6 +105,7 @@ export default function LoginForm() {
         onClick={handleLogin}
         text="Sign in"
         className="w-full bg-purple-500 hover:bg-purple-600 text-white"
+        disabled={!email || !password || loading}
       />
 
       <div className="flex items-center w-full gap-4 my-2">

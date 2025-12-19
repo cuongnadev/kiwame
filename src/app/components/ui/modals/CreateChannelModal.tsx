@@ -9,6 +9,7 @@ import { Button } from "../button/Button";
 import { useToast } from "../toast/ToastContext";
 import { useRouter } from "next/navigation";
 import { useAppUser } from "@/hooks/useAppUser";
+import { getFirstZodError } from "@/helper/get-first-zod-error";
 
 export interface CreateChannelProps {
   open: boolean;
@@ -57,21 +58,6 @@ export default function CreateChannelModal({
   }
 
   const handleSubmit = async () => {
-    if (!channelName) {
-      return showToast(
-        'Channel name are required.',
-        'error'
-      );
-    }
-
-    const channelRegex = /^@[a-zA-Z0-9_]{3,20}$/;
-
-    if (!channelRegex.test(channelName)) {
-      return showToast(
-        "Channel name can only contain letters, numbers, and underscores, and must be 3–20 characters long.",
-        "error"
-      );
-    }
 
     try {
       setLoading(true);
@@ -91,11 +77,11 @@ export default function CreateChannelModal({
         body: formData,
       });
 
-      const data = await res.json();
-
-      if (!data.success) {
+      if(!res.ok) {
+        const data = await res.json();
+        const message = getFirstZodError(data.error);
         showToast(
-          data.error || 'Failed to created channel. Please try again.',
+          message || 'Failed to create channel. Please check your input.',
           'error'
         );
         setLoading(false);
@@ -107,7 +93,6 @@ export default function CreateChannelModal({
         'success'
       );
 
-      // Refetch user data to get the newly created channel
       await refetch();
 
       handleCancel();
@@ -168,6 +153,7 @@ export default function CreateChannelModal({
 
               setChannelName(value);
             }}
+            required
           />
 
           <div

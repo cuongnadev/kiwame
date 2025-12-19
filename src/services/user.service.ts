@@ -38,7 +38,7 @@ export const UserService = {
       return NextResponse.json({
         success: false,
         error: "Invalid form data",
-      });
+      }, { status: 400 });
     }
 
     const username = usernameEntry.trim();
@@ -48,7 +48,7 @@ export const UserService = {
       return NextResponse.json({
         success: false,
         error: "Username and Fullname are required",
-      });
+      }, { status: 400 });
     }
 
     const { data: existedUser, error: checkError } = await supabase
@@ -62,14 +62,14 @@ export const UserService = {
       return NextResponse.json({
         success: false,
         error: "Failed to validate username",
-      });
+      },  { status: 500 });
     }
 
     if (existedUser) {
       return NextResponse.json({
         success: false,
         error: "Username already exists",
-      });
+      }, { status: 409 });
     }
 
     let avatarUrl: string | undefined;
@@ -88,7 +88,7 @@ export const UserService = {
         return NextResponse.json({
           success: false,
           error: "Avatar upload failed.",
-        });
+        }, { status: 500 });
       }
 
       const { data: publicUrl } = supabase.storage
@@ -114,11 +114,11 @@ export const UserService = {
       return NextResponse.json({
         success: false,
         error: profileError.message,
-      });
+      }, { status: 500 });
     }
 
     return NextResponse.json({
       success: true,
-    });
+    }, { status: 200 });
   },
 };

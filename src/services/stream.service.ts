@@ -1,34 +1,99 @@
 "use server";
 
-import { kiwameConfig } from "@/config/kiwame.config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { Stream } from "@/types/stream";
+import {
+  IngressClient,
+  IngressInput,
+  CreateIngressOptions,
+} from "livekit-server-sdk";
+import { kiwameConfig } from "@/config/kiwame.config";
 
-export async function startStream(): Promise<Stream> {
+const apiKey = kiwameConfig.livekitApiKey;
+const apiSecret = kiwameConfig.livekitApiSecret;
+const livekitHost = kiwameConfig.livekitURL;
+
+const ingressClient = new IngressClient(livekitHost, apiKey, apiSecret);
+
+export async function getOrCreateStream() {
   const supabase = await createSupabaseServerClient();
 
   const {
     data: { user },
-    error,
   } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
 
-  if (error || !user) {
-    throw new Error("Authentication");
+  const { data: channel } = await supabase
+    .from("channels")
+    .select("id")
+    .eq("owner_id", user.id)
+    .single();
+
+  if (!channel) throw new Error("Channel not found");
+
+  const roomName = `channel_${channel.id}`;
+
+  const { data: streamExist } = await supabase
+    .from("streams")
+    .select("*")
+    .eq("channel_id", channel.id)
+    .is("ended_at", null)
+    .maybeSingle();
+
+  if (streamExist?.ingress_id && streamExist.whip_url && streamExist.stream_key) {
+    return streamExist;
   }
 
-  const res = await fetch(
-    `${kiwameConfig.nextPublicSiteUrl}/api/live/ingress`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ roomName: `Room_${user.id}` }),
+  const ingressList = await ingressClient.listIngress();
+
+  for (const ingress of ingressList) {
+    if (ingress.roomName === roomName) {
+      await ingressClient.deleteIngress(ingress.ingressId);
+      await new Promise(r => setTimeout(r, 2000));
     }
+  }
+
+  const opts: CreateIngressOptions = {
+    name: `${roomName}-obs`,
+    roomName,
+    participantIdentity: "obs-streamer",
+    participantName: "OBS Stream",
+    bypassTranscoding: false,
+  };
+
+  const ingress = await ingressClient.createIngress(
+    IngressInput.WHIP_INPUT,
+    opts
   );
 
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error ?? "Không thể tạo ingress");
+  if (streamExist) {
+    const { data: updated } = await supabase
+      .from("streams")
+      .update({
+        ingress_id: ingress.ingressId,
+        whip_url: ingress.url,
+        stream_key: ingress.streamKey,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", streamExist.id)
+      .select()
+      .single();
+
+    return updated;
   }
 
-  return res.json();
+  const { data: stream } = await supabase
+    .from("streams")
+    .insert({
+      channel_id: channel.id,
+      title: "Live stream",
+      stream_key: ingress.streamKey,
+      ingress_id: ingress.ingressId,
+      whip_url: ingress.url,
+      room_name: roomName,
+      is_live: false,
+    })
+    .select()
+    .single();
+
+  return stream;
 }

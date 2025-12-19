@@ -34,7 +34,7 @@ export const ChannelService = {
       return NextResponse.json({
         success: false,
         error: "Invalid channel name",
-      });
+      }, { status: 400 });
     }
 
     const channelName = channelNameEntry.trim();
@@ -43,7 +43,7 @@ export const ChannelService = {
       return NextResponse.json({
         success: false,
         error: 'Channel name is required',
-      });
+      }, { status: 400 });
     }
 
     const { data: existedChannel, error: checkError } = await supabase
@@ -57,14 +57,14 @@ export const ChannelService = {
       return NextResponse.json({
         success: false,
         error: "Failed to validate channel",
-      });
+      }, { status: 500 });
     }
 
     if (existedChannel) {
       return NextResponse.json({
         success: false,
         error: 'Channel name already exists',
-      })
+      }, { status: 409 })
     }
 
     const ownerId = user.id;
@@ -85,7 +85,7 @@ export const ChannelService = {
         return NextResponse.json({
           success: false,
           error: 'Avatar upload failed.',
-        });
+        }, { status: 500 });
       }
 
       const { data: publicUrl } = supabase.storage
@@ -111,7 +111,7 @@ export const ChannelService = {
         return NextResponse.json({
           success: false,
           error: 'Banner upload failed.',
-        });
+        }, { status: 500 });
       }
 
       const { data: publicUrl } = supabase.storage
@@ -138,12 +138,12 @@ export const ChannelService = {
       return NextResponse.json({
         success: false,
         error: insertError.message,
-      });
+      }, { status: 500 });
     }
 
     return NextResponse.json({
       success: true,
       channel
-    });
+    }, { status: 201 });
   },
 }
