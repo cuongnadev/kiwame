@@ -1,6 +1,6 @@
 'use client'
 import { use, useState, useEffect } from "react";
-import NavigationTabs from "./layout/NavigationTabs"
+import NavigationTabs from "../../components/ui/tabs/NavigationTabs"
 import ProfileHeader from "./layout/ProfileHeader"
 import { usePathname } from "next/navigation";
 import { useAppUser } from "@/hooks/useAppUser";
@@ -38,9 +38,9 @@ export default function Layout(
           channel={channel}
         />
       </div>
-      <div className="pl-12">
+      <main className="pl-12">
         {children}
-      </div>
+      </main>
     </div>
   )
 }

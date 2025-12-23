@@ -11,7 +11,8 @@ export interface ButtonProps {
   radius?: 'none' | 'sm' | 'md' | 'lg' | 'full';
   loading?: boolean;
   disabled?: boolean;
-  onClick?: () => void;
+  nowrap?: boolean;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
 }
 
@@ -24,6 +25,7 @@ export const Button: React.FC<ButtonProps> = ({
   radius = 'md',
   loading = false,
   disabled = false,
+  nowrap = false,
   onClick,
   className
 }) => {
@@ -95,7 +97,7 @@ export const Button: React.FC<ButtonProps> = ({
       ) : (
         <>
           {icon && iconPosition === 'left' && <span>{icon}</span>}
-          {text && <span>{text}</span>}
+          {text && <span className={nowrap===true ? 'block overflow-hidden text-ellipsis whitespace-nowrap max-w-full':''}>{text}</span>}
           {icon && iconPosition === 'right' && <span>{icon}</span>}
         </>
       )}

@@ -100,7 +100,7 @@ export default function CreatePostForm() {
                 className="border-none"
               />
             }
-            <div className="flex items-center">
+            <div className="flex items-center rounded-full">
               {showSchedule ? (
                 <>
                   <Button
@@ -121,6 +121,7 @@ export default function CreatePostForm() {
                     radius="full"
                     disabled={content.trim() === ""}
                   />
+                  <span className="h-8 w-[1px] bg-white/60"></span>
                   <Popup
                     trigger={
                       <Button

@@ -53,6 +53,29 @@ create index idx_videos_channel_id on public.videos(channel_id);
 create index idx_videos_visibility on public.videos(visibility);
 
 -- ==============================
+-- VIDEOS UPDATE
+-- ==============================
+
+alter table public.videos
+drop column video_url;
+ALTER TABLE public.videos
+ADD COLUMN for_children BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE public.videos
+ADD COLUMN is_draft BOOLEAN NOT NULL DEFAULT true;
+create table public.video_items (
+    id uuid primary key default gen_random_uuid(),
+    video_id uuid references public.videos(id) on delete cascade,
+    part_index int not null,
+    cloud_url text not null,
+    size_mb float,
+    duration integer,
+    created_at timestamptz default now()
+);
+
+create index idx_video_items_video_id on public.video_items(video_id);
+create index idx_video_items_part_index on public.video_items(part_index);
+
+-- ==============================
 -- VIDEO VIEWS
 -- ==============================
 create table public.video_views (

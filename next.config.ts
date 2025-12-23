@@ -27,8 +27,13 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "ahxftawcbaodqcsdorbr.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com"
+      }
     ],
   },
+
 };
 
 export default nextConfig;

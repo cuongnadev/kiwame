@@ -1,5 +1,5 @@
 'use client'
-import NavigationTabs from "../layout/NavigationTabs"
+import NavigationTabs from "../../../components/ui/tabs/NavigationTabs"
 import CreatePostForm from "./CreatePostForm"
 import { use, useState } from "react"
 import { useSearchParams } from "next/navigation"
