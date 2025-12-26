@@ -242,6 +242,10 @@ export default function StreamPlayer({ initialStream }: { initialStream: Stream 
           </div>
 
           <div className="flex-1 space-y-4">
+            <h3 className="text-lg font-semibold">Thumbnail</h3>
+
+            {/* Thumbnail preview and upload area */}
+
             <h3 className="text-lg font-semibold">Mô tả</h3>
 
             <div className="w-full">

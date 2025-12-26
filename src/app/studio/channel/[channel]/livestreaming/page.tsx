@@ -2,7 +2,7 @@
 
 import LiveChat from "@/app/components/stream/LiveChat";
 import StreamPlayer from "@/app/components/stream/StreamPlayer";
-import { getOrCreateStream } from "@/services/stream.service";
+import { StreamService } from "@/services/stream.service";
 
 async function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -10,7 +10,7 @@ async function sleep(ms: number) {
 
 export default async function LivePage() {
   await sleep(2000);
-  const stream = await getOrCreateStream();
+  const stream = await StreamService.getOrCreateStream();
 
   return (
     <div className="flex h-full text-white">

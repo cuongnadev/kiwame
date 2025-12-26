@@ -2,17 +2,17 @@ import { VideoService } from "@/services/video.service";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    const form = await req.formData();
-    const title = form.get("title");
+  const form = await req.formData();
+  const title = form.get("title");
 
-    const video = await VideoService.createVideo({
-        title: title
-    })
+  const video = await VideoService.createVideo({
+    title: title
+  })
 
-    return NextResponse.json({
-        success: true,
-        video: video
-    },
+  return NextResponse.json({
+    success: true,
+    video: video
+  },
     { status: 200 }
-    )
+  );
 }

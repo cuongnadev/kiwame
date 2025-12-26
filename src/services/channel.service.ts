@@ -147,3 +147,28 @@ export const ChannelService = {
     }, { status: 201 });
   },
 }
+
+export const getCurrentChannelId = async (
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>
+) => {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    throw new Error('User not authenticated');
+  }
+
+  const { data: channel, error } = await supabase
+    .from('channels')
+    .select('id')
+    .eq('owner_id', user.id)
+    .single();
+
+  if (error || !channel) {
+    throw new Error('Channel not found');
+  }
+
+  return channel.id;
+};

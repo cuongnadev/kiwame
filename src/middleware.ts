@@ -10,7 +10,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/favicon") ||
     pathname.startsWith("/manifest") ||
     pathname.startsWith("/.well-known") ||
-    pathname.startsWith("/api")
+    pathname.startsWith("/api") ||
+    pathname.includes(".")
   ) {
     return NextResponse.next();
   }
