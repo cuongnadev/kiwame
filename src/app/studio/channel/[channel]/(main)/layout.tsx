@@ -1,19 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
 import Header from "@/app/(main)/layout/Header";
 import { useAppUser } from "@/hooks/useAppUser";
 import SidebarStudio from "@/app/studio/channel/layout/SidebarStudio";
 
 export default function StudioLayout({ children }: { children: React.ReactNode }) {
-  const params = useParams();
-  const channel = decodeURIComponent(params.channel as string);
-
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const { user, loading } = useAppUser();
 
-  const channelName = user?.channel?.name;
+  const channel = user?.channel;
 
   const toggleSidebar = () => setSidebarExpanded((prev) => !prev);
 
@@ -25,7 +21,7 @@ export default function StudioLayout({ children }: { children: React.ReactNode }
         <Header
           onMenuClick={toggleSidebar}
           user={user}
-          channel={channelName ?? channel}
+          channel={channel!}
           type="studio"
           className="shadow-lg shadow-black/50"
         />
@@ -34,7 +30,7 @@ export default function StudioLayout({ children }: { children: React.ReactNode }
           <SidebarStudio
             expanded={sidebarExpanded}
             user={user}
-            channel={channelName ?? channel}
+            channel={channel!}
           />
 
           <main className="flex-1 overflow-y-auto scrollbar-main px-6 py-4 bg-[#0f0f0f]">

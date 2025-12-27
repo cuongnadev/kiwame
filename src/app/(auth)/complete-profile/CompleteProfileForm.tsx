@@ -51,11 +51,13 @@ export default function CompleteProfileForm() {
       const res = await fetch('/api/profile', {
         method: 'POST',
         body: formData,
+        credentials: 'include',
       });
 
       if (!res.ok) {
         const data = await res.json();
         const message = getFirstZodError(data.error);
+
         showToast(
           message ?? 'Profile completion failed',
           'error'

@@ -8,7 +8,7 @@ export async function POST(req: Request) {
 
     const channelName = formData.get("channelName");
 
-    const parsed = channelSchema.safeParse(channelName);
+    const parsed = channelSchema.safeParse({ channelName });
 
     if (!parsed.success) {
       return NextResponse.json(

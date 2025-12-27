@@ -5,17 +5,18 @@ import Link from "next/link";
 import { getStudioMenuItems, systemMenuItems } from "@/constants/menu.constants";
 import { AppUser } from "@/hooks/useAppUser";
 import { SidebarItem } from "@/app/(main)/layout/SidebarItem";
+import { AppUserChannel } from "@/types/channel";
 
 interface SidebarStudioProps {
   expanded: boolean;
   user: AppUser | null;
-  channel: string | null;
+  channel: AppUserChannel | null;
 }
 
 export default function SidebarStudio({
   expanded,
   user,
-  channel = "Kênh của bạn",
+  channel = { name: "Kênh của bạn", avatar_url: null, banner_url: null },
 }: SidebarStudioProps) {
   const studioItems = getStudioMenuItems(channel);
 
@@ -26,20 +27,20 @@ export default function SidebarStudio({
     >
       {/* Channel Header */}
       <div className="p-4 flex flex-col items-center">
-        <Link href={channel ? `/${channel}` : "#"} className="block">
+        <Link href={channel ? `/${channel.name}` : "#"} className="block">
           <Image
-            src={user?.avatar_url || "https://avatar.iran.liara.run/public"}
+            src={channel?.avatar_url || "https://avatar.iran.liara.run/public"}
             width={expanded ? 88 : 40}
             height={expanded ? 88 : 40}
             alt="Channel avatar"
-            className="rounded-full object-cover border-2 border-white/10"
+            className={`rounded-full ${expanded ? "w-22 h-22" : "w-10 h-10"} object-cover border-2 border-white/10`}
             priority
           />
         </Link>
 
         {expanded && (
           <div className="mt-3 text-center">
-            {channel && <p className="text-xs text-gray-400 font-mono">{channel}</p>}
+            {channel && <p className="text-xs text-gray-400 font-mono">{channel.name}</p>}
           </div>
         )}
       </div>

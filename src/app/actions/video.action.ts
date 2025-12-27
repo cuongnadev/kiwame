@@ -3,7 +3,6 @@
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { VideoRow } from "@/types/video";
-import { da } from "date-fns/locale";
 
 export async function getHomeVideos() {
   const supabase = await createSupabaseServerClient();

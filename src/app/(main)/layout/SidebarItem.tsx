@@ -6,12 +6,13 @@ import { ChevronRight } from "lucide-react";
 import { MenuItem, canAccess } from "@/constants/menu.constants";
 import { useMenuNavigation } from "@/hooks/useMenuNavigation";
 import { AppUser } from "@/hooks/useAppUser";
+import { AppUserChannel } from "@/types/channel";
 
 interface Props {
   item: MenuItem;
   expanded: boolean;
   user: AppUser | null;
-  channel: string | null;
+  channel: AppUserChannel | null;
   openCreateChannel?: () => void;
 }
 

@@ -15,9 +15,12 @@ export const UserService = {
 
     const { data, error: userError } = await supabase.auth.getUser();
 
+    console.log('getUser result:', { data, userError });
+
     const user = data?.user;
 
     if (userError || !user) {
+      console.error('Unauthorized: no user in session', userError);
       return NextResponse.json(
         {
           success: false,
@@ -59,10 +62,11 @@ export const UserService = {
       .maybeSingle();
 
     if (checkError) {
+      console.error('Error checking existing username', checkError);
       return NextResponse.json({
         success: false,
         error: "Failed to validate username",
-      },  { status: 500 });
+      }, { status: 500 });
     }
 
     if (existedUser) {
@@ -85,6 +89,7 @@ export const UserService = {
         });
 
       if (uploadError) {
+        console.error('Avatar upload error:', uploadError);
         return NextResponse.json({
           success: false,
           error: "Avatar upload failed.",
@@ -111,6 +116,7 @@ export const UserService = {
       .upsert(payload);
 
     if (profileError) {
+      console.error('Profile upsert error:', profileError);
       return NextResponse.json({
         success: false,
         error: profileError.message,

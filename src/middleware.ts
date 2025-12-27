@@ -1,6 +1,5 @@
 import { updateSupabaseSession } from "@/lib/supabase/middleware";
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseServerClient } from "./lib/supabase/server";
 
 export async function middleware(request: NextRequest) {
   const { pathname, origin } = request.nextUrl;
@@ -16,12 +15,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const response = await updateSupabaseSession(request);
-  const supabase = await createSupabaseServerClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { response, user, supabase } = await updateSupabaseSession(request);
 
   if (pathname.startsWith("/studio/channel/")) {
     const channelName = pathname.split("/")[3];

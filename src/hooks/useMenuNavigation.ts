@@ -2,10 +2,11 @@ import { useRouter } from "next/navigation";
 import { MenuItem, canAccess } from "@/constants/menu.constants";
 import { AppUser } from "@/hooks/useAppUser";
 import { useToast } from "@/app/components/ui/toast/ToastContext";
+import { AppUserChannel } from "@/types/channel";
 
 export const useMenuNavigation = (
   user: AppUser | null,
-  channel: string | null,
+  channel: AppUserChannel | null,
   openCreateChannel?: () => void,
 ) => {
   const router = useRouter();

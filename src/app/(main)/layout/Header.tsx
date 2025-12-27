@@ -15,11 +15,12 @@ import { AppUser } from "@/hooks/useAppUser";
 import clsx from "clsx";
 import { useToast } from "@/app/components/ui/toast/ToastContext";
 import { useRouter } from "next/navigation";
+import { AppUserChannel } from "@/types/channel";
 
 interface HeaderProps {
   onMenuClick: () => void;
   user: AppUser | null;
-  channel: string | null;
+  channel: AppUserChannel | null;
   openCreateChannel?: () => void;
   className?: string;
   type: "main" | "studio";
@@ -107,11 +108,11 @@ export default function Header({
           {user ? (
             <Popup trigger={
               <Image
-                src={user.avatar_url || "https://avatar.iran.liara.run/public"}
+                src={type === "main" ? user?.avatar_url || "https://avatar.iran.liara.run/public" : channel?.avatar_url || "https://avatar.iran.liara.run/public"}
                 width={44}
                 height={44}
                 alt="Avatar"
-                className="rounded-full ring-2 ring-white/20 hover:ring-white/40 cursor-pointer transition-all"
+                className="rounded-full w-[44px] h-[44px] ring-2 ring-white/20 hover:ring-white/40 object-cover cursor-pointer transition-all"
                 unoptimized
               />
             } position="bottom-left">
@@ -121,7 +122,7 @@ export default function Header({
                 user={user}
                 channel={channel}
                 onLogout={handleLogout}
-                onToGoChannel={() => channel && navigate(`/${channel}`)}
+                onToGoChannel={() => channel && navigate(`/${channel.name}`)}
                 type={type}
               />
             </Popup>

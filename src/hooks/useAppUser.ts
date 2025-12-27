@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { AppUserChannel } from "@/types/channel";
 
 export type AppUser = {
   id: string;
@@ -9,9 +10,7 @@ export type AppUser = {
   username: string;
   full_name: string;
   avatar_url: string | null;
-  channel?: {
-    name: string; // "@Kiwame Studio"
-  } | null;
+  channel?: AppUserChannel | null;
 };
 
 export function useAppUser() {
@@ -46,7 +45,7 @@ export function useAppUser() {
     if (authUser.id) {
       const { data: channel, error: channelError } = await supabase
         .from("channels")
-        .select("name")
+        .select("name, avatar_url, banner_url")
         .eq("owner_id", authUser.id)
         .maybeSingle();
 
@@ -57,6 +56,8 @@ export function useAppUser() {
       if (channel) {
         channelData = {
           name: channel.name,
+          avatar_url: channel.avatar_url,
+          banner_url: channel.banner_url,
         };
       }
     }

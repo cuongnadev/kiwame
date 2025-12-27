@@ -17,7 +17,7 @@ export const AuthService = {
     if (error) return NextResponse.json({ success: false, error: error.message }, { status: 400 });
 
 
-    return NextResponse.json({ success: true, data: data.user }, { status: 201 });
+    return NextResponse.json({ success: true, message: "Please check your email to confirm your account." }, { status: 201 });
   },
 
   login: async (email: string, password: string, rememberMe: boolean) => {
@@ -35,27 +35,27 @@ export const AuthService = {
     }
 
     const response = NextResponse.json({ success: true }, { status: 200 });
-    if (rememberMe) {
-      response.cookies.set({
-        name: "sb_session",
-        value: data.session?.access_token || "",
-        httpOnly: true,
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-      });
-    } else {
-      response.cookies.set({
-        name: "sb_session",
-        value: data.session?.access_token || "",
-        httpOnly: true,
-        path: "/",
-        maxAge: 0,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-      });
-    }
+    // if (rememberMe) {
+    //   response.cookies.set({
+    //     name: "sb_session",
+    //     value: data.session?.access_token || "",
+    //     httpOnly: true,
+    //     path: "/",
+    //     maxAge: 60 * 60 * 24 * 7,
+    //     secure: process.env.NODE_ENV === "production",
+    //     sameSite: "lax",
+    //   });
+    // } else {
+    //   response.cookies.set({
+    //     name: "sb_session",
+    //     value: data.session?.access_token || "",
+    //     httpOnly: true,
+    //     path: "/",
+    //     maxAge: 0,
+    //     secure: process.env.NODE_ENV === "production",
+    //     sameSite: "lax",
+    //   });
+    // }
     return response;
   },
 

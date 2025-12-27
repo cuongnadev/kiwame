@@ -27,17 +27,16 @@ export default function RegisterForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, confirmPassword }),
       });
-
+      const data = await res.json();
+      const message = getFirstZodError(data.error);
 
       if (!res.ok) {
-        const data = await res.json();
-        const message = getFirstZodError(data.error);
         showToast(message ?? "Registration failed", "error");
         return;
       }
 
       showToast(
-        'Registration successful! Please complete your profile.',
+        message ?? 'Registration successful! Please complete your profile.',
         'success'
       );
       router.push('/complete-profile');
