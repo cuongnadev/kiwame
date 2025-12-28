@@ -18,7 +18,8 @@ export async function middleware(request: NextRequest) {
   const { response, user, supabase } = await updateSupabaseSession(request);
 
   if (pathname.startsWith("/studio/channel/")) {
-    const channelName = pathname.split("/")[3];
+    const rawName = pathname.split("/")[3];
+    const channelName = decodeURIComponent(rawName);
 
     if (!user) {
       return NextResponse.redirect(new URL("/login", origin));
@@ -41,7 +42,8 @@ export async function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith("/@")) {
-    const channelName = pathname.split("/")[1];
+    const rawName = pathname.split("/")[1];
+    const channelName = decodeURIComponent(rawName);
 
     const { data: channel } = await supabase
       .from("channels")

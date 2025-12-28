@@ -9,11 +9,12 @@ import {
   systemMenuItems,
 } from "@/constants/menu.constants";
 import { AppUser } from "@/hooks/useAppUser";
+import { AppUserChannel } from "@/types/channel";
 
 interface SidebarProps {
   expanded: boolean;
   user: AppUser | null;
-  channel: string | null;
+  channel: AppUserChannel | null;
   openCreateChannel: () => void;
 }
 

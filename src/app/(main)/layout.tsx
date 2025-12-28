@@ -13,7 +13,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const [showCreateChannel, setShowCreateChannel] = useState(false);
   const { user, loading } = useAppUser();
 
-  const channel = user?.channel?.name || null;
+  const channel = user?.channel;
 
   const toggleSidebar = () => setSidebarExpanded((prev) => !prev);
 
@@ -37,7 +37,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <Header
           onMenuClick={toggleSidebar}
           user={user}
-          channel={channel}
+          channel={channel!}
           type="main"
           openCreateChannel={() => setShowCreateChannel(true)}
         />
@@ -46,7 +46,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <Sidebar
             expanded={sidebarExpanded}
             user={user}
-            channel={channel}
+            channel={channel!}
             openCreateChannel={() => setShowCreateChannel(true)}
           />
 

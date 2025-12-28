@@ -24,7 +24,7 @@ export function SidebarItem({ item, expanded, user, channel, openCreateChannel }
   const isActive = item.href ? pathname === item.href : false;
 
   const handleClick = (e: React.MouseEvent) => {
-    if (!allowed || !item.href) {
+    if (!allowed) {
       e.preventDefault();
       navigate(item);
     }
@@ -33,6 +33,7 @@ export function SidebarItem({ item, expanded, user, channel, openCreateChannel }
   return (
     <Link
       href={allowed && item.href ? item.href : "#"}
+      aria-disabled={!item.href}
       onClick={handleClick}
       className={`flex items-center gap-4 rounded-lg px-3 transition-all group relative
         ${expanded ? "py-2 justify-start" : "py-4 justify-center"}
