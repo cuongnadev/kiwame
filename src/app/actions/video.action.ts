@@ -4,9 +4,8 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { VideoRow } from "@/types/video";
 
+const supabase = await createSupabaseServerClient();
 export async function getHomeVideos() {
-  const supabase = await createSupabaseServerClient();
-
   const { data, error } = await supabase
     .from("videos")
     .select(`
@@ -60,4 +59,21 @@ export async function getHomeVideos() {
       })),
     };
   });
+}
+
+export async function getMyVideos() {
+  const { data, error } = await supabase
+    .from("videos")
+    .select(`
+      id,
+      title,
+      description,
+      thumbnail_url,
+      visibility,
+      is_draft,
+      video_views(count),
+      comments(count),
+      created_at
+      `
+    )
 }

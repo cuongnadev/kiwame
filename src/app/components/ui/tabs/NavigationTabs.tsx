@@ -5,7 +5,7 @@ interface NavigationTabsProps {
   activeTab: string,
   setActiveTab: (tab: string) => void,
   type: string,
-  channel: string | null,
+  channelName: string | null,
 }
 
 const MainTabs = [
@@ -29,7 +29,7 @@ const ContentTabs = [
 
 ]
 
-export default function NavigationTabs({ activeTab, setActiveTab, type, channel }: NavigationTabsProps) {
+export default function NavigationTabs({ activeTab, setActiveTab, type, channelName }: NavigationTabsProps) {
     const tabs =
         type === "main"
             ? MainTabs
@@ -41,7 +41,7 @@ export default function NavigationTabs({ activeTab, setActiveTab, type, channel 
   const handlePostTabClick = (tabId: string) => {
     setActiveTab(tabId);
     router.push(
-      `/${channel}/posts?type=${tabId}`,
+      `/${channelName}/posts?type=${tabId}`,
       { scroll: false }
     );
   }
@@ -56,7 +56,7 @@ export default function NavigationTabs({ activeTab, setActiveTab, type, channel 
                         onClick={() => {
                             setActiveTab(activeTab = tab.id)
                         }}
-                        href={`/${channel}/${tab.id === 'home' ? '' : tab.id}`}
+                        href={`/${channelName}/${tab.id === 'home' ? '' : tab.id}`}
                         className={`text-white hover:border-b-2 hover:border-white/90 px-0 py-3 font-semibold 
                         ${activeTab === tab.id ? 'border-b-2 border-white text-white' : 'opacity-80'}`}
                         title={tab.label}
@@ -70,7 +70,7 @@ export default function NavigationTabs({ activeTab, setActiveTab, type, channel 
                         onClick={() => {
                             setActiveTab(activeTab = tab.id)
                         }}
-                        href={`/studio/channel/${channel}/${tab.id}`}
+                        href={`/studio/channel/${channelName}/${tab.id}`}
                         className={`text-white hover:border-b-2 hover:border-white/90 px-0 py-3 font-semibold 
                         ${activeTab === tab.id ? 'border-b-2 border-white text-white' : 'opacity-80'}`}
                         title={tab.label}

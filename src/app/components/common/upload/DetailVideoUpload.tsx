@@ -1,13 +1,14 @@
 import { AlertCircle, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "../../ui/button/Button";
 
 interface DetailVideoUploadProps {
     title: string,
     setTitle: (title: string) => void,
     description: string,
+    thumbnailUrl: string | null,
     forChildren?: boolean,
     setDescription: (description: string) => void,
     setThumbnailFile: (file: File | null) => void,
@@ -15,14 +16,22 @@ interface DetailVideoUploadProps {
     setThumbnailUrl?: (url: string) => void,
     videoUrl?: string,
     videoFileName: string,
+    error: string
 }
 
-export default function DetailVideoUpload({ title, description, forChildren, setTitle, setDescription, setForChildren, setThumbnailFile, videoUrl, videoFileName }: DetailVideoUploadProps) {
+export default function DetailVideoUpload({ title, description, forChildren, thumbnailUrl, setTitle, setDescription, setForChildren, setThumbnailFile, videoUrl, videoFileName, error }: DetailVideoUploadProps) {
     const thumbnailInputRef = useRef<HTMLInputElement>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [showTooltip, setShowTooltip] = useState(false);
+    const [generateUrl, setGenerateUrl] = useState<string | null>(null);
 
     const isEmpty = title.trim() === '';
+    const hasError = error === "detail"
+    useEffect(() => {
+        if (thumbnailUrl) {
+            setGenerateUrl(thumbnailUrl)
+        }
+    }, [thumbnailUrl])
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file && file.type.startsWith('image/')) {
@@ -113,11 +122,11 @@ export default function DetailVideoUpload({ title, description, forChildren, set
                             <span className="text-xs">Chọn hình thu nhỏ nổi bật để thu hút sự chú ý của người xem.
                                 <Link href="#" className="underline text-blue-400"> Tìm hiểu thêm </Link>
                             </span>
-                            <div className="w-1/3 py-4">
+                            <div className="w-full py-4 flex gap-3">
                                 {/* Upload Image Card */}
                                 <div
                                     onClick={handleUploadClick}
-                                    className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 hover:bg-neutral-600 transition-all h-[120px] group"
+                                    className="relative w-1/3 border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 hover:bg-neutral-600 transition-all h-[120px] group"
                                 >
                                     <input
                                         ref={thumbnailInputRef}
@@ -132,9 +141,8 @@ export default function DetailVideoUpload({ title, description, forChildren, set
                                             <Image
                                                 src={previewUrl}
                                                 alt="Preview"
-                                                width={200}
-                                                height={150}
-                                                className="w-full h-full object-contain rounded"
+                                                fill
+                                                className="object-cover rounded"
                                             />
                                             <Button
                                                 icon={<X size={16} />}
@@ -154,6 +162,23 @@ export default function DetailVideoUpload({ title, description, forChildren, set
                                             </svg>
                                             <span className="text-sm text-gray-600 group-hover:text-gray-700">Tải ảnh lên</span>
                                         </>
+                                    )}
+                                </div>
+                                <div
+                                    className="relative w-1/3 border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 hover:bg-neutral-600 transition-all h-[120px] group"
+                                >
+                                    {generateUrl && (
+                                        <div className="relative w-full h-full">
+                                            <Image
+                                                src={generateUrl}
+                                                alt="Preview"
+                                                fill
+                                                className="object-cover rounded"
+                                            />
+                                            <div className="absolute flex items-center justify-center top-0 h-full bg-black opacity-30">
+                                                <span className="text-xs text-center text-white">Ảnh được tạo tự động</span>
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -178,7 +203,7 @@ export default function DetailVideoUpload({ title, description, forChildren, set
                                     </Link>
                                 </p>
                             </div>
-                            <div className={`relative flex flex-col mb-4 gap-2 ${forChildren === null ? 'border-2 border-red-400 rounded-2xl p-2 -translate-x-3' : ''
+                            <div className={`relative flex flex-col mb-4 gap-2 ${(forChildren === null && hasError) ? 'border-2 border-red-400 rounded-2xl p-2 -translate-x-3' : ''
                                 }`}>
                                 <label
                                     className={`flex items-center gap-2 rounded-lg cursor-pointer transition-all`}
@@ -213,7 +238,7 @@ export default function DetailVideoUpload({ title, description, forChildren, set
                                         Không, nội dung này không dành cho trẻ em
                                     </span>
                                 </label>
-                                {forChildren === null && (
+                                {(forChildren === null && hasError) && (
                                     <div className="absolute left-0 top-full mt-2 z-50 animate-in fade-in slide-in-from-top-1 duration-200">
                                         <div className="bg-neutral-500 text-white text-xs px-3 py-2 rounded-lg shadow-lg relative">
                                             <div className="absolute -top-1 left-4 w-2 h-2 bg-neutral-500 rotate-45"></div>

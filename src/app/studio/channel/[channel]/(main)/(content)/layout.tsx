@@ -9,7 +9,7 @@ export default function Layout({ children, params }: { children: React.ReactNode
   const channel = decodeURIComponent(use(params).channel);
   const [activeTab, setActiveTab] = useState('upload');
   return (
-    <div className="flex flex-col overflow-hidden">
+    <div className="flex flex-col overflow-hidden relative h-full">
       <h2 className="font-bold p-3 text-2xl">
         Nội dung của kênh
       </h2>
@@ -33,7 +33,7 @@ export default function Layout({ children, params }: { children: React.ReactNode
           variant="bare"
         />
       </div>
-      <main className="pt-4">
+      <main className="pt-4 h-full">
         {children}
       </main>
     </div>

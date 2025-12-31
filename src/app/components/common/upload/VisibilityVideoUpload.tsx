@@ -8,10 +8,11 @@ interface VisibilityVideoUploadPros {
     videoUrl: string,
     videoFileName: string,
     privacy: string,
-    setPrivacy: (privacy: string) => void
+    setPrivacy: (privacy: string) => void,
+    errorForm: string
 }
 
-export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, videoFileName }: VisibilityVideoUploadPros) {
+export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, videoFileName, errorForm }: VisibilityVideoUploadPros) {
     const [showDetailCard, setShowDetailCard] = useState('privacy')
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('00:00');
@@ -19,7 +20,8 @@ export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, v
     const [showTimeDropdown, setShowTimeDropdown] = useState(false);
     const [showTimezoneDropdown, setShowTimezoneDropdown] = useState(false);
     const [isPremiere, setIsPremiere] = useState(false);
-    const [error, setError] = useState('');
+    const [errorTime, setErrorTime] = useState('');
+    const hasError = errorForm === "visibility"
     const dateRef = useRef<HTMLInputElement>(null);
     const timeDropdownRef = useRef<HTMLDivElement>(null);
     const timezoneDropdownRef = useRef<HTMLDivElement>(null);
@@ -86,7 +88,7 @@ export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, v
 
     const validateDateTime = useCallback(() => {
         if (!selectedDate || !selectedTime) {
-            setError('Vui lòng chọn ngày và giờ');
+            setErrorTime('Vui lòng chọn ngày và giờ');
             return false;
         }
 
@@ -103,11 +105,11 @@ export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, v
         const selectedDateTime = new Date(year, month - 1, day, hours, minutes);
 
         if (selectedDateTime <= nowInSelectedTZ) {
-            setError('Thời gian được chọn phải trong tương lai');
+            setErrorTime('Thời gian được chọn phải trong tương lai');
             return false;
         }
 
-        setError('');
+        setErrorTime('');
         return true;
     },[selectedDate, selectedTime, timezone]);
 
@@ -333,15 +335,15 @@ export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, v
                                     </div>
 
                                     {/* Error Message */}
-                                    {error && (
+                                    {errorTime && (
                                         <div className="flex items-start gap-2 text-red-500 text-sm bg-red-500/10 border border-red-500/30 rounded-lg p-3">
                                             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                                            <span>{error}</span>
+                                            <span>{errorTime}</span>
                                         </div>
                                     )}
 
                                     {/* Success Message */}
-                                    {!error && selectedDate && selectedTime && (
+                                    {!errorTime && selectedDate && selectedTime && (
                                         <div className="text-gray-400 text-sm">
                                             Video sẽ ở chế độ <span className="font-semibold text-white">riêng tư</span> trước khi xuất bản
                                         </div>

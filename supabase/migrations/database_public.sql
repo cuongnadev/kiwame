@@ -59,9 +59,13 @@ create index idx_videos_visibility on public.videos(visibility);
 alter table public.videos
 drop column video_url;
 ALTER TABLE public.videos
+DROP COLUMN duration;
+ALTER TABLE public.videos
 ADD COLUMN for_children BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE public.videos
 ADD COLUMN is_draft BOOLEAN NOT NULL DEFAULT true;
+alter table public.videos
+alter column visibility drop default;
 create table public.video_items (
     id uuid primary key default gen_random_uuid(),
     video_id uuid references public.videos(id) on delete cascade,

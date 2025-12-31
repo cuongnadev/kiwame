@@ -17,9 +17,11 @@ export function useAppUser() {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadUser = useCallback(async () => {
+  const loadUser = useCallback(async (isInitialLoad = true) => {
     const supabase = createSupabaseBrowserClient();
-    setLoading(true);
+    if (isInitialLoad) {
+      setLoading(true);
+    }
 
     const {
       data: { user: authUser },
@@ -77,16 +79,16 @@ export function useAppUser() {
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
 
-    loadUser();
+    loadUser(true);
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_, session) => {
-      if (!session?.user) {
-        setUser(null);
-        setLoading(false);
-      } else {
-        loadUser();
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        loadUser(false)
+      } else if (event === "SIGNED_OUT") {
+        setUser(null)
+        setLoading(false)
       }
     });
 

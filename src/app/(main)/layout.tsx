@@ -29,7 +29,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   }, [loading, channel, searchParams]);
 
 
-  if (loading) return null;
+  // if (loading) return null;
 
   return (
     <>
@@ -39,6 +39,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           user={user}
           channel={channel!}
           type="main"
+          loading={loading}
           openCreateChannel={() => setShowCreateChannel(true)}
         />
 

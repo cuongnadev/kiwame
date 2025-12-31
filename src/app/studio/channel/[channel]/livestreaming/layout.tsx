@@ -18,7 +18,7 @@ export default function LiveStreamingLayout({ children }: { children: React.Reac
 
   const toggleSidebar = () => setSidebarExpanded((prev) => !prev);
 
-  if (loading) return null;
+  // if (loading) return null;
 
   return (
     <>

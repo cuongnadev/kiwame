@@ -13,7 +13,7 @@ export default function StudioLayout({ children }: { children: React.ReactNode }
 
   const toggleSidebar = () => setSidebarExpanded((prev) => !prev);
 
-  if (loading) return null;
+  // if (loading) return null;
 
   return (
     <>
@@ -24,6 +24,7 @@ export default function StudioLayout({ children }: { children: React.ReactNode }
           channel={channel!}
           type="studio"
           className="shadow-lg shadow-black/50"
+          loading={loading}
         />
 
         <div className="flex flex-1 overflow-hidden">

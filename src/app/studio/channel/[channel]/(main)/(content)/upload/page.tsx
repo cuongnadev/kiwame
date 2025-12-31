@@ -2,7 +2,7 @@
 import { Button } from '@/app/components/ui/button/Button';
 import React, { useEffect, useState } from 'react'
 import UploadForm from '../UploadForm';
-import { ArrowDown, ChevronDown, X } from 'lucide-react';
+import { ArrowDown, ChevronDown, SquarePlay, X } from 'lucide-react';
 import { Video } from '@/types/video';
 import CheckBox from '@/app/components/ui/input/CheckBox';
 
@@ -10,7 +10,8 @@ export default function UploadPage() {
   const [listVideo, setListVideo] = useState<Video[]>([])
   const [selectedVideos, setSelectedVideos] = useState<number[]>([])
   const [showUploadModal, setShowUploadModal] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [formStatus, setFormStatus] = useState("upload")
 
   const hasSelection = selectedVideos.length > 0
 
@@ -50,7 +51,18 @@ export default function UploadPage() {
 
 
   return (
-    <div className='w-full'>
+    <div className='w-full h-full'>
+      {listVideo.length > 0 && (
+        <div className='absolute bottom-1 right-1'>
+          <Button
+            icon={<SquarePlay size={20} />}
+            onClick={() => { setShowUploadModal(true) }}
+            variant='outline'
+            text='Tải video lên'
+            radius='full'
+          />
+        </div>
+      )}
       {hasSelection && (
         <div className="flex items-center gap-6 py-3 px-4 bg-white text-black mb-2">
           <span className="text-sm font-semibold">
@@ -147,7 +159,7 @@ export default function UploadPage() {
         )
       )}
       {showUploadModal && (
-        <UploadForm onClose={() => setShowUploadModal(false)} />
+        <UploadForm onClose={() => setShowUploadModal(false)} formStatus={formStatus} />
       )}
     </div>
   )

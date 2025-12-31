@@ -12,30 +12,30 @@ export default function Layout(
   const pathname = usePathname();
   const { user, loading } = useAppUser();
 
-  const channel = user?.channel?.name || null;
+  const channelName = user?.channel?.name || null;
 
   useEffect(() => {
 
     if (!pathname) return;
 
-    if (pathname === `/@${channel}`) {
+    if (pathname === `/@${channelName}`) {
       setActiveTab("home");
     }
 
-    if (pathname.startsWith(`/@${channel}/posts`)) {
+    if (pathname.startsWith(`/@${channelName}/posts`)) {
       setActiveTab("posts");
     }
-  }, [pathname, channel]);
+  }, [pathname, channelName]);
 
   return (
     <div className="bg-[#0f0f0f] -translate-x-4">
-      <ProfileHeader channel={channel} />
+      <ProfileHeader channelName={channelName} loading={loading} />
       <div className="border-b border-b-gray-500 pl-12">
         <NavigationTabs
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           type="main"
-          channel={channel}
+          channelName={channelName}
         />
       </div>
       <main className="pl-12">

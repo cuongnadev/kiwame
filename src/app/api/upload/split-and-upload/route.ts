@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import ffmpeg from 'fluent-ffmpeg';
+import ffmpeg, { FfprobeData } from 'fluent-ffmpeg';
 import ffmpegStatic from 'ffmpeg-static';
 import ffprobeStatic from 'ffprobe-static';
 import { createCloudinary } from '@/lib/cloudinary/cloudinary';
 import { VideoItemService } from '@/services/video-item.service';
+import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
 
 
 if (ffmpegStatic) {
@@ -31,8 +32,8 @@ if (ffprobeStatic.path) {
 }
 
 const cloudinary = createCloudinary();
-const VIDEO_DIR = path.join(process.cwd(), 'public/videos');
 const SPLITS_DIR = path.join(process.cwd(), 'public/video-splits');
+const THUMBNAILS_DIR = path.join(process.cwd(), "public/thumbnails")
 const TARGET_SIZE_MB = 90;
 const TARGET_SIZE_BYTES = TARGET_SIZE_MB * 1024 * 1024;
 
@@ -41,7 +42,7 @@ function getVideoDuration(videoPath: string): Promise<number> {
   return new Promise((resolve, reject) => {
     console.log(`📊 Getting duration for: ${videoPath}`);
 
-    ffmpeg.ffprobe(videoPath, (err: any, metadata: any) => {
+    ffmpeg.ffprobe(videoPath, (err: Error, metadata: FfprobeData) => {
       if (err) {
         console.error(`❌ FFprobe error:`, err.message);
         reject(new Error(`Failed to get video duration: ${err.message}`));
@@ -59,11 +60,17 @@ function getFileSize(filePath: string): number {
   return fs.statSync(filePath).size;
 }
 
+
+interface videoPart {
+  filename: string,
+  size: number,
+  sizeInMB: string
+}
 // Cắt video thành 90MB
 async function splitVideoBy90MB(
   videoPath: string,
   uploadId: string
-): Promise<{ filename: string; size: number; sizeInMB: string }[]> {
+): Promise<videoPart[]> {
   // Tạo folder splits
   if (!fs.existsSync(SPLITS_DIR)) {
     fs.mkdirSync(SPLITS_DIR, { recursive: true });
@@ -124,6 +131,10 @@ async function splitVideoBy90MB(
     });
   }
 
+  if(fs.existsSync(videoPath)){
+    fs.unlinkSync(videoPath)
+  }
+
   return parts;
 }
 
@@ -154,7 +165,7 @@ async function uploadToCloudinary(
           resource_type: 'video',
           chunk_size: 6000000, // 6MB chunks
         },
-        (error: any, result: any) => {
+        (error: UploadApiErrorResponse| undefined, result: UploadApiResponse| undefined) => {
           if (error) {
             console.error(`Cloudinary upload error for part ${partIndex}:`, error);
             reject(error);
@@ -258,7 +269,6 @@ export async function POST(req: Request) {
           throw new Error(`Failed to save part ${i + 1} to DB`)
         }
         uploadedParts.push(uploadedPart);
-
       } catch (error) {
         console.error(`Failed to upload part ${i + 1}:`, error);
         throw error;

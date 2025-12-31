@@ -23,6 +23,7 @@ interface HeaderProps {
   channel: AppUserChannel | null;
   openCreateChannel?: () => void;
   className?: string;
+  loading: boolean,
   type: "main" | "studio";
 }
 
@@ -32,6 +33,7 @@ export default function Header({
   channel,
   openCreateChannel,
   className,
+  loading,
   type,
 }: HeaderProps) {
   const router = useRouter();
@@ -105,17 +107,26 @@ export default function Header({
 
           <Button icon={<Bell size={22} />} variant="ghost" radius="full" className="p-3! hover:bg-white/10" />
 
-          {user ? (
-            <Popup trigger={
-              <Image
-                src={type === "main" ? user?.avatar_url || "https://avatar.iran.liara.run/public" : channel?.avatar_url || "https://avatar.iran.liara.run/public"}
-                width={44}
-                height={44}
-                alt="Avatar"
-                className="rounded-full w-[44px] h-[44px] ring-2 ring-white/20 hover:ring-white/40 object-cover cursor-pointer transition-all"
-                unoptimized
-              />
-            } position="bottom-left">
+          {loading ? (
+            <div className="w-[44px] h-[44px] rounded-full bg-white/10 animate-pulse" />
+          ) : user ? (
+            <Popup
+              trigger={
+                <Image
+                  src={
+                    type === "main"
+                      ? user.avatar_url || "https://avatar.iran.liara.run/public"
+                      : channel?.avatar_url || "https://avatar.iran.liara.run/public"
+                  }
+                  width={44}
+                  height={44}
+                  alt="Avatar"
+                  className="rounded-full w-[44px] h-[44px] ring-2 ring-white/20 hover:ring-white/40 object-cover cursor-pointer transition-all"
+                  unoptimized
+                />
+              }
+              position="bottom-left"
+            >
               <UserMenu
                 items={userMenuItems}
                 onNavigate={navigate}
