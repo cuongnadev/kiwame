@@ -1,36 +1,33 @@
 'use client'
 
-import { VideoPlayer } from "@/app/components/common/videoPlayer/VideoPlayer"
-import { Button } from '@/app/components/ui/button/Button'
-import { VideoPreviewCard } from '@/app/components/common/VideoPreviewCard/VideoPreviewCard'
-import Image from 'next/image'
-import { ThumbsUp, ThumbsDown, Share2, Download, Bookmark } from 'lucide-react'
-import { useEffect, useState } from "react"
-import { ShareIcon } from "@/app/components/ui/icons"
+import Image from 'next/image';
+import { useEffect, useState } from "react";
+import { ThumbsUp, ThumbsDown, Download, Bookmark } from 'lucide-react';
+
+import { Button, ShareIcon } from '@/app/components/ui';
+import { VideoPlayer } from '@/app/components/common';
 
 interface WatchPagePros {
   video_id: string
 }
 
 export default function WatchPage({ video_id }: WatchPagePros) {
-  const channel = null;
   const [activeTab, setActiveTab] = useState("all");
+
   useEffect(() => {
     fetch(`/api/video/get-video?video-id=${video_id}`)
-  }, [])
+  }, [video_id]);
+
   const videoFeed = [
     { id: "all", label: "Tất cả" },
     { id: "channel", label: "Của ..." },
     { id: "related", label: "Video có liên quan" },
     { id: "for_you", label: "Dành cho bạn" },
     { id: "watch_later", label: "Xem sau" },
-
   ]
 
-  const subcribe = () => {
+  const subcribe = () => { }
 
-  }
-  
   return (
     <main className="flex">
       <div className="w-3/4 flex-col">
@@ -85,11 +82,11 @@ export default function WatchPage({ video_id }: WatchPagePros) {
               />
               <Button
                 text="Tải xuống"
-                icon={<Download size={20}/>}
+                icon={<Download size={20} />}
               />
               <Button
                 text="Lưu"
-                icon={<Bookmark size={20}/>}
+                icon={<Bookmark size={20} />}
               />
               <Button
                 text=""

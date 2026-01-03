@@ -1,6 +1,7 @@
+import { NextResponse } from "next/server";
+
 import { channelSchema } from "@/schema/channel.schema";
 import { ChannelService } from "@/services/channel.service";
-import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {

@@ -4,8 +4,8 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { VideoRow } from "@/types/video";
 
-const supabase = await createSupabaseServerClient();
 export async function getHomeVideos() {
+  const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("videos")
     .select(`
@@ -62,6 +62,7 @@ export async function getHomeVideos() {
 }
 
 export async function getMyVideos() {
+  const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("videos")
     .select(`

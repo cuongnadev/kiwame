@@ -7,7 +7,7 @@ import { LiveIcon } from '@/app/components/ui/icons/LiveIcon';
 import { Button } from '@/app/components/ui/button/Button';
 import { Popup } from '@/app/components/ui/popup/Popup';
 import { ShareIcon } from '@/app/components/ui/icons/ShareIcon';
-import { VideoPart, VideoPlayer } from '@/app/components/common/videoPlayer/VideoPlayer';
+import { VideoPart, VideoPlayer } from '@/app/components/common/video/videoPlayer/VideoPlayer';
 import { formatDuration } from '@/helper/formatDuration';
 
 interface VideoPreviewCardProps {

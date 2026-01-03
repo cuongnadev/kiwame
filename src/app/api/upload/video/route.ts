@@ -1,5 +1,6 @@
-import { VideoService } from "@/services/video.service";
 import { NextResponse } from "next/server";
+
+import { VideoService } from "@/services/video.service";
 
 export async function POST(req: Request) {
   const form = await req.formData();

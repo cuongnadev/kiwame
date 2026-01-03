@@ -1,21 +1,20 @@
 "use client";
 
-import { Menu, Plus, Bell, CircleUserRound } from "lucide-react";
+import clsx from "clsx";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/app/components/ui/button/Button";
-import { Popup } from "@/app/components/ui/popup/Popup";
-import { Search } from "@/app/components/ui/search/Search";
-import { UserMenu } from "./UserMenu";
+import { useRouter } from "next/navigation";
+import { Menu, Plus, Bell, CircleUserRound } from "lucide-react";
+
+import { useToast } from "@/hooks/useToast";
+import { AppUser } from "@/hooks/useAppUser";
+import { AppUserChannel } from "@/types/channel";
+import { UserMenu } from "@/app/(main)/layout/UserMenu";
+import { Button, Popup, Search } from "@/app/components/ui";
+import { useMenuNavigation } from "@/hooks/useMenuNavigation";
+import { getCreateMenuItems, getUserDropdownMenu } from "@/constants/menu.constants";
 import logo from "@/assets/images/logo.png";
 import logoText from "@/assets/images/logo_text.png";
-import { getCreateMenuItems, getUserDropdownMenu } from "@/constants/menu.constants";
-import { useMenuNavigation } from "@/hooks/useMenuNavigation";
-import { AppUser } from "@/hooks/useAppUser";
-import clsx from "clsx";
-import { useToast } from "@/app/components/ui/toast/ToastContext";
-import { useRouter } from "next/navigation";
-import { AppUserChannel } from "@/types/channel";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -74,7 +73,7 @@ export default function Header({
 
         <div className="flex items-center gap-4">
           <Button onClick={onMenuClick} icon={<Menu size={24} />} variant="ghost" radius="full" className="p-2.5! hover:bg-white/10" />
-          <Link href="/" className="flex items-center gap-4">
+          <Link href={type === "main" ? "/" : `/studio/channel/${channel?.name}`} className="flex items-center gap-4">
             <Image src={logo} width={44} height={44} alt="Kiwame" className="drop-shadow-md" />
             {type === "main" ? <Image src={logoText} width={200} height={40} alt="Kiwame" className="m-[-30px] hidden sm:block" /> : <span className="text-2xl font-semibold">Studio</span>}
           </Link>

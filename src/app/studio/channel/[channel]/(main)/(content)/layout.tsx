@@ -1,13 +1,17 @@
 'use client';
-import { Button } from "@/app/components/ui/button/Button";
-import NavigationTabs from "@/app/components/ui/tabs/NavigationTabs";
-import { use, useState } from "react";
-import { ListFilter } from "lucide-react";
-import { Input } from "@/app/components/ui/input/Input";
 
-export default function Layout({ children, params }: { children: React.ReactNode, params: Promise<{ channel: string }> }) {
-  const channel = decodeURIComponent(use(params).channel);
+import { useState } from "react";
+import { ListFilter } from "lucide-react";
+
+import { Button, Input, NavigationTabs } from "@/app/components/ui";
+import { useAppUser } from "@/hooks/useAppUser";
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAppUser();
+
+  const channelName = user?.channel?.name || "Phát trực tiếp";
   const [activeTab, setActiveTab] = useState('upload');
+
   return (
     <div className="flex flex-col overflow-hidden relative h-full">
       <h2 className="font-bold p-3 text-2xl">
@@ -18,7 +22,7 @@ export default function Layout({ children, params }: { children: React.ReactNode
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           type="content"
-          channel={channel}
+          channelName={channelName}
         />
       </div>
       <div className="flex items-center py-2 border-b border-b-gray-500">

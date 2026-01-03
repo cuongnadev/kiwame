@@ -1,7 +1,7 @@
-import { existsSync, readdirSync } from 'fs';
-import { mkdir, readFile, writeFile, unlink, rmdir } from 'fs/promises';
-import { NextResponse } from 'next/server';
 import path from 'path';
+import { existsSync } from 'fs';
+import { NextResponse } from 'next/server';
+import { mkdir, readFile, writeFile, unlink, rmdir } from 'fs/promises';
 
 const TEMP_DIR = path.join(process.cwd(), 'public/temp-chunks');
 const OUTPUT_DIR = path.join(process.cwd(), 'public/videos');
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
     // Đọc tất cả chunks theo thứ tự
     const chunks: Buffer[] = [];
-    
+
     for (let i = 0; i < total_chunks; i++) {
       const chunkPath = path.join(uploadDir, `chunk-${i}`);
 
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     const outputPath = path.join(OUTPUT_DIR, outputFileName);
 
     await writeFile(outputPath, mergedBuffer);
-    
+
     const finalSize = mergedBuffer.length;
     console.log(`✓ File merged: ${outputFileName} (${(finalSize / (1024 * 1024)).toFixed(2)}MB)`);
 

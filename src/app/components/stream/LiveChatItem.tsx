@@ -1,9 +1,10 @@
 "use client";
-import { formatDistanceToNow } from "date-fns";
-import { vi } from "date-fns/locale"; // Thêm locale tiếng Việt
-import { Heart, MessageCircle, Pin, Gift } from "lucide-react";
-import Image from "next/image";
+
 import React from "react";
+import Image from "next/image";
+import { vi } from "date-fns/locale";
+import { formatDistanceToNow } from "date-fns";
+import { Heart, MessageCircle, Pin, Gift } from "lucide-react";
 
 export interface Comment {
   id: string;

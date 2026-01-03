@@ -1,9 +1,10 @@
-import { Button } from "@/app/components/ui/button/Button";
+import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { X, Globe, Info, Share2 } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { X, Globe, Info, Share2 } from "lucide-react";
+
+import { Button } from "@/app/components/ui";
 import { useAppUser } from "@/hooks/useAppUser";
 
 interface ProfileHeaderProps {

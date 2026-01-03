@@ -1,30 +1,58 @@
 "use client";
-import { useEffect, useState } from "react";
-import { Flag, EyeOff, Eye, Info, SquarePen, Save, Radio } from "lucide-react";
-import { Button } from "../ui/button/Button";
-import { Input } from "../ui/input/Input";
-import { Select } from "../ui/input/Select";
-import { Textarea } from "../ui/input/Textarea";
-import { kiwameConfig } from "@/config/kiwame.config";
-import CopyButton from "./CopyButton";
+
+import clsx from "clsx";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
-import { VideoView } from "./VideoView";
+import { Flag, EyeOff, Eye, Info, Save, Radio, UploadCloud, PencilLine, PencilOff } from "lucide-react";
+
 import { Stream } from "@/types/stream";
-import StreamCleanup from "./StreamCleanup";
+import { kiwameConfig } from "@/config/kiwame.config";
+import { VideoView, StreamCleanup } from "@/app/components/stream";
+import { Button, CopyButton, Input, Select, Textarea } from "@/app/components/ui";
 
 export default function StreamPlayer({ initialStream }: { initialStream: Stream }) {
-  const [viewCount] = useState(10);
-  const [title, setTitle] = useState("Restream hôm qua.............................");
+  const [viewCount] = useState(0);
+  const [title, setTitle] = useState("Live stream");
   const [category, setCategory] = useState("Trò chơi");
   const [subCategory, setSubCategory] = useState(false);
   const [subTitles, setSubTitles] = useState(false);
   const [privacy, setPrivacy] = useState("Công khai");
-  const [description, setDescription] = useState("Chúc các bạn xem stream vui vẻ.");
+  const [description, setDescription] = useState("");
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [delay, setDelay] = useState("Thấp");
   const [visible, setVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isSave, setIsSave] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const [token, setToken] = useState<string | null>(null)
+  const thumbnailRef = useRef<HTMLInputElement | null>(null);
+
+  const handlePickThumbnail = () => thumbnailRef.current?.click();
+
+  const handleFile = (
+    file: File,
+    setFile: React.Dispatch<React.SetStateAction<File | null>>,
+    setPreview: React.Dispatch<React.SetStateAction<string | null>>
+  ) => {
+    setFile(file);
+    setPreview(URL.createObjectURL(file));
+    setIsSave(true);
+  };
+
+  const handleDrog = (
+    e: React.DragEvent<HTMLDivElement>,
+    setFile: React.Dispatch<React.SetStateAction<File | null>>,
+    setPreview: React.Dispatch<React.SetStateAction<string | null>>
+  ) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFile(file, setFile, setPreview);
+    setIsSave(true);
+  }
+
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialStream?.room_name) {
@@ -34,6 +62,17 @@ export default function StreamPlayer({ initialStream }: { initialStream: Stream 
         .catch(console.error);
     }
   }, [initialStream?.room_name]);
+
+  const handleSave = async () => {
+    try {
+
+    } catch (error) {
+      console.log(error);
+
+    }
+
+    setIsSave(false);
+  }
 
   return (
     <div className="w-full h-full flex flex-col group/sidebar">
@@ -72,7 +111,7 @@ export default function StreamPlayer({ initialStream }: { initialStream: Stream 
                       type="text"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      className="w-[92%]!"
+                      className="w-[88%]!"
                     />
                   ) : (
                     <p className="text-lg font-bold line-clamp-1 max-w-180">{title}</p>
@@ -121,7 +160,7 @@ export default function StreamPlayer({ initialStream }: { initialStream: Stream 
                 <div className="flex items-start gap-6">
                   <div className="flex flex-col items-start gap-2">
                     <label className="text-sm text-gray-400">Số người xem đang đợi</label>
-                    <p className="text-md font-bold">10</p >
+                    <p className="text-md font-bold">0</p >
                   </div>
 
                   <div className="flex flex-col items-start gap-2">
@@ -132,13 +171,33 @@ export default function StreamPlayer({ initialStream }: { initialStream: Stream 
               </div>
             </div>
 
+            {isSave && (
+              <Button
+                icon={
+                  <Save size={18} />
+                }
+                onClick={handleSave}
+                radius="full"
+                variant="dark"
+                size="sm"
+                className="p-2.5! absolute top-4 right-16 border border-white"
+              />
+            )}
+
             <Button
-              icon={!isEditing ? <SquarePen size={18} /> : <Save size={18} />}
-              onClick={() => { setIsEditing(!isEditing); }}
+              icon={
+                !isEditing ?
+                  <PencilLine size={18} /> :
+                  <PencilOff size={18} />
+              }
+              onClick={() => {
+                setIsEditing(!isEditing);
+                if (isEditing) setIsSave(true);
+              }}
               radius="full"
               variant="dark"
               size="sm"
-              className="p-2.5! absolute top-4 right-4"
+              className="p-2.5! absolute top-4 right-4 border border-white"
             />
           </div>
           <div className="p-2.5 flex items-center gap-2">
@@ -244,7 +303,45 @@ export default function StreamPlayer({ initialStream }: { initialStream: Stream 
           <div className="flex-1 space-y-4">
             <h3 className="text-lg font-semibold">Thumbnail</h3>
 
-            {/* Thumbnail preview and upload area */}
+            <div
+              onClick={handlePickThumbnail}
+              onDrop={(e) => handleDrog(e, setThumbnailFile, setThumbnailPreview)}
+              onDragOver={(e) => e.preventDefault()}
+              className={clsx(
+                "group relative flex h-[140px] w-full cursor-pointer items-center justify-center rounded-xl border-2 bg-white/5 transition",
+                thumbnailPreview
+                  ? "border-white/20"
+                  : "border-dashed border-white/15 hover:border-white"
+              )}
+            >
+              <input
+                ref={thumbnailRef}
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFile(file, setThumbnailFile, setThumbnailPreview);
+                }}
+              />
+
+              {thumbnailPreview ? (
+                <Image
+                  src={thumbnailPreview}
+                  alt="thumbnail preview"
+                  width={600}
+                  height={240}
+                  className="h-full w-full rounded-xl object-cover"
+                />
+              ) : (
+                <div className="text-center">
+                  <UploadCloud className="mx-auto mb-2 h-8 w-8 text-gray-400 group-hover:text-white transition" />
+                  <p className="text-sm text-gray-400">
+                    Upload Thumbnail
+                  </p>
+                </div>
+              )}
+            </div>
 
             <h3 className="text-lg font-semibold">Mô tả</h3>
 

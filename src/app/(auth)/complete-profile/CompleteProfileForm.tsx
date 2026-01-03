@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/app/components/ui/button/Button';
-import { Input } from '@/app/components/ui/input/Input';
+import React, { useRef, useState } from 'react';
 import { LockKeyhole, User, UploadCloud } from 'lucide-react';
-import { useToast } from '@/app/components/ui/toast/ToastContext';
+
+import { useToast } from '@/hooks/useToast';
+import { Button, Input } from '@/app/components/ui';
 import { getFirstZodError } from '@/helper/get-first-zod-error';
 
 export default function CompleteProfileForm() {

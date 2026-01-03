@@ -1,6 +1,7 @@
+import { NextRequest, NextResponse } from "next/server";
+
 import { profileSchema } from "@/schema/profile.schema";
 import { UserService } from "@/services/user.service";
-import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {

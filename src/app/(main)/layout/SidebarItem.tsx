@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
-import { MenuItem, canAccess } from "@/constants/menu.constants";
-import { useMenuNavigation } from "@/hooks/useMenuNavigation";
+
 import { AppUser } from "@/hooks/useAppUser";
 import { AppUserChannel } from "@/types/channel";
+import { useMenuNavigation } from "@/hooks/useMenuNavigation";
+import { MenuItem, canAccess } from "@/constants/menu.constants";
 
 interface Props {
   item: MenuItem;

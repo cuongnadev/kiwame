@@ -1,9 +1,11 @@
 'use client'
-import { use, useState, useEffect } from "react";
-import NavigationTabs from "../../components/ui/tabs/NavigationTabs"
-import ProfileHeader from "./layout/ProfileHeader"
+
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+
 import { useAppUser } from "@/hooks/useAppUser";
+import { NavigationTabs } from "@/app/components/ui";
+import ProfileHeader from "@/app/(main)/[channel]/layout/ProfileHeader";
 
 export default function Layout(
   { children }: { children: React.ReactNode }

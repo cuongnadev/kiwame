@@ -1,10 +1,10 @@
+"use client"
+
 import { useCallback, useEffect, useState } from "react";
-import { Button } from "../../ui/button/Button";
-import StepperProgressBar from "../../ui/progressbar/StepperProgressBar";
 import { CheckCircle, Loader2, X } from "lucide-react";
-import DetailVideoUpload from "./DetailVideoUpload";
-import ComponentsVideoUpload from "./ComponentVideoUpload";
-import VisibilityVideoUpload from "./VisibilityVideoUpload";
+
+import { Button, StepperProgressBar } from "@/app/components/ui";
+import { ComponentsVideoUpload, VisibilityVideoUpload, DetailVideoUpload } from "@/app/components/common";
 
 interface UploadEditDetailsPros {
     onClose: () => void,
@@ -64,10 +64,10 @@ export default function UploadEditDetails({ onClose,thumbnailUrl, videoUrl, uplo
 
     const handleStepClick = (stepId: number) => {
         if (currentStep === 1 && stepId > 1) {
-            setHasAttemptedNext(true); 
+            setHasAttemptedNext(true);
 
             if (!validateDetail()) {
-                return; 
+                return;
             }
         }
         setCurrentStep(stepId);

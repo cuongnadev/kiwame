@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { kiwameConfig } from "@/config/kiwame.config";
 

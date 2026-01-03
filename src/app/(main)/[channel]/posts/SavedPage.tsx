@@ -1,7 +1,7 @@
-export default function SavedPage(){
-    return (
-        <div>
-            Saved Page
-        </div>
-    )
+export default function SavedPage() {
+  return (
+    <div>
+      Saved Page
+    </div>
+  )
 }

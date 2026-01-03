@@ -1,10 +1,11 @@
 'use client'
-import { Button } from '@/app/components/ui/button/Button';
-import React, { useEffect, useState } from 'react'
-import UploadForm from '../UploadForm';
+
+import React, { useEffect, useState } from 'react';
 import { ArrowDown, ChevronDown, SquarePlay, X } from 'lucide-react';
+
 import { Video } from '@/types/video';
-import CheckBox from '@/app/components/ui/input/CheckBox';
+import { Button, CheckBox } from '@/app/components/ui';
+import UploadForm from '@/app/studio/channel/[channel]/(main)/(content)/UploadForm';
 
 export default function UploadPage() {
   const [listVideo, setListVideo] = useState<Video[]>([])

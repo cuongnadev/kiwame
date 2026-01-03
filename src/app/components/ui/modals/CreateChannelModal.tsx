@@ -1,13 +1,12 @@
 "use client";
 
 import clsx from "clsx";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 import { Tv, UploadCloud, X, Image as ImageIcon } from "lucide-react";
-import Image from "next/image";
-import { Input } from "../input/Input";
-import { Button } from "../button/Button";
-import { useToast } from "../toast/ToastContext";
-import { useRouter } from "next/navigation";
+import { Input, Button } from "@/app/components/ui";
+import { useToast } from "@/hooks/useToast";
 import { useAppUser } from "@/hooks/useAppUser";
 import { getFirstZodError } from "@/helper/get-first-zod-error";
 
@@ -16,7 +15,7 @@ export interface CreateChannelProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export default function CreateChannelModal({
+export function CreateChannelModal({
   open,
   onOpenChange,
 }: CreateChannelProps) {

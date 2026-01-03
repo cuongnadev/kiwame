@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { AppUserChannel } from "@/types/channel";
 

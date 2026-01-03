@@ -1,12 +1,12 @@
 'use client';
-import React, { useState } from 'react'
+
 import Image from 'next/image';
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
-import { Button } from '@/app/components/ui/button/Button';
-import { GoogleIcon } from '@/app/components/ui/icons/GoogleIcon';
-import { Input } from '@/app/components/ui/input/Input';
 import { Facebook, LockKeyhole, LockKeyholeOpen, Mail } from 'lucide-react';
-import { useToast } from '@/app/components/ui/toast/ToastContext';
+
+import { useToast } from '@/hooks/useToast';
+import { Button, Input, GoogleIcon } from '@/app/components/ui';
 import { getFirstZodError } from '@/helper/get-first-zod-error';
 
 export default function RegisterForm() {

@@ -1,6 +1,8 @@
 'use client';
-import { Button } from "@/app/components/ui/button/Button";
+
 import { useState, useEffect } from "react";
+
+import { Button } from "@/app/components/ui";
 
 export default function ChannelPage() {
   const [videoList, setVideoList] = useState([]);

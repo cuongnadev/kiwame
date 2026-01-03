@@ -1,24 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useState } from "react";
+
 import Header from "@/app/(main)/layout/Header";
 import { useAppUser } from "@/hooks/useAppUser";
-import SidebarLiveStreaming from "../../layout/SidebarLiveStreaming";
+import SidebarLiveStreaming from "@/app/studio/channel/layout/SidebarLiveStreaming";
 
 export default function LiveStreamingLayout({ children }: { children: React.ReactNode }) {
-  const params = useParams();
-
-  const channel = decodeURIComponent(params.channel as string);
-
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const { user, loading } = useAppUser();
 
+  const channel = user?.channel;
   const channelName = user?.channel?.name || "Phát trực tiếp";
 
   const toggleSidebar = () => setSidebarExpanded((prev) => !prev);
-
-  // if (loading) return null;
 
   return (
     <>
@@ -26,8 +21,9 @@ export default function LiveStreamingLayout({ children }: { children: React.Reac
         <Header
           onMenuClick={toggleSidebar}
           user={user}
-          channel={channel}
+          channel={channel!}
           type="studio"
+          loading={loading}
           className="shadow-2xl shadow-red-900/20 border-b border-red-500/20"
         />
 

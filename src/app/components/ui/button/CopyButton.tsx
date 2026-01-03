@@ -7,7 +7,7 @@ interface CopyButtonPros {
   value?: string
 }
 
-export default function CopyButton({ value }: CopyButtonPros) {
+export function CopyButton({ value }: CopyButtonPros) {
   const [isCopied, setIsCopied] = useState(false);
   const handleCopy = () => {
     if (!value) return

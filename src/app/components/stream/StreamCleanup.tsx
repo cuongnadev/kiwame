@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRoomContext } from "@livekit/components-react";
 
-export default function StreamCleanup() {
+export function StreamCleanup() {
   const room = useRoomContext();
 
   useEffect(() => {

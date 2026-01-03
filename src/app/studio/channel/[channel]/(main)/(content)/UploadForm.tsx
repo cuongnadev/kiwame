@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import UploadSelectedFile from "@/app/components/common/upload/UploadSelectedFile";
-import UploadEditDetails from "@/app/components/common/upload/UploadEditDetail";
+import { UploadSelectedFile, UploadEditDetails } from "@/app/components/common";
 
 interface UploadFormProps {
   onClose: () => void,

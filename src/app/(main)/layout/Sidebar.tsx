@@ -1,6 +1,8 @@
 "use client";
 
-import { SidebarItem } from "./SidebarItem";
+import { AppUser } from "@/hooks/useAppUser";
+import { AppUserChannel } from "@/types/channel";
+import { SidebarItem } from "@/app/(main)/layout/SidebarItem";
 import {
   mainMenuItems,
   getUserMenuItems,
@@ -8,8 +10,6 @@ import {
   exploreMenuItems,
   systemMenuItems,
 } from "@/constants/menu.constants";
-import { AppUser } from "@/hooks/useAppUser";
-import { AppUserChannel } from "@/types/channel";
 
 interface SidebarProps {
   expanded: boolean;

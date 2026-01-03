@@ -9,7 +9,7 @@ export interface CheckBoxPros {
     all?: boolean
 }
 
-export default function CheckBox(
+export function CheckBox(
     { checked, onCheckedChange, label, className, all }: CheckBoxPros
 ) {
     return (

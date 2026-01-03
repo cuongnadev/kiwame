@@ -1,8 +1,9 @@
 import { useRouter } from "next/navigation";
-import { MenuItem, canAccess } from "@/constants/menu.constants";
+
+import { useToast } from "@/hooks/useToast";
 import { AppUser } from "@/hooks/useAppUser";
-import { useToast } from "@/app/components/ui/toast/ToastContext";
 import { AppUserChannel } from "@/types/channel";
+import { MenuItem, canAccess } from "@/constants/menu.constants";
 
 export const useMenuNavigation = (
   user: AppUser | null,

@@ -1,11 +1,12 @@
 "use client";
 
-import { MenuItem } from "@/constants/menu.constants";
-import { AppUser } from "@/hooks/useAppUser";
-import { AppUserChannel } from "@/types/channel";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import { AppUser } from "@/hooks/useAppUser";
+import { AppUserChannel } from "@/types/channel";
+import { MenuItem } from "@/constants/menu.constants";
 
 interface UserMenuProps {
   items: MenuItem[];

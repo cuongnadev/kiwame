@@ -1,6 +1,7 @@
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import React from 'react';
 import { redirect } from 'next/navigation';
-import React from 'react'
+
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export default async function Authlayout({
   children,

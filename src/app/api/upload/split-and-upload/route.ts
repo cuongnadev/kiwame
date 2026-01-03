@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import ffmpeg, { FfprobeData } from 'fluent-ffmpeg';
+import { NextResponse } from 'next/server';
 import ffmpegStatic from 'ffmpeg-static';
 import ffprobeStatic from 'ffprobe-static';
+import ffmpeg, { FfprobeData } from 'fluent-ffmpeg';
 import { createCloudinary } from '@/lib/cloudinary/cloudinary';
 import { VideoItemService } from '@/services/video-item.service';
 import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
@@ -131,7 +131,7 @@ async function splitVideoBy90MB(
     });
   }
 
-  if(fs.existsSync(videoPath)){
+  if (fs.existsSync(videoPath)) {
     fs.unlinkSync(videoPath)
   }
 
@@ -165,7 +165,7 @@ async function uploadToCloudinary(
           resource_type: 'video',
           chunk_size: 6000000, // 6MB chunks
         },
-        (error: UploadApiErrorResponse| undefined, result: UploadApiResponse| undefined) => {
+        (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
           if (error) {
             console.error(`Cloudinary upload error for part ${partIndex}:`, error);
             reject(error);

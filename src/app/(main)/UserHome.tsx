@@ -1,27 +1,29 @@
-import React from 'react'
-import { getHomeStreams } from '@/app/actions/stream.actions';
-import { getHomeVideos } from '@/app/actions/video.action';
-import { VideoPreviewCard } from '@/app/components/common/VideoPreviewCard/VideoPreviewCard'
+import React from 'react';
+
+import { getHomeVideos, getHomeStreams } from '@/app/actions';
+import { VideoGrid, VideoPreviewCard } from '@/app/components/common';
 
 export default async function UserHome() {
   const liveStreams = await getHomeStreams();
   const listVideos = await getHomeVideos();
 
+  const videoCount = liveStreams.length + listVideos.length;
+
   return (
-    <>
+    <VideoGrid videoCount={videoCount}>
       {liveStreams.map((stream) => (
-          <VideoPreviewCard
-            key={stream.videoId}
-            videoId={stream.videoId}
-            title={stream.title}
-            channel={stream.channel}
-            views={stream.views}
-            thumbnailUrl={stream.thumbnailUrl}
-            avatar={stream.avatar}
-            isLive={true}
-            roomName={stream.roomName}
-          />
-        ))}
+        <VideoPreviewCard
+          key={stream.videoId}
+          videoId={stream.videoId}
+          title={stream.title}
+          channel={stream.channel}
+          views={stream.views}
+          thumbnailUrl={stream.thumbnailUrl}
+          avatar={stream.avatar}
+          isLive={true}
+          roomName={stream.roomName}
+        />
+      ))}
 
       {listVideos.map((video) => (
         <VideoPreviewCard
@@ -37,6 +39,6 @@ export default async function UserHome() {
           parts={video.parts}
         />
       ))}
-    </>
+    </VideoGrid>
   )
 }

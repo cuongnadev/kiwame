@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Header from "./layout/Header";
-import Sidebar from "./layout/Sidebar";
-import { useAppUser } from "@/hooks/useAppUser";
 import { useSearchParams } from "next/navigation";
-import CreateChannelModal from "@/app/components/ui/modals/CreateChannelModal";
+import React, { useEffect, useState } from "react";
+
+import Header from "@/app/(main)/layout/Header";
+import Sidebar from "@/app/(main)/layout/Sidebar";
+import { useAppUser } from "@/hooks/useAppUser";
+import { CreateChannelModal } from "@/app/components/ui";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
@@ -28,9 +29,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     }
   }, [loading, channel, searchParams]);
 
-
-  // if (loading) return null;
-
   return (
     <>
       <div className="flex flex-col h-screen bg-[#0f0f0f]">
@@ -51,7 +49,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             openCreateChannel={() => setShowCreateChannel(true)}
           />
 
-          <main className="w-full grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 px-6 py-4 bg-[#0f0f0f] overflow-y-auto overflow-x-hidden scrollbar-main">
+          <main className="w-full">
             {children}
           </main>
         </div>

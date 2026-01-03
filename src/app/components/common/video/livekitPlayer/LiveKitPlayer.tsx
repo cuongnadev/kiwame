@@ -9,6 +9,7 @@ import {
   useTracks,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
+
 import { kiwameConfig } from "@/config/kiwame.config";
 
 interface LiveKitPlayerProps {

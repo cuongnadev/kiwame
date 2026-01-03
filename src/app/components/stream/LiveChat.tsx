@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Send, MoreVertical } from "lucide-react";
-import LiveChatItem, { Comment } from "./LiveChatItem";
+
+import LiveChatItem, { Comment } from "@/app/components/stream/LiveChatItem";
 
 
 const initialComments: Comment[] = [
@@ -95,6 +96,7 @@ const initialComments: Comment[] = [
 export default function LiveChat() {
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [input, setInput] = useState("");
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const send = () => {
     if (!input.trim()) return;
@@ -109,6 +111,12 @@ export default function LiveChat() {
     setComments([newComment, ...comments]);
     setInput("");
   };
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [comments]);
 
   return (
     <aside className="w-full h-full flex flex-col bg-[#181818] border-l border-[#303030] group/sidebar">
@@ -128,6 +136,8 @@ export default function LiveChat() {
         {comments.map((c, index) => (
           <LiveChatItem comment={c} key={index} />
         ))}
+
+        <div ref={bottomRef} />
       </div>
 
       {/* Input */}

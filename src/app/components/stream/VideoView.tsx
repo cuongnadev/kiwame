@@ -1,7 +1,7 @@
 "use client";
 
-import { ParticipantTile } from "@livekit/components-react";
 import "@livekit/components-styles";
+import { ParticipantTile } from "@livekit/components-react";
 import { useParticipants, useTracks } from "@livekit/components-react";
 
 export function VideoView() {

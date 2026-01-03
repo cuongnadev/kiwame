@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { ReactNode } from "react";
-import logo from "@/assets/images/logo.png";
 import {
   UserRound, LogOut, Database,
   Monitor, Languages, MapPinned,
@@ -22,10 +21,12 @@ import {
   LayoutDashboard,
   BadgeDollarSign,
   Camera
-} from "lucide-react"
-import { YourVideoIcon, AnalyticsIcon, AudienceIcon, ListBulletIcon, RecordIcon, SparkIcon, MusicNoteSquareIcon, ManagerIcon, SpeedCycleIcon } from "@/app/components/ui/icons";
+} from "lucide-react";
+
 import { AppUser } from "@/hooks/useAppUser";
 import { AppUserChannel } from "@/types/channel";
+import { YourVideoIcon, AnalyticsIcon, AudienceIcon, ListBulletIcon, RecordIcon, SparkIcon, MusicNoteSquareIcon, ManagerIcon, SpeedCycleIcon } from "@/app/components/ui";
+import logo from "@/assets/images/logo.png";
 
 export type AccessRequirement = 'auth' | 'channel' | 'premium' | 'admin' | null;
 
