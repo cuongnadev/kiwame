@@ -8,6 +8,7 @@ import {
 import { kiwameConfig } from "@/config/kiwame.config";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseWorkerClient } from "@/lib/supabase/worker";
+import { success } from "zod";
 
 const apiKey = kiwameConfig.livekitApiKey;
 const apiSecret = kiwameConfig.livekitApiSecret;
@@ -132,7 +133,7 @@ export const StreamService = {
             })
             .eq("id", stream.id);
 
-            console.log(`Stream ONLINE: ${streamKey}`);
+          console.log(`Stream ONLINE: ${streamKey}`);
           break;
         }
 
@@ -213,5 +214,85 @@ export const StreamService = {
     });
 
     return NextResponse.json({ token: await token.toJwt() });
+  },
+
+  update: async (formData: FormData) => {
+    const supabase = await createSupabaseServerClient();
+
+    const { data, error: userError } = await supabase.auth.getUser();
+
+    const user = data?.user;
+
+    if (userError || !user) {
+      throw new Error("UNAUTHORIZED");
+    }
+
+    const ownerId = user.id;
+
+    const { data: channel } = await supabase
+      .from('channels')
+      .select('id')
+      .eq('owner_id', ownerId)
+      .maybeSingle();
+
+    if (!channel) {
+      throw new Error("CHANNEL_NOT_FOUND");
+    }
+
+    const { data: stream } = await supabase
+      .from('streams')
+      .select('id')
+      .eq('channel_id', channel.id)
+      .maybeSingle()
+
+    if (!stream) {
+      throw new Error("STREAM_NOT_FOUND");
+    }
+
+    const title = formData.get('title') as string;
+    const descriptionRaw = formData.get("description") as string | null;
+    const description = descriptionRaw?.trim() || null;
+    const thumbnailEntry = formData.get('thumbnail') as File | null;
+
+    let thumbnailUrl: string | undefined;
+
+    if (thumbnailEntry instanceof File) {
+      const ext = thumbnailEntry.name.split(".").pop();
+      const fileName = `thumbnail-${ownerId}-${Date.now()}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('Images')
+        .upload(fileName, thumbnailEntry, {
+          contentType: thumbnailEntry.type,
+        });
+
+      if (uploadError) {
+        throw new Error("THUMBNAIL_UPLOAD_FAILED");
+      }
+
+      const { data: publicUrl } = supabase.storage
+        .from('Images')
+        .getPublicUrl(fileName);
+
+      thumbnailUrl = publicUrl.publicUrl;
+    }
+
+    const { error: updateError } = await supabase
+      .from('streams')
+      .update({
+        title,
+        description,
+        ...(thumbnailUrl && { thumbnail_url: thumbnailUrl }),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", stream.id);
+
+    if (updateError) {
+      throw new Error("UPDATE_STREAM_FAILED");
+    }
+
+    return {
+      success: true,
+    }
   }
 };

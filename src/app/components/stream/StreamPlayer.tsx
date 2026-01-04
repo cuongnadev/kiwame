@@ -10,6 +10,8 @@ import { Stream } from "@/types/stream";
 import { kiwameConfig } from "@/config/kiwame.config";
 import { VideoView, StreamCleanup } from "@/app/components/stream";
 import { Button, CopyButton, Input, Select, Textarea } from "@/app/components/ui";
+import { getFirstZodError } from "@/helper/get-first-zod-error";
+import { useToast } from "@/hooks/useToast";
 
 export default function StreamPlayer({ initialStream }: { initialStream: Stream }) {
   const [viewCount] = useState(0);
@@ -26,6 +28,7 @@ export default function StreamPlayer({ initialStream }: { initialStream: Stream 
   const [isEditing, setIsEditing] = useState(false);
   const [isSave, setIsSave] = useState(false);
   const [saving, setSaving] = useState(false);
+  const { showToast } = useToast();
 
   const thumbnailRef = useRef<HTMLInputElement | null>(null);
 
@@ -64,14 +67,45 @@ export default function StreamPlayer({ initialStream }: { initialStream: Stream 
   }, [initialStream?.room_name]);
 
   const handleSave = async () => {
-    try {
+    if (saving) return;
+    setSaving(true);
 
+    try {
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('description', description);
+
+      if (thumbnailFile) {
+        formData.append('thumbnail', thumbnailFile);
+      }
+
+      const res = await fetch('/api/live/update', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        const message = getFirstZodError(data.error);
+
+        showToast(
+          message ?? 'Stream info update failed',
+          'error'
+        );
+        return;
+      }
+
+      showToast(
+        'Stream info update successfully',
+        'success'
+      );
+      setIsSave(false);
     } catch (error) {
       console.log(error);
-
+      showToast('Something went wrong', 'error');
+    } finally {
+      setSaving(false);
     }
-
-    setIsSave(false);
   }
 
   return (
