@@ -45,9 +45,7 @@ export const VideoService = {
     const { id, ...updateData } = data;
     const { data: video, error } = await supabaseWorker
       .from("videos")
-      .update({
-        updateData
-      })
+      .update(updateData)
       .eq("id", id)
       .select()
       .single();

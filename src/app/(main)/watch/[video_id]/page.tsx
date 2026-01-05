@@ -2,10 +2,12 @@
 
 import Image from 'next/image';
 import { useEffect, useState } from "react";
-import { ThumbsUp, ThumbsDown, Download, Bookmark } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Download, Bookmark } from 'lucide-react'
 
 import { Button, ShareIcon } from '@/app/components/ui';
 import { VideoPlayer } from '@/app/components/common';
+import { Video, VideoItemRow, VideoPart } from "@/types/video"
+import { getVideo } from "@/app/actions/video.actions"
 
 interface WatchPagePros {
   video_id: string
@@ -13,10 +15,22 @@ interface WatchPagePros {
 
 export default function WatchPage({ video_id }: WatchPagePros) {
   const [activeTab, setActiveTab] = useState("all");
-
+  const [video, setVideo] = useState<Video | null>(null);
+  const [parts, setParts] = useState<VideoPart[]>([]);
   useEffect(() => {
-    fetch(`/api/video/get-video?video-id=${video_id}`)
-  }, [video_id]);
+    const fetchVideo = async () => {
+      const data = await getVideo(video_id);
+      setVideo(data);
+      const video_parts: VideoPart[] = video?.video_items
+        ? video.video_items.map((item: VideoItemRow) => ({
+          url: item.cloud_url,
+          duration: item.duration,
+        }))
+        : [];
+      setParts(video_parts);
+    }
+    fetchVideo();
+  })
 
   const videoFeed = [
     { id: "all", label: "Tất cả" },
@@ -32,7 +46,7 @@ export default function WatchPage({ video_id }: WatchPagePros) {
     <main className="flex">
       <div className="w-3/4 flex-col">
         <div className="aspect-video w-full rounded-xl overflow-hidden bg-black">
-          <VideoPlayer parts={[{ url: '/videos/sample.mp4', duration: 600 }]} />
+          <VideoPlayer parts={parts} />
         </div>
         {/* Video-Info */}
         <div className="flex flex-col gap-3 mt-3">

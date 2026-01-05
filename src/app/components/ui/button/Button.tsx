@@ -14,6 +14,7 @@ export interface ButtonProps {
   nowrap?: boolean;
   onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
+  title?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -27,6 +28,7 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   nowrap = false,
   onClick,
+  title,
   className
 }) => {
   const baseStyles = 'inline-flex hover:pointer items-center justify-center gap-2 font-medium transition-colors duration-200';
@@ -91,6 +93,7 @@ export const Button: React.FC<ButtonProps> = ({
         (disabled || loading) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
         className
       )}
+      title={title}
     >
       {loading ? (
         <Loader2 className="w-5 h-5 animate-spin"/>

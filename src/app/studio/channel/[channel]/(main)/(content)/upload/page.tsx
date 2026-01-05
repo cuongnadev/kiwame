@@ -4,33 +4,33 @@ import React, { useEffect, useState } from 'react';
 import { ArrowDown, ChevronDown, SquarePlay, X } from 'lucide-react';
 
 import { Video } from '@/types/video';
-import { Button, CheckBox } from '@/app/components/ui';
+import { Button, CheckBox, Popup } from '@/app/components/ui';
 import UploadForm from '@/app/studio/channel/[channel]/(main)/(content)/UploadForm';
+import { VideoItem } from '@/app/components/common';
+import { getMyVideos } from '@/app/actions/video.actions';
 
 export default function UploadPage() {
   const [listVideo, setListVideo] = useState<Video[]>([])
-  const [selectedVideos, setSelectedVideos] = useState<number[]>([])
+  const [selectedVideos, setSelectedVideos] = useState<string[]>([])
   const [showUploadModal, setShowUploadModal] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [formStatus, setFormStatus] = useState("upload")
+  const [videoEdit, setVideoEdit] = useState<Video | null>(null)
+  const [hoveredVideo, setHoveredVideo] = useState<string | null>(null)
 
   const hasSelection = selectedVideos.length > 0
 
+  const fetchVideos = async () => {
+    const data = await getMyVideos()
+    setListVideo(data)
+    console.log(data)
+    setLoading(false)
+  }
   useEffect(() => {
-    const fetchVideos = async () => {
-      const response = await fetch("/api/video/my-videos", {
-        method: "GET",
-        headers: { 'Content-Type': 'application/json' }
-      })
-      const data = await response.json()
-      console.log(data)
-      setListVideo(data)
-      setLoading(false)
-    }
     fetchVideos()
   }, [])
 
-  const toggleVideo = (id: number) => {
+  const toggleVideo = (id: string) => {
     setSelectedVideos((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]))
   }
 
@@ -50,11 +50,43 @@ export default function UploadPage() {
     setSelectedVideos([])
   }
 
+  const editVideo = (video_id: string) => {
+    const video = listVideo.find(v => v.id === video_id)
+    if (video) {
+      setFormStatus("edit")
+      setVideoEdit(video)
+      setShowUploadModal(true)
+    }
+  }
+
+  const deleteSelectedVideos = async () => {
+    const res = await fetch('/api/upload/delete-video', {
+      method: 'DELETE',
+      body: (() => {
+        const formData = new FormData();
+        formData.append("listId", JSON.stringify(selectedVideos));
+        return formData;
+      })()
+    })
+    fetchVideos()
+  }
+
+  const deleteVideo = async (video_id: string) => {
+    const res = await fetch('/api/upload/delete-video', {
+      method: 'DELETE',
+      body: (() => {
+        const formData = new FormData();
+        formData.append("listId", JSON.stringify([video_id]));
+        return formData;
+      })()
+    })
+    fetchVideos()
+  }
 
   return (
     <div className='w-full h-full'>
       {listVideo.length > 0 && (
-        <div className='absolute bottom-1 right-1'>
+        <div className='absolute bottom-1 right-1 z-100'>
           <Button
             icon={<SquarePlay size={20} />}
             onClick={() => { setShowUploadModal(true) }}
@@ -87,13 +119,35 @@ export default function UploadPage() {
             variant='outline'
             className='text-black! hover:shadow hover:bg-neutral-200!'
           />
-          <Button
-            text='Thao tác khác'
-            icon={<ChevronDown className="w-4 h-4" />}
-            iconPosition='right'
-            variant='outline'
-            className='text-black! hover:shadow hover:bg-neutral-200!'
-          />
+          <Popup
+            trigger={
+              <Button
+                text='Thao tác khác'
+                icon={<ChevronDown className="w-4 h-4" />}
+                iconPosition='right'
+                variant='outline'
+                className='text-black! hover:shadow hover:bg-neutral-200!'
+              />
+            }
+          >
+            <div className=" w-40 flex flex-col items-center gap-2 p-2 rounded-xl cursor-pointer transition-all group">
+              <Button
+                text="Tải xuống"
+                variant="outline"
+                className="text-white/80 border-none text-xs group-hover:text-white transition-colors w-full justify-start"
+                radius="sm"
+                onClick={() => { }}
+                disabled={selectedVideos.length > 1 || selectedVideos.length === 0}
+              />
+              <Button
+                text="Xóa vĩnh viễn"
+                variant="outline"
+                className="text-white/80 border-none text-xs group-hover:text-white transition-colors w-full justify-start"
+                radius="sm"
+                onClick={() => deleteSelectedVideos()}
+              />
+            </div>
+          </Popup>
           <Button
             icon={<X className="w-6 h-6" />}
             onClick={clearSelection}
@@ -139,12 +193,16 @@ export default function UploadPage() {
         listVideo.length > 0 ? (
           <>
             {listVideo.map((video) => (
-              <div key={video.id} className="grid grid-cols-[48px_1fr_150px_100px_140px_80px_100px_120px] items-center py-3 border-b border-[#3f3f3f] text-[#aaa] text-sm">
-                <CheckBox
-                  checked={selectedVideos.includes(video.id)}
-                  onCheckedChange={() => toggleVideo(video.id)}
-                />
-              </div>
+              <VideoItem
+                key={video.id}
+                video={video}
+                isSelected={selectedVideos.includes(video.id)}
+                onSelect={() => toggleVideo(video.id)}
+                editVideo={() => { editVideo(video.id) }}
+                hoveredVideo={hoveredVideo}
+                setHoveredVideo={setHoveredVideo}
+                deleteVideo={deleteVideo}
+              />
             ))}
           </>
         ) : (
@@ -160,7 +218,7 @@ export default function UploadPage() {
         )
       )}
       {showUploadModal && (
-        <UploadForm onClose={() => setShowUploadModal(false)} formStatus={formStatus} />
+        <UploadForm video={videoEdit} onClose={() => { setShowUploadModal(false); setVideoEdit(null); fetchVideos() }} formStatus={formStatus} />
       )}
     </div>
   )

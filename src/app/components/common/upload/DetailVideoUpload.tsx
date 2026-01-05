@@ -6,37 +6,46 @@ import { AlertCircle, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/app/components/ui";
+import { VideoPlayer } from "@/app/components/common";
+import { VideoPart } from "@/types/video";
 
 interface DetailVideoUploadProps {
+  parts: VideoPart[],
   title: string,
   setTitle: (title: string) => void,
+  tags: string[],
+  setTags: (tags: string[]) => void,
   description: string,
   thumbnailUrl: string | null,
-  forChildren?: boolean,
+  forChildren: boolean | null,
   setDescription: (description: string) => void,
   setThumbnailFile: (file: File | null) => void,
   setForChildren: (forChildren: boolean | null) => void,
   setThumbnailUrl?: (url: string) => void,
   videoUrl?: string,
   videoFileName: string,
-  error: string
+  error: string,
+  formStatus?: string,
+  uploadingVideo?: boolean,
 }
 
-export default function DetailVideoUpload({ title, description, forChildren, thumbnailUrl, setTitle, setDescription, setForChildren, setThumbnailFile, videoUrl, videoFileName, error }: DetailVideoUploadProps) {
+export default function DetailVideoUpload({ uploadingVideo, formStatus, parts, title, tags, description, forChildren, thumbnailUrl, setTitle, setTags, setDescription, setForChildren, setThumbnailFile, videoUrl, videoFileName, error }: DetailVideoUploadProps) {
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
   const [generateUrl, setGenerateUrl] = useState<string | null>(null);
+  const [input, setInput] = useState('');
 
   const isEmpty = title.trim() === '';
-  const hasError = error === "detail";
-
+  const hasError = error === "detail"
   useEffect(() => {
     if (thumbnailUrl) {
+      if (formStatus === "edit") {
+        setPreviewUrl(thumbnailUrl)
+      }
       setGenerateUrl(thumbnailUrl)
     }
-  }, [thumbnailUrl]);
-
+  }, [thumbnailUrl, formStatus]);
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
@@ -59,6 +68,24 @@ export default function DetailVideoUpload({ title, description, forChildren, thu
     setPreviewUrl(null);
     if (thumbnailInputRef.current) {
       thumbnailInputRef.current.value = '';
+    }
+  };
+
+  const addTag = () => {
+    if (input.trim() && !tags.includes(input.trim())) {
+      setTags([...tags, input.trim()]);
+      setInput('');
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addTag();
     }
   };
   return (
@@ -252,19 +279,61 @@ export default function DetailVideoUpload({ title, description, forChildren, thu
                   </div>
                 )}
               </div>
+              <div className="w-full max-w-2xl mx-auto rounded-lg">
+                <h2 className="text-white text-lg font-semibold mb-2">Thẻ (từ khóa)</h2>
+                <p className="text-neutral-400 text-sm mb-6">
+                  Thẻ có thể giúp cho bạn nếu nội dung trong video của bạn thường để bị viết sai chính tả.
+                  Trong các trường hợp khác, thẻ chỉ đóng vai trò rất nhỏ trong việc giúp người xem tìm thấy
+                  video của bạn. Tìm hiểu thêm
+                </p>
+
+                {/* Input field with tags inside */}
+                <div className="bg-neutral-800 border border-neutral-700 rounded px-3 py-3 flex flex-wrap gap-2 items-center">
+                  {tags.map((tag) => (
+                    <div
+                      key={tag}
+                      className="bg-neutral-700 text-white px-2 py-1 rounded text-sm flex items-center gap-1"
+                    >
+                      <span>{tag}</span>
+                      <Button
+                        icon={<X size={14} />}
+                        onClick={() => removeTag(tag)}
+                        variant="ghost"
+                        radius="full"
+                        className="p-1! border-none"
+                      />
+                    </div>
+                  ))}
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    placeholder={tags.length === 0 ? "Nhập tag và nhấn Enter" : ""}
+                    className="bg-transparent text-white outline-none flex-1 min-w-[150px] placeholder-neutral-500"
+                  />
+                </div>
+
+                {/* Counter */}
+                <div className="text-gray-500 text-sm mb-3 ">
+                  {tags.length > 0 && <span>{tags.length}/500</span>}
+                </div>
+              </div>
             </div>
           </div>
           <div className="h-80 sticky top-10 flex flex-col justify-start items-end">
-            <video src={videoUrl}
-              controls
-              className="w-80 rounded-t-lg shadow-lg p-0 m-0" />
-            <div className="bg-neutral-900 w-80 rounded-b-lg flex flex-col p-2">
+
+            <div className="aspect-video w-80 rounded-t-lg shadow-lg overflow-hidden bg-black">
+
+              {uploadingVideo ? (<div>Đang tải video ...</div>) : (<VideoPlayer parts={parts} />)}
+            </div>
+            <div className="bg-neutral-900 w-80 rounded-b-lg flex flex-col p-2 mb-2">
               <span className="text-xs text-neutral-500 font-semibold" >Đường liên kết của video</span>
               <Link href="#" className="underline text-blue-400 mb-3">
                 https://www.kiwame.com/...
               </Link>
               <span className="text-xs text-neutral-500 font-semibold">Tên tệp</span>
-              <span className="text-base">{videoFileName}</span>
+              <span className="text-base truncate">{videoFileName}</span>
             </div>
           </div>
         </div>

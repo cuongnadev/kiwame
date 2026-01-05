@@ -300,13 +300,9 @@ export async function POST(req: Request) {
         video_id,
         uploadId,
         totalParts: parts.length,
-        parts: uploadedParts.map((p, i) => ({
-          partIndex: i + 1,
-          totalParts: parts.length,
-          size: parts[i].sizeInMB,
-          cloudinaryUrl: p.secureUrl,
-          cloudinaryPublicId: p.publicId,
-          cloudinaryDuration: p.duration,
+        parts: uploadedParts.map((p) => ({
+          url: p.secureUrl,
+          duration: Math.round(p.duration ?? 0),
         })),
       },
       { status: 200 }

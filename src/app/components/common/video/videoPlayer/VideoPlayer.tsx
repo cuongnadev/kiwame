@@ -1,16 +1,12 @@
 'use client';
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Play, Volume2, VolumeX, Maximize2, Minimize2, Pause, Settings, ClosedCaption, Rewind } from 'lucide-react';
-import { Button } from '@/app/components/ui/button/Button';
-import { Popup } from '@/app/components/ui/popup/Popup';
-import { videoSettingsItems } from '@/constants/menu.constants';
-import { LiveKitPlayer } from '@/app/components/common/video/livekitPlayer/LiveKitPlayer';
-import { vi } from 'vitest';
 
-export interface VideoPart {
-  url: string;
-  duration: number; // seconds
-}
+import { Button, Popup } from '@/app/components/ui';
+import { videoSettingsItems } from '@/constants/menu.constants';
+import { LiveKitPlayer } from '@/app/components/common';
+import { VideoPart } from '@/types/video';
 
 interface VideoPlayerProps {
   parts?: VideoPart[];

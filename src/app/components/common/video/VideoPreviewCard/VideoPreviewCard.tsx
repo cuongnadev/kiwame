@@ -1,14 +1,13 @@
 "use client"
-import { Bookmark, Dot, EllipsisVertical, Play } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useRef, useState } from 'react'
-import { LiveIcon } from '@/app/components/ui/icons/LiveIcon';
-import { Button } from '@/app/components/ui/button/Button';
-import { Popup } from '@/app/components/ui/popup/Popup';
-import { ShareIcon } from '@/app/components/ui/icons/ShareIcon';
-import { VideoPart, VideoPlayer } from '@/app/components/common/video/videoPlayer/VideoPlayer';
+import React, { useRef, useState } from 'react';
+import { Bookmark, Dot, EllipsisVertical, Play } from 'lucide-react';
+
+import { Button, Popup, LiveIcon, ShareIcon } from '@/app/components/ui';
+import { VideoPlayer } from '@/app/components/common';
 import { formatDuration } from '@/helper/formatDuration';
+import { VideoPart } from '@/types/video';
 
 interface VideoPreviewCardProps {
   videoId: string;
@@ -42,7 +41,7 @@ export const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({
   const router = useRouter();
 
   const handleClick = () => {
-    // router.push(`/watch/${videoId}`);
+    router.push(`/watch/${videoId}`);
   }
 
   const handleMouseEnter = () => {
