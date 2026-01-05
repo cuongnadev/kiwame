@@ -1,127 +1,141 @@
 "use client";
+
 import { useEffect, useRef, useState } from "react";
 import { Send, MoreVertical } from "lucide-react";
 
 import LiveChatItem, { Comment } from "@/app/components/stream/LiveChatItem";
+import { Button, Input } from "@/app/components/ui";
 
+import type { Database } from "@/lib/supabase/database.types";
+import { useToast } from "@/hooks/useToast";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
-const initialComments: Comment[] = [
-  {
-    id: "1",
-    author: "Bé Na Cute",
-    avatar: "https://yt3.ggpht.com/8OvO6JSUcP5YaxmKK5xJy71r79tKp58U14Rj34jG5CrE78-8sJjTlAzJe1EcKR5MySuf1MVK3s0=s88-c-k-c0x00ffffff-no-rj",
-    content: "Anh ơi stream hay quá trời luôn áaaa ơi ơi",
-    time: new Date(Date.now() - 1 * 60 * 1000),
-    likes: 1234,
-    liked: true,
-    pinned: true,
-  },
-  {
-    id: "2",
-    author: "ProGamer99",
-    avatar: "https://avatar.iran.liara.run/public/boy?username=progamer99",
-    content: "Anh dùng SRS hay Nginx-RTMP vậy? Delay bao nhiêu ms thế anh?",
-    time: new Date(Date.now() - 3 * 60 * 1000),
-    likes: 89,
-    liked: false,
-  },
-  {
-    id: "3",
-    author: "Gái Xinh 2k5",
-    avatar: "https://avatar.iran.liara.run/public/girl?username=gaixinh2k5",
-    content: "Em vừa follow anh nè ❤️❤️❤️",
-    time: new Date(Date.now() - 5 * 60 * 1000),
-    likes: 892,
-    liked: true,
-  },
-  {
-    id: "4",
-    author: "Hater số 1",
-    avatar: "https://avatar.iran.liara.run/public/boy?username=hater",
-    content: "Chơi dở thế mà cũng stream à =))",
-    time: new Date(Date.now() - 7 * 60 * 1000),
-    likes: 12,
-    liked: false,
-    replies: 45,
-  },
-  {
-    id: "6",
-    author: "Đại Gia Lắm Tiền",
-    avatar: "https://avatar.iran.liara.run/public/boy?username=daigia",
-    content: "Gift 10 cái super chat cho anh em chill nào!!!",
-    time: new Date(Date.now() - 12 * 60 * 1000),
-    likes: 2341,
-    liked: true,
-    gift: true,
-  },
-  {
-    id: "7",
-    author: "Noob Master",
-    avatar: "https://avatar.iran.liara.run/public/boy",
-    content: "Ai cho mình xin config OBS với anh ơi, mình mới tập stream :<<",
-    time: new Date(Date.now() - 15 * 60 * 1000),
-    likes: 67,
-    liked: false,
-  },
-  {
-    id: "8",
-    author: "Thanh Niên Cứng",
-    avatar: "https://avatar.iran.liara.run/public/boy?username=thanhniencung",
-    content: "Đỉnh cao của sự lầy lội luôn rồi đấy anh ơi 😂😂😂",
-    time: new Date(Date.now() - 20 * 60 * 1000),
-    likes: 789,
-    liked: true,
-  },
-  {
-    id: "9",
-    author: "Fan Cứng 10 Năm",
-    avatar: "https://avatar.iran.liara.run/public/girl?username=fan10nam",
-    content: "Từ hồi anh còn 10 viewers em đã ở đây rồi đó nha 🥹",
-    time: new Date(Date.now() - 25 * 60 * 1000),
-    likes: 2103,
-    liked: true,
-  },
-  {
-    id: "10",
-    author: "Bot Spam 247",
-    avatar: "https://avatar.iran.liara.run/public/boy?username=bot",
-    content: "Check link in bio để nhận giftcard miễn phí nhé các bạn!!!",
-    time: new Date(Date.now() - 28 * 60 * 1000),
-    likes: 3,
-    liked: false,
-    isSpam: true,
-  },
-];
+type Stream = Database["public"]["Tables"]["streams"]["Row"];
 
-export default function LiveChat() {
-  const [comments, setComments] = useState<Comment[]>(initialComments);
+interface LiveChatProps {
+  stream: Stream;
+}
+
+export default function LiveChat({ stream }: LiveChatProps) {
+  const [comments, setComments] = useState<Comment[]>([]);
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const { showToast } = useToast();
 
-  const send = () => {
+  const send = async () => {
     if (!input.trim()) return;
-    const newComment: Comment = {
-      id: Date.now().toString(),
-      author: "Bạn",
-      content: input,
-      time: new Date(),
-      likes: 0,
-      liked: false,
-    };
-    setComments([newComment, ...comments]);
+
+    const message = input;
     setInput("");
+
+    try {
+      const res = await fetch("/api/live/chat/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          streamId: stream.id,
+          message,
+        }),
+      });
+
+      if (!res.ok) {
+        showToast("Gửi tin nhắn thất bại", "error");
+      }
+    } catch {
+      showToast("Lỗi kết nối", "error");
+    }
   };
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({
-      behavior: "smooth",
-    });
+    const fetchInitialMessages = async () => {
+      const supabase = createSupabaseBrowserClient();
+
+      const { data, error } = await supabase
+        .from("stream_chat")
+        .select("*")
+        .eq("stream_id", stream.id)
+        .order("sent_at", { ascending: true })
+        .limit(50);
+
+      if (error) {
+        showToast("Không tải được tin nhắn", "error");
+        return;
+      }
+
+      setComments(
+        data.map((c) => ({
+          id: c.id.toString(),
+          author: "User",
+          content: c.message,
+          time: new Date(c.sent_at),
+          likes: c.likes ?? 0,
+          liked: false,
+          pinned: c.pinned,
+          gift: c.is_gift,
+          isSpam: c.is_spam,
+        }))
+      );
+    };
+
+    fetchInitialMessages();
+  }, [stream.id, showToast]);
+
+  useEffect(() => {
+    const supabase = createSupabaseBrowserClient();
+
+    const channel = supabase
+      .channel(`stream-chat-${stream.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "stream_chat",
+          filter: `stream_id=eq.${stream.id}`,
+        },
+        (payload) => {
+          console.log("🔥 REALTIME EVENT:", payload);
+          const c = payload.new;
+
+          setComments((prev) => {
+            if (prev.some((p) => p.id === c.id.toString())) {
+              return prev;
+            }
+
+            return [
+              ...prev,
+              {
+                id: c.id.toString(),
+                author: "User",
+                content: c.message,
+                time: new Date(c.sent_at),
+                likes: c.likes ?? 0,
+                liked: false,
+                pinned: c.pinned,
+                gift: c.is_gift,
+                isSpam: c.is_spam,
+              },
+            ];
+          });
+        }
+      )
+      .subscribe((status) => {
+        console.log("📡 CHANNEL STATUS:", status);
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [stream.id]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [comments]);
 
   return (
-    <aside className="w-full h-full flex flex-col bg-[#181818] border-l border-[#303030] group/sidebar">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-[#303030] flex-shrink-0">
+    <aside className="w-full h-full flex flex-col bg-[#181818] border-l border-[#303030]">
+      <div className="flex items-center justify-between p-4 border-b border-[#303030]">
         <div>
           <h3 className="font-semibold text-white">Trò chuyện trực tiếp</h3>
           <p className="text-xs text-gray-400">{comments.length} tin nhắn</p>
@@ -131,33 +145,30 @@ export default function LiveChat() {
         </button>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-hover">
-        {comments.map((c, index) => (
-          <LiveChatItem comment={c} key={index} />
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {comments.map((c) => (
+          <LiveChatItem comment={c} key={c.id} />
         ))}
-
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
       <div className="p-4 border-t border-[#303030]">
         <div className="flex gap-2">
-          <input
-            type="text"
+          <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), send())}
+            onEnter={send}
             placeholder="Gửi tin nhắn..."
-            className="flex-1 bg-[#303030] text-white placeholder-gray-500 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            clearable
+            className="rounded-full!"
           />
-          <button
+          <Button
+            icon={<Send className="w-5 h-5" />}
             onClick={send}
             disabled={!input.trim()}
-            className="p-2.5 rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-          >
-            <Send className="w-5 h-5" />
-          </button>
+            radius="full"
+            className="p-2.5!"
+          />
         </div>
       </div>
     </aside>

@@ -4,26 +4,25 @@ import React from "react";
 import Image from "next/image";
 import { vi } from "date-fns/locale";
 import { formatDistanceToNow } from "date-fns";
-import { Heart, MessageCircle, Pin, Gift } from "lucide-react";
+import { Heart, Pin, Gift } from "lucide-react";
 
 export interface Comment {
   id: string;
   author: string;
-  avatar?: string; // optional vì có thể fallback
+  avatar?: string;
   content: string;
   time: Date;
   likes: number;
   liked: boolean;
   pinned?: boolean;
   gift?: boolean;
-  replies?: number;
   isSpam?: boolean;
 }
 
 export default function LiveChatItem({ comment }: { comment: Comment }) {
   const timeAgo = formatDistanceToNow(comment.time, {
     addSuffix: true,
-    locale: vi, // "5 phút trước", "vừa xong"...
+    locale: vi,
   });
 
   return (
@@ -34,7 +33,6 @@ export default function LiveChatItem({ comment }: { comment: Comment }) {
         comment.isSpam ? "opacity-60" : ""
       }`}
     >
-      {/* Pinned badge */}
       {comment.pinned && (
         <div className="flex items-center gap-1.5 text-yellow-400 text-xs font-bold mb-2">
           <Pin className="w-3.5 h-3.5 fill-yellow-400" />
@@ -42,7 +40,6 @@ export default function LiveChatItem({ comment }: { comment: Comment }) {
         </div>
       )}
 
-      {/* Gift badge */}
       {comment.gift && (
         <div className="flex items-center gap-1.5 text-purple-400 text-xs font-bold mb-2">
           <Gift className="w-4 h-4" />
@@ -51,7 +48,6 @@ export default function LiveChatItem({ comment }: { comment: Comment }) {
       )}
 
       <div className="flex gap-3">
-        {/* Avatar */}
         <div className="shrink-0">
           {comment.avatar ? (
             <Image
@@ -69,7 +65,6 @@ export default function LiveChatItem({ comment }: { comment: Comment }) {
           )}
         </div>
 
-        {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-semibold text-white text-sm">
@@ -84,7 +79,6 @@ export default function LiveChatItem({ comment }: { comment: Comment }) {
             {comment.content}
           </p>
 
-          {/* Actions */}
           <div className="flex items-center gap-4 mt-2 text-xs">
             <button className="flex items-center gap-1 text-gray-400 hover:text-red-500 transition">
               <Heart
@@ -92,13 +86,6 @@ export default function LiveChatItem({ comment }: { comment: Comment }) {
               />
               {comment.likes > 0 && comment.likes.toLocaleString("vi-VN")}
             </button>
-
-            {comment.replies && comment.replies > 0 && (
-              <button className="flex items-center gap-1 text-gray-400 hover:text-blue-500 transition">
-                <MessageCircle className="w-4 h-4" />
-                {comment.replies}
-              </button>
-            )}
           </div>
         </div>
       </div>

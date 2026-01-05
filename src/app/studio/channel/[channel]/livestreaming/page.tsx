@@ -19,7 +19,7 @@ export default async function LivePage() {
       </div>
 
       <div className="w-96 h-full overflow-hidden flex-shrink-0 border-l border-[#303030]">
-        <LiveChat />
+        <LiveChat stream={stream} />
       </div>
     </div>
   );

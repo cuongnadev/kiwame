@@ -8,7 +8,6 @@ import {
 import { kiwameConfig } from "@/config/kiwame.config";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseWorkerClient } from "@/lib/supabase/worker";
-import { success } from "zod";
 
 const apiKey = kiwameConfig.livekitApiKey;
 const apiSecret = kiwameConfig.livekitApiSecret;
@@ -294,5 +293,56 @@ export const StreamService = {
     return {
       success: true,
     }
+  },
+
+  sendChat: async ({ streamId, message }: { streamId: string; message: string }) => {
+    const supabase = await createSupabaseServerClient();
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      throw new Error("UNAUTHORIZED");
+    }
+
+    if (!streamId || !message?.trim()) {
+      throw new Error("INVALID_PAYLOAD");
+    }
+
+    const { data: stream } = await supabase
+      .from("streams")
+      .select("id, is_live")
+      .eq("id", streamId)
+      .single();
+
+    if (!stream) {
+      throw new Error("STREAM_NOT_FOUND");
+    }
+
+    if (!stream.is_live) {
+      throw new Error("STREAM_NOT_LIVE");
+    }
+
+    const { data: chat, error } = await supabase
+      .from("stream_chat")
+      .insert({
+        stream_id: streamId,
+        user_id: user.id,
+        message,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("SEND_CHAT_ERROR:", error);
+      throw new Error("SEND_CHAT_FAILED");
+    }
+
+    return {
+      success: true,
+      chat,
+    };
   }
 };
