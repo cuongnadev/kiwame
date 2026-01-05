@@ -3,17 +3,23 @@ import { Button } from "../../ui/button/Button";
 import { AlertCircle, ChevronDown, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import CheckBox from "../../ui/input/CheckBox";
+import { VideoPart } from "@/types/video";
+import { VideoPlayer } from "../videoPlayer/VideoPlayer";
 
 interface VisibilityVideoUploadPros {
+    parts: VideoPart[],
+    formStatus?: string,
     videoUrl: string,
     videoFileName: string,
     privacy: string,
     setPrivacy: (privacy: string) => void,
-    errorForm: string
+    errorForm: string,
+    typeVisibility: string,
+    setTypeVisibility: (type: string) => void,
+    uploadingVideo: boolean,
 }
 
-export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, videoFileName, errorForm }: VisibilityVideoUploadPros) {
-    const [showDetailCard, setShowDetailCard] = useState('privacy')
+export default function VisibilityVideoUpload({uploadingVideo, parts, formStatus, privacy, setPrivacy, videoUrl, videoFileName, typeVisibility, setTypeVisibility, errorForm }: VisibilityVideoUploadPros) {
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('00:00');
     const [timezone, setTimezone] = useState('');
@@ -111,7 +117,7 @@ export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, v
 
         setErrorTime('');
         return true;
-    },[selectedDate, selectedTime, timezone]);
+    }, [selectedDate, selectedTime, timezone]);
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -156,8 +162,8 @@ export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, v
                 <p className="text-white text-sm mb-4">Chọn thời điểm xuất bản và những ai có thể thấy video của bạn</p>
                 <div className="flex justify-between py-4 w-full">
                     <div className="flex flex-col gap-6 flex-1 w-2/3 pr-8 ">
-                        <div onClick={() => setShowDetailCard('privacy')} className="relative cursor-pointer flex flex-col border-2 p-4 bg-neutral-800 rounded-lg border-neutral-700 hover:border-white focus-within:border-white focus-within:outline-white focus-within:outline-offset-2 transition-all duration-200">
-                            {showDetailCard !== 'privacy' && (
+                        <div onClick={() => { setTypeVisibility("privacy") }} className="relative cursor-pointer flex flex-col border-2 p-4 bg-neutral-800 rounded-lg border-neutral-700 hover:border-white focus-within:border-white focus-within:outline-white focus-within:outline-offset-2 transition-all duration-200">
+                            {typeVisibility !== 'privacy' && (
                                 <Button
                                     icon={<ChevronDown size={20} />}
                                     variant="outline"
@@ -167,7 +173,7 @@ export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, v
                             )}
                             <p>Lưu hoặc xuất bản</p>
                             <span className="text-xs font-semibold text-neutral-500">Đặt video của bạn ở chế độ <span className="font-bold">công khai</span>, <span className="font-bold">không công khai</span> hoặc <span className="font-bold">riêng tư</span></span>
-                            {showDetailCard === 'privacy' && (
+                            {(typeVisibility === "privacy") && (
                                 <div className={`relative flex flex-col mb-4 gap-3 pl-4 py-2`}>
                                     <label
                                         className={`flex items-start gap-2 rounded-lg cursor-pointer transition-all`}
@@ -176,7 +182,7 @@ export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, v
                                             <input
                                                 type="radio"
                                                 checked={privacy === 'private'}
-                                                onChange={() => { setPrivacy('private') }}
+                                                onChange={() => { setPrivacy('private'); }}
                                                 className="w-5 h-5 appearance-none cursor-pointer rounded-full 
                                                     border-2 border-neutral-600 bg-neutral-700 
                                                     checked:bg-transparent checked:border-[7px] checked:border-white 
@@ -198,7 +204,7 @@ export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, v
                                             <input
                                                 type="radio"
                                                 checked={privacy === 'unlisted'}
-                                                onChange={() => { setPrivacy('unlisted') }}
+                                                onChange={() => { setPrivacy('unlisted'); }}
                                                 className="w-5 h-5 appearance-none cursor-pointer rounded-full 
                                                     border-2 border-neutral-600 bg-neutral-700 
                                                     checked:bg-transparent checked:border-[7px] checked:border-white 
@@ -220,7 +226,7 @@ export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, v
                                             <input
                                                 type="radio"
                                                 checked={privacy === 'public'}
-                                                onChange={() => { setPrivacy('public') }}
+                                                onChange={() => { setPrivacy('public'); }}
                                                 className="w-5 h-5 appearance-none cursor-pointer rounded-full 
                                                     border-2 border-neutral-600 bg-neutral-700 
                                                     checked:bg-transparent checked:border-[7px] checked:border-white 
@@ -237,8 +243,8 @@ export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, v
                                 </div>
                             )}
                         </div>
-                        <div onClick={() => setShowDetailCard('schedule')} className="relative cursor-pointer flex flex-col border-2 p-4 bg-neutral-800 rounded-lg border-neutral-700 hover:border-white focus-within:border-white focus-within:outline-white focus-within:outline-offset-2 transition-all duration-200">
-                            {showDetailCard !== 'schedule' && (
+                        <div onClick={() => { setTypeVisibility("schedule") }} className="relative cursor-pointer flex flex-col border-2 p-4 bg-neutral-800 rounded-lg border-neutral-700 hover:border-white focus-within:border-white focus-within:outline-white focus-within:outline-offset-2 transition-all duration-200">
+                            {typeVisibility !== 'schedule' && (
                                 <Button
                                     icon={<ChevronDown size={20} />}
                                     variant="outline"
@@ -248,7 +254,7 @@ export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, v
                             )}
                             <p>Lên lịch</p>
                             <span className="text-xs font-semibold text-neutral-500">Chọn ngày để chuyển video của bạn sang chế độ <span className="font-bold">công khai</span></span>
-                            {showDetailCard === 'schedule' && (
+                            {(typeVisibility === "schedule") && (
                                 <div className="relative flex flex-col mb-4 gap-3 py-2">
                                     <div className="flex gap-3">
                                         {/* Date Picker */}
@@ -352,7 +358,7 @@ export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, v
                                     {/* Premiere Checkbox */}
                                     <CheckBox
                                         checked={isPremiere}
-                                        onCheckedChange={(e)=>setIsPremiere(e.target.checked)}
+                                        onCheckedChange={(e) => setIsPremiere(e.target.checked)}
                                         label="Đặt làm video công chiếu"
                                         className="mt-6"
                                     />
@@ -361,16 +367,16 @@ export default function VisibilityVideoUpload({ privacy, setPrivacy, videoUrl, v
                         </div>
                     </div>
                     <div className="h-80 sticky top-10 flex flex-col justify-start items-end">
-                        <video src={videoUrl}
-                            controls
-                            className="w-80 rounded-t-lg shadow-lg p-0 m-0" />
+                        <div className="aspect-video w-80 rounded-t-lg shadow-lg overflow-hidden bg-black">
+                            {uploadingVideo ? (<div>Đang tải video ...</div>): (<VideoPlayer parts={parts}/>)}
+                        </div>
                         <div className="bg-neutral-900 w-80 rounded-b-lg flex flex-col p-2">
                             <span className="text-xs text-neutral-500 font-semibold" >Đường liên kết của video</span>
                             <Link href="#" className="underline text-blue-400 mb-3">
                                 https://www.kiwame.com/...
                             </Link>
                             <span className="text-xs text-neutral-500 font-semibold">Tên tệp</span>
-                            <span className="text-base">{videoFileName}</span>
+                            <span className="text-base truncate">{videoFileName}</span>
                         </div>
                     </div>
                 </div>

@@ -18,7 +18,7 @@ export default function Layout({ children, params }: { children: React.ReactNode
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           type="content"
-          channel={channel}
+          channelName={channel}
         />
       </div>
       <div className="flex items-center py-2 border-b border-b-gray-500">

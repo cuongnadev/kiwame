@@ -1,6 +1,6 @@
 import React from 'react'
 import { getHomeStreams } from '@/app/actions/stream.actions';
-import { getHomeVideos } from '@/app/actions/video.action';
+import { getHomeVideos } from '@/app/actions/video.actions';
 import { VideoPreviewCard } from '@/app/components/common/VideoPreviewCard/VideoPreviewCard'
 
 export default async function UserHome() {

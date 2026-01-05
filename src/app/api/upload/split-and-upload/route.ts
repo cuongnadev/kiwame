@@ -131,7 +131,7 @@ async function splitVideoBy90MB(
     });
   }
 
-  if(fs.existsSync(videoPath)){
+  if (fs.existsSync(videoPath)) {
     fs.unlinkSync(videoPath)
   }
 
@@ -165,7 +165,7 @@ async function uploadToCloudinary(
           resource_type: 'video',
           chunk_size: 6000000, // 6MB chunks
         },
-        (error: UploadApiErrorResponse| undefined, result: UploadApiResponse| undefined) => {
+        (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
           if (error) {
             console.error(`Cloudinary upload error for part ${partIndex}:`, error);
             reject(error);
@@ -300,13 +300,9 @@ export async function POST(req: Request) {
         video_id,
         uploadId,
         totalParts: parts.length,
-        parts: uploadedParts.map((p, i) => ({
-          partIndex: i + 1,
-          totalParts: parts.length,
-          size: parts[i].sizeInMB,
-          cloudinaryUrl: p.secureUrl,
-          cloudinaryPublicId: p.publicId,
-          cloudinaryDuration: p.duration,
+        parts: uploadedParts.map((p) => ({
+          url: p.secureUrl,
+          duration: Math.round(p.duration ?? 0),
         })),
       },
       { status: 200 }

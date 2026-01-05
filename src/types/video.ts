@@ -1,19 +1,23 @@
+import { Channel } from "./channel"
+
 export interface Video {
-  id: number
-  thumbnail: string
+  id: string
   title: string
   isDraft: boolean
   date: string
   dateLabel: string
   views: string
+  for_children: boolean | null
   comments: string
   likes: string
   channel_id?: string,
+  channel?:Channel | null,
   description?: string;
   thumbnail_url?: string;
-  duration?: string;
+  duration: string;
   visibility?: string;
   tags?: string[];
+  video_items?: VideoItemRow[];
 }
 
 export interface VideoItemRow {
@@ -43,4 +47,9 @@ export interface VideoRow {
   channel: ChannelRow | null;
 
   video_views: VideoViewRow[];
+}
+
+export interface VideoPart {
+  url: string;
+  duration: number; // seconds
 }

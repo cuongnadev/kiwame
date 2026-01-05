@@ -5,12 +5,8 @@ import { Button } from '@/app/components/ui/button/Button';
 import { Popup } from '@/app/components/ui/popup/Popup';
 import { videoSettingsItems } from '@/constants/menu.constants';
 import { LiveKitPlayer } from '@/app/components/common/livekitPlayer/LiveKitPlayer';
-import { vi } from 'vitest';
+import { VideoPart } from '@/types/video';
 
-export interface VideoPart {
-  url: string;
-  duration: number; // seconds
-}
 
 interface VideoPlayerProps {
   parts?: VideoPart[];

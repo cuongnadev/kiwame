@@ -7,8 +7,9 @@ import { LiveIcon } from '@/app/components/ui/icons/LiveIcon';
 import { Button } from '@/app/components/ui/button/Button';
 import { Popup } from '@/app/components/ui/popup/Popup';
 import { ShareIcon } from '@/app/components/ui/icons/ShareIcon';
-import { VideoPart, VideoPlayer } from '@/app/components/common/videoPlayer/VideoPlayer';
+import { VideoPlayer } from '@/app/components/common/videoPlayer/VideoPlayer';
 import { formatDuration } from '@/helper/formatDuration';
+import { VideoPart } from '@/types/video';
 
 interface VideoPreviewCardProps {
   videoId: string;
@@ -42,7 +43,7 @@ export const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({
   const router = useRouter();
 
   const handleClick = () => {
-    // router.push(`/watch/${videoId}`);
+    router.push(`/watch/${videoId}`);
   }
 
   const handleMouseEnter = () => {

@@ -7,8 +7,8 @@ interface StepperProgressBarProps {
 export default function StepperProgressBar({ currentStep, handleStepClick, error}: StepperProgressBarProps) {
     const steps = [
         { id: 1, label: 'Chi tiết', type:"detail" },
-        { id: 2, label: 'Các thành phần của video', type:"component"},
-        { id: 3, label: 'Chế độ hiển thị', type:"visibility" },
+        // { id: 2, label: 'Các thành phần của video', type:"component"},
+        { id: 2, label: 'Chế độ hiển thị', type:"visibility" },
     ]
 
     return (
@@ -17,7 +17,7 @@ export default function StepperProgressBar({ currentStep, handleStepClick, error
                 <div className="max-w-4xl mx-auto">
                     <div className="relative flex items-center justify-between">
                         {/* Progress line */}
-                        <div className="absolute top-11 h-0.5 bg-neutral-700" style={{ left: '150px', right: '150px' }}>
+                        <div className="absolute top-11 h-0.5 bg-neutral-700" style={{ left: '210px', right: '210px' }}>
                             <div
                                 className="h-full bg-white transition-all duration-500"
                                 style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
