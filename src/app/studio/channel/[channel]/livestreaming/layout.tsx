@@ -31,7 +31,7 @@ export default function LiveStreamingLayout({ children }: { children: React.Reac
           <SidebarLiveStreaming
             expanded={sidebarExpanded}
             user={user}
-            channel={channelName}
+            channel={channel!}
           />
 
           <main className="w-full bg-[#0f0f0f]">
