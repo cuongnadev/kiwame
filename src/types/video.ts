@@ -17,6 +17,7 @@ export interface Video {
   duration: string;
   visibility?: string;
   tags?: string[];
+  isLike?: boolean| null;
   video_items?: VideoItemRow[];
 }
 

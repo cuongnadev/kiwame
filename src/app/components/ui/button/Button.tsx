@@ -100,7 +100,7 @@ export const Button: React.FC<ButtonProps> = ({
       ) : (
         <>
           {icon && iconPosition === 'left' && <span>{icon}</span>}
-          {text && <span className={nowrap===true ? 'block overflow-hidden text-ellipsis whitespace-nowrap max-w-full':''}>{text}</span>}
+          {text && <span className={`p-0 ${nowrap===true ? 'block overflow-hidden text-ellipsis whitespace-nowrap max-w-full':''}`}>{text}</span>}
           {icon && iconPosition === 'right' && <span>{icon}</span>}
         </>
       )}

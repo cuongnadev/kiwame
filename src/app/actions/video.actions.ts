@@ -2,7 +2,7 @@
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentChannelId } from "@/services/channel.service";
-import { Channel } from "@/types/channel";
+import { Channel, Profile } from "@/types/channel";
 import { Video, VideoRow } from "@/types/video";
 
 export async function getHomeVideos() {
@@ -134,12 +134,12 @@ export async function getVideo(video_id: string): Promise<Video | null> {
     .from('videos')
     .select(`
       id,
-      channels(
+      channel_id,
+      channel:channels!videos_channel_id_fkey (
+        id,
         name,
         avatar_url,
-        profile:profiles (
-        full_name
-        )
+        owner_id
       ),
       title,
       description,
@@ -156,22 +156,51 @@ export async function getVideo(video_id: string): Promise<Video | null> {
       tags,
       video_views(count),
       comments(count),
-      video_likes(count)
+      video_likes(count),
+      user_like:video_likes (
+        is_like
+      )
     `)
     .eq('id', video_id)
+    .eq('user_like.user_id', (await supabase.auth.getUser()).data.user?.id)
     .single()
+
   if (error) {
     console.error(error)
     return null
   }
+
   if (!data) return null
+  console.log(data)
 
   const totalDuration = data.video_items.reduce(
     (total, item) => total + item.duration,
     0
-  );
-  const channel = data.channels?.[0] ?? null
-  return ({
+  )
+
+  // Lấy profile của channel owner
+  const channelData = Array.isArray(data.channel) ? data.channel[0] : data.channel;
+
+  let channel: Channel | null = null
+  if (data.channel) {
+    const ownerProfile = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', channelData?.owner_id)
+      .single()
+
+    channel = {
+      name: channelData?.name,
+      avatar_url: channelData?.avatar_url,
+      profile: {
+        full_name: ownerProfile.data?.full_name ?? ""
+      } as Profile
+    }
+  }
+
+  const isLike =data.user_like?.[0] ? data.user_like?.[0].is_like : null
+
+  return {
     id: data.id,
     title: data.title,
     description: data.description,
@@ -179,25 +208,16 @@ export async function getVideo(video_id: string): Promise<Video | null> {
     isDraft: data.is_draft,
     visibility: data.visibility,
     for_children: data.for_children,
+    channel_id: data.channel_id,
+    channel: channel,
     date: data.created_at,
     dateLabel: new Date(data.created_at).toLocaleDateString("vi-VN"),
     video_items: data.video_items,
     views: String(data.video_views?.[0]?.count ?? 0),
     comments: String(data.comments?.[0]?.count ?? 0),
     likes: String(data.video_likes?.[0]?.count ?? 0),
-    // channel: channel
-    // ? {
-    //     name: channel.name,
-    //     avatar_url: channel.avatar_url,
-    //     owner:auth.user()
-    //       ? {
-    //           id: owner.id,
-    //           profile: profile ?? null,
-    //         }
-    //       : null,
-    //   }
-    // : null,
+    isLike: isLike,
     duration: totalDuration.toString(),
     tags: data.tags,
-  })
+  }
 }

@@ -6,7 +6,7 @@ import { ArrowDown, ChevronDown, SquarePlay, X } from 'lucide-react';
 import { Video } from '@/types/video';
 import { Button, CheckBox, Popup } from '@/app/components/ui';
 import UploadForm from '@/app/studio/channel/[channel]/(main)/(content)/UploadForm';
-import { VideoItem } from '@/app/components/common';
+import { VideoUploadItem } from '@/app/components/common';
 import { getMyVideos } from '@/app/actions/video.actions';
 
 export default function UploadPage() {
@@ -193,7 +193,7 @@ export default function UploadPage() {
         listVideo.length > 0 ? (
           <>
             {listVideo.map((video) => (
-              <VideoItem
+              <VideoUploadItem
                 key={video.id}
                 video={video}
                 isSelected={selectedVideos.includes(video.id)}
@@ -218,7 +218,7 @@ export default function UploadPage() {
         )
       )}
       {showUploadModal && (
-        <UploadForm video={videoEdit} onClose={() => { setShowUploadModal(false); setVideoEdit(null); fetchVideos() }} formStatus={formStatus} />
+        <UploadForm video={videoEdit} onClose={() => { setShowUploadModal(false); setVideoEdit(null); fetchVideos(); setFormStatus("upload") }} formStatus={formStatus} />
       )}
     </div>
   )

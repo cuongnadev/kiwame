@@ -5,7 +5,7 @@ export { default as UploadSelectedFile } from "./upload/UploadSelectedFile";
 export { default as VisibilityVideoUpload } from "./upload/VisibilityVideoUpload";
 
 export { VideoGrid } from "./video/videoGrid/VideoGrid";
-export { VideoItem } from "./video/videoItem/VideoItem";
+export { VideoUploadItem } from "./video/videoItem/VideoUploadItem";
 export { VideoPlayer } from "./video/videoPlayer/VideoPlayer";
 export { LiveKitPlayer } from "./video/livekitPlayer/LiveKitPlayer";
 export { VideoPreviewCard } from "./video/VideoPreviewCard/VideoPreviewCard";

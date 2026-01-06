@@ -15,7 +15,7 @@ interface VideoItemProps {
     deleteVideo: (id: string) => void
 }
 
-export function VideoItem({
+export function VideoUploadItem({
     video,
     isSelected,
     onSelect,

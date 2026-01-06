@@ -117,6 +117,20 @@ create table public.comments (
 create index idx_comments_video_id_created_at on public.comments(video_id, created_at);
 
 -- ==============================
+-- COMMENT-LIKES
+-- ==============================
+create table public.comment_likes (
+    id bigserial primary key,
+    comment_id uuid references public.comments(id) on delete cascade,
+    user_id uuid references auth.users(id) on delete cascade,
+    is_like boolean default true,
+    created_at timestamptz default now(),
+    unique(comment_id, user_id)
+);
+
+create index idx_comment_likes_comment_id on public.comment_likes(comment_id);
+
+-- ==============================
 -- COMMENT REPLIES
 -- ==============================
 create table public.comment_replies (

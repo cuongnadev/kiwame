@@ -109,7 +109,6 @@ export default function UploadForm({ onClose, formStatus, video}: UploadFormProp
       console.log(uploadVideoData)
       const video_id = uploadVideoData.video.id
       setVideoId(video_id)
-      setParts(uploadVideoData.video.parts || [])
       try {
         const uploadId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
         const totalChunks = Math.ceil(selectedVideoFile.size / CHUNK_SIZE)
@@ -153,6 +152,7 @@ export default function UploadForm({ onClose, formStatus, video}: UploadFormProp
         }
 
         const data = await splitAndUploadResponse.json();
+        setParts(data.parts || [])
         console.log(data)
 
       } catch (err) {
@@ -233,10 +233,8 @@ export default function UploadForm({ onClose, formStatus, video}: UploadFormProp
   const onSubmit = (type: string) => {
     if (type === "exit") {
       onUpdateVideo("exit")
-      onClose()
     } else {
       onUpdateVideo("save")
-      onClose()
     }
   }
 
@@ -288,6 +286,7 @@ export default function UploadForm({ onClose, formStatus, video}: UploadFormProp
     } catch (err) {
       console.error('Update video failed:', err);
     }
+    onClose()
   };
 
   return (
