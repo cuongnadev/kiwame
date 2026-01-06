@@ -16,7 +16,7 @@ export function VideoGrid({
   return (
     <div
       className={clsx(
-        "w-full grid gap-6 px-6 py-4 bg-[#0f0f0f] overflow-y-auto overflow-x-hidden scrollbar-main",
+        "w-full h-full grid gap-6 px-6 py-4 bg-[#0f0f0f] overflow-y-auto overflow-x-hidden scrollbar-main",
         gridClass
       )}
     >

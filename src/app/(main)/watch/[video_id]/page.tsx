@@ -234,10 +234,10 @@ export default function WatchPage() {
   };
 
   return (
-    <main className="flex h-[620px] w-full bg-black text-white group/sidebar">
+    <main className="flex w-full h-full bg-black text-white group/sidebar">
       {/* Main Content */}
-      <div className="w-3/4 h-full overflow-y-auto scrollbar-hover">
-        <div className="p-4 space-y-4">
+      <div className="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden scrollbar-hover mr-4">
+        <div className="w-full p-4 space-y-4">
           {/* Video Player */}
           <div className="aspect-video w-full rounded-xl bg-black overflow-hidden">
             <VideoPlayer parts={parts} />
@@ -396,7 +396,7 @@ export default function WatchPage() {
       </div>
 
       {/* Sidebar - Related Videos */}
-      <aside className="w-1/4 h-full flex flex-col overflow-y-auto scrollbar-hover bg-black">
+      <aside className="w-[400px] shrink-0 h-full flex flex-col overflow-y-auto scrollbar-hover bg-black">
         <div className='sticky top-0 bg-black py-3 z-10'>
           <div className="flex items-center gap-2 px-2">
             {canScrollLeft && (

@@ -38,7 +38,6 @@ export const StreamService = {
       .from("streams")
       .select("*")
       .eq("channel_id", channel.id)
-      .is("ended_at", null)
       .maybeSingle();
 
     if (streamExist?.ingress_id && streamExist.whip_url && streamExist.stream_key) {
@@ -149,6 +148,7 @@ export const StreamService = {
 
           if (!stream) break;
 
+          // 1. update status stream
           await supabase
             .from("streams")
             .update({
@@ -157,6 +157,18 @@ export const StreamService = {
               updated_at: new Date().toISOString(),
             })
             .eq("id", stream.id);
+
+          // 2. delete chat likes
+          await supabase
+            .from("stream_chat_likes")
+            .delete()
+            .eq("stream_id", stream.id);
+
+          // 3. delete chats
+          await supabase
+            .from("stream_chat")
+            .delete()
+            .eq("stream_id", stream.id);
 
           console.log(`Stream OFFLINE: ${streamKey}`);
           break;

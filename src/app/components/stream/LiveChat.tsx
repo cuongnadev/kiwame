@@ -1,31 +1,47 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Send, MoreVertical } from "lucide-react";
 
 import LiveChatItem, { Comment } from "@/app/components/stream/LiveChatItem";
 import { Button, Input } from "@/app/components/ui";
 
-import type { Database } from "@/lib/supabase/database.types";
-import { useToast } from "@/hooks/useToast";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-
-type Stream = Database["public"]["Tables"]["streams"]["Row"];
+import { useToast } from "@/hooks/useToast";
 
 interface LiveChatProps {
-  stream: Stream;
+  stream: { id: string };
+}
+
+interface ProfileCache {
+  [userId: string]: {
+    name: string;
+    avatar?: string;
+  };
 }
 
 export default function LiveChat({ stream }: LiveChatProps) {
+  const supabase = createSupabaseBrowserClient();
+  const { showToast } = useToast();
+
   const [comments, setComments] = useState<Comment[]>([]);
   const [input, setInput] = useState("");
+  const profileCacheRef = useRef<ProfileCache>({});
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  const messageIdsRef = useRef<Set<string>>(new Set());
   const bottomRef = useRef<HTMLDivElement | null>(null);
-  const { showToast } = useToast();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrentUserId(data.user?.id ?? null);
+    });
+  }, []);
 
   const send = async () => {
     if (!input.trim()) return;
 
-    const message = input;
+    const message = input.trim();
     setInput("");
 
     try {
@@ -47,43 +63,91 @@ export default function LiveChat({ stream }: LiveChatProps) {
     }
   };
 
-  useEffect(() => {
-    const fetchInitialMessages = async () => {
-      const supabase = createSupabaseBrowserClient();
+  const getProfile = useCallback(
+    async (userId: string) => {
+      if (profileCacheRef.current[userId]) {
+        return profileCacheRef.current[userId];
+      };
 
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("full_name, avatar_url")
+        .eq("id", userId)
+        .single();
+
+      const profile = {
+        name: data?.full_name ?? "User",
+        avatar: data?.avatar_url,
+      };
+
+      profileCacheRef.current[userId] = profile;
+      return profile;
+    },
+    [supabase],
+  );
+
+  useEffect(() => {
+    if (!currentUserId) return;
+
+    const fetchInitialMessages = async () => {
       const { data, error } = await supabase
         .from("stream_chat")
         .select("*")
         .eq("stream_id", stream.id)
         .order("sent_at", { ascending: true })
-        .limit(50);
+        .limit(100);
 
       if (error) {
         showToast("Không tải được tin nhắn", "error");
+        console.error(error);
         return;
       }
 
+      const userIds = Array.from(
+        new Set(data.map((m) => m.user_id).filter(Boolean))
+      );
+
+      const profiles: ProfileCache = {};
+      await Promise.all(
+        userIds.map(async (id) => {
+          profiles[id] = await getProfile(id);
+        }),
+      );
+
+      const chatIds = data.map((m) => m.id);
+      const { data: likedRows, error: likeError } = await supabase
+        .from("stream_chat_likes")
+        .select("chat_id")
+        .eq("user_id", currentUserId)
+        .in("chat_id", chatIds);
+
+      const likedSet = new Set(likedRows?.map((l) => l.chat_id));
+
       setComments(
-        data.map((c) => ({
-          id: c.id.toString(),
-          author: "User",
-          content: c.message,
-          time: new Date(c.sent_at),
-          likes: c.likes ?? 0,
-          liked: false,
-          pinned: c.pinned,
-          gift: c.is_gift,
-          isSpam: c.is_spam,
-        }))
+        data.map((c) => {
+          messageIdsRef.current.add(c.id.toString());
+          const profile = c.user_id ? profiles[c.user_id] : null;
+
+          return {
+            id: c.id.toString(),
+            author: profile?.name ?? "User",
+            avatar: profile?.avatar ?? "https://avatar.iran.liara.run/public",
+            content: c.message,
+            time: new Date(c.sent_at),
+            likes: c.likes ?? 0,
+            liked: likedSet.has(c.id),
+            pinned: c.pinned,
+            gift: c.is_gift,
+            isSpam: c.is_spam,
+          };
+        }),
       );
     };
 
     fetchInitialMessages();
-  }, [stream.id, showToast]);
+  }, [stream.id, currentUserId]);
 
   useEffect(() => {
-    const supabase = createSupabaseBrowserClient();
-
     const channel = supabase
       .channel(`stream-chat-${stream.id}`)
       .on(
@@ -94,35 +158,51 @@ export default function LiveChat({ stream }: LiveChatProps) {
           table: "stream_chat",
           filter: `stream_id=eq.${stream.id}`,
         },
-        (payload) => {
-          console.log("🔥 REALTIME EVENT:", payload);
-          const c = payload.new;
+        async ({ new: c }) => {
+          console.log("REALTIME MESSAGE:", c);
+          console.log("REALTIME user_id:", c.user_id);
 
-          setComments((prev) => {
-            if (prev.some((p) => p.id === c.id.toString())) {
-              return prev;
-            }
+          if (messageIdsRef.current.has(c.id.toString())) return;
+          messageIdsRef.current.add(c.id.toString());
 
-            return [
-              ...prev,
-              {
-                id: c.id.toString(),
-                author: "User",
-                content: c.message,
-                time: new Date(c.sent_at),
-                likes: c.likes ?? 0,
-                liked: false,
-                pinned: c.pinned,
-                gift: c.is_gift,
-                isSpam: c.is_spam,
-              },
-            ];
-          });
-        }
+          const profile = c.user_id ? await getProfile(c.user_id) : null;
+
+          setComments((prev) => [
+            ...prev,
+            {
+              id: c.id.toString(),
+              author: profile?.name ?? "User",
+              avatar: profile?.avatar ?? "https://avatar.iran.liara.run/public",
+              content: c.message,
+              time: new Date(c.sent_at),
+              likes: c.likes ?? 0,
+              liked: false,
+              pinned: c.pinned,
+              gift: c.is_gift,
+              isSpam: c.is_spam,
+            },
+          ]);
+        },
       )
-      .subscribe((status) => {
-        console.log("📡 CHANNEL STATUS:", status);
-      });
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "stream_chat",
+          filter: `stream_id=eq.${stream.id}`,
+        },
+        ({ new: c }) => {
+          console.log("REALTIME MESSAGE:", c);
+
+          setComments((prev) =>
+            prev.map((m) =>
+              m.id === c.id.toString() ? { ...m, likes: c.likes } : m,
+            ),
+          );
+        },
+      )
+      .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
@@ -133,8 +213,44 @@ export default function LiveChat({ stream }: LiveChatProps) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [comments]);
 
+  const toggleLike = async (chatId: string, liked: boolean) => {
+    if (!currentUserId) return;
+    const id = Number(chatId);
+
+    setComments((prev) =>
+      prev.map((c) =>
+        c.id === chatId
+          ? {
+            ...c,
+            liked: !liked,
+            likes: liked ? Math.max(c.likes - 1, 0) : c.likes + 1,
+          }
+          : c
+      )
+    );
+
+    try {
+      if (liked) {
+        await supabase.from("stream_chat_likes").delete().match({
+          chat_id: id,
+          user_id: currentUserId,
+        });
+        await supabase.rpc("decrement_chat_like", { chat_id: id });
+      } else {
+        await supabase.from("stream_chat_likes").insert({
+          chat_id: id,
+          user_id: currentUserId,
+        });
+        await supabase.rpc("increment_chat_like", { chat_id: id });
+      }
+    } catch {
+      showToast("Không thể like", "error");
+    }
+  };
+
   return (
     <aside className="w-full h-full flex flex-col bg-[#181818] border-l border-[#303030]">
+      {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-[#303030]">
         <div>
           <h3 className="font-semibold text-white">Trò chuyện trực tiếp</h3>
@@ -145,13 +261,19 @@ export default function LiveChat({ stream }: LiveChatProps) {
         </button>
       </div>
 
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {comments.map((c) => (
-          <LiveChatItem comment={c} key={c.id} />
+          <LiveChatItem
+            key={c.id}
+            comment={c}
+            onLike={() => toggleLike(c.id, c.liked)}
+          />
         ))}
         <div ref={bottomRef} />
       </div>
 
+      {/* Input */}
       <div className="p-4 border-t border-[#303030]">
         <div className="flex gap-2">
           <Input

@@ -5,6 +5,8 @@ import Image from "next/image";
 import { vi } from "date-fns/locale";
 import { formatDistanceToNow } from "date-fns";
 import { Heart, Pin, Gift } from "lucide-react";
+import { Button } from "../ui";
+import clsx from "clsx";
 
 export interface Comment {
   id: string;
@@ -19,7 +21,7 @@ export interface Comment {
   isSpam?: boolean;
 }
 
-export default function LiveChatItem({ comment }: { comment: Comment }) {
+export default function LiveChatItem({ comment, onLike }: { comment: Comment, onLike: () => void }) {
   const timeAgo = formatDistanceToNow(comment.time, {
     addSuffix: true,
     locale: vi,
@@ -27,11 +29,9 @@ export default function LiveChatItem({ comment }: { comment: Comment }) {
 
   return (
     <div
-      className={`group rounded-xl p-3 transition-all duration-200 hover:bg-white/10 ${
-        comment.pinned ? "bg-yellow-500/10 border border-yellow-500/30" : ""
-      } ${comment.gift ? "bg-purple-900/20 border border-purple-500/50" : ""} ${
-        comment.isSpam ? "opacity-60" : ""
-      }`}
+      className={`group rounded-xl p-3 transition-all duration-200 hover:bg-white/10 ${comment.pinned ? "bg-yellow-500/10 border border-yellow-500/30" : ""
+        } ${comment.gift ? "bg-purple-900/20 border border-purple-500/50" : ""} ${comment.isSpam ? "opacity-60" : ""
+        }`}
     >
       {comment.pinned && (
         <div className="flex items-center gap-1.5 text-yellow-400 text-xs font-bold mb-2">
@@ -80,12 +80,24 @@ export default function LiveChatItem({ comment }: { comment: Comment }) {
           </p>
 
           <div className="flex items-center gap-4 mt-2 text-xs">
-            <button className="flex items-center gap-1 text-gray-400 hover:text-red-500 transition">
-              <Heart
-                className={`w-4 h-4 ${comment.liked ? "fill-red-500 text-red-500" : ""}`}
-              />
-              {comment.likes > 0 && comment.likes.toLocaleString("vi-VN")}
-            </button>
+            <Button
+              icon={
+                <Heart
+                  className={clsx(
+                    'w-4 h-4 transition-colors',
+                    comment.liked
+                      ? 'fill-red-500 text-red-500'
+                      : 'text-gray-400 hover:text-red-500'
+                  )}
+                />
+              }
+              text={comment.likes > 0 ? comment.likes.toLocaleString("vi-VN") : ''}
+              radius="full"
+              iconPosition="left"
+              variant="ghost"
+              onClick={onLike}
+              className="p-2! text-gray-400 text-sm hover:bg-transparent"
+            />
           </div>
         </div>
       </div>

@@ -49,7 +49,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             openCreateChannel={() => setShowCreateChannel(true)}
           />
 
-          <main className="w-full">
+          <main className="flex-1 overflow-hidden">
             {children}
           </main>
         </div>
