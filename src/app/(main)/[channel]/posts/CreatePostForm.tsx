@@ -1,9 +1,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import TextareaAutosize from "react-textarea-autosize";
-import { X, ImageIcon, ChartBarBig, SquareCheckBig, Film, ChevronDown, Clock } from "lucide-react"
-import { Button } from "@/app/components/ui/button/Button";
-import { Popup } from "@/app/components/ui/popup/Popup";
+import { X, ImageIcon, ChartBarBig, SquareCheckBig, Film, ChevronDown, Clock } from "lucide-react";
+
+import { Button, Popup } from "@/app/components/ui";
 
 export default function CreatePostForm() {
   const [showTypeOptions, setShowTypeOptions] = useState(false);
@@ -100,7 +100,7 @@ export default function CreatePostForm() {
                 className="border-none"
               />
             }
-            <div className="flex items-center">
+            <div className="flex items-center rounded-full">
               {showSchedule ? (
                 <>
                   <Button
@@ -121,6 +121,7 @@ export default function CreatePostForm() {
                     radius="full"
                     disabled={content.trim() === ""}
                   />
+                  <span className="h-8 w-[1px] bg-white/60"></span>
                   <Popup
                     trigger={
                       <Button

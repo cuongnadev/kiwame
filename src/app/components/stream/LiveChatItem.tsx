@@ -1,0 +1,107 @@
+"use client";
+
+import React from "react";
+import Image from "next/image";
+import { vi } from "date-fns/locale";
+import { formatDistanceToNow } from "date-fns";
+import { Heart, Pin, Gift } from "lucide-react";
+import { Button } from "../ui";
+import clsx from "clsx";
+
+export interface Comment {
+  id: string;
+  author: string;
+  avatar?: string;
+  content: string;
+  time: Date;
+  likes: number;
+  liked: boolean;
+  pinned?: boolean;
+  gift?: boolean;
+  isSpam?: boolean;
+}
+
+export default function LiveChatItem({ comment, onLike }: { comment: Comment, onLike: () => void }) {
+  const timeAgo = formatDistanceToNow(comment.time, {
+    addSuffix: true,
+    locale: vi,
+  });
+
+  return (
+    <div
+      className={`group rounded-xl p-3 transition-all duration-200 hover:bg-white/10 ${comment.pinned ? "bg-yellow-500/10 border border-yellow-500/30" : ""
+        } ${comment.gift ? "bg-purple-900/20 border border-purple-500/50" : ""} ${comment.isSpam ? "opacity-60" : ""
+        }`}
+    >
+      {comment.pinned && (
+        <div className="flex items-center gap-1.5 text-yellow-400 text-xs font-bold mb-2">
+          <Pin className="w-3.5 h-3.5 fill-yellow-400" />
+          Đã ghim
+        </div>
+      )}
+
+      {comment.gift && (
+        <div className="flex items-center gap-1.5 text-purple-400 text-xs font-bold mb-2">
+          <Gift className="w-4 h-4" />
+          Super Chat
+        </div>
+      )}
+
+      <div className="flex gap-3">
+        <div className="shrink-0">
+          {comment.avatar ? (
+            <Image
+              src={comment.avatar}
+              alt={comment.author}
+              width={36}
+              height={36}
+              className="rounded-full object-cover border border-white/20"
+              priority
+            />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-sm font-bold text-white">
+              {comment.author[0].toUpperCase()}
+            </div>
+          )}
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-semibold text-white text-sm">
+              {comment.author}
+            </span>
+            <span className="text-xs text-gray-400">
+              {timeAgo.replace("khoảng ", "").replace("hơn ", "")}
+            </span>
+          </div>
+
+          <p className="text-sm text-gray-100 mt-0.5 break-words">
+            {comment.content}
+          </p>
+
+          <div className="flex items-center gap-4 mt-2 text-xs">
+            <Button
+              icon={
+                <Heart
+                  className={clsx(
+                    'w-4 h-4 transition-colors',
+                    comment.liked
+                      ? 'fill-red-500 text-red-500'
+                      : 'text-gray-400 hover:text-red-500'
+                  )}
+                />
+              }
+              text={comment.likes > 0 ? comment.likes.toLocaleString("vi-VN") : ''}
+              radius="full"
+              iconPosition="left"
+              variant="ghost"
+              onClick={onLike}
+              className="p-2! text-gray-400 text-sm hover:bg-transparent"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+

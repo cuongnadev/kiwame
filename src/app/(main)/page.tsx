@@ -1,6 +1,6 @@
+import UserHome from "@/app/(main)/UserHome";
+import GuestHome from "@/app/(main)/GuestHome";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import UserHome from "./UserHome";
-import GuestHome from "./GuestHome";
 
 export default async function Home() {
   const supabase = await createSupabaseServerClient();

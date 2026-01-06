@@ -11,8 +11,10 @@ export interface ButtonProps {
   radius?: 'none' | 'sm' | 'md' | 'lg' | 'full';
   loading?: boolean;
   disabled?: boolean;
-  onClick?: () => void;
+  nowrap?: boolean;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
+  title?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -24,7 +26,9 @@ export const Button: React.FC<ButtonProps> = ({
   radius = 'md',
   loading = false,
   disabled = false,
+  nowrap = false,
   onClick,
+  title,
   className
 }) => {
   const baseStyles = 'inline-flex hover:pointer items-center justify-center gap-2 font-medium transition-colors duration-200';
@@ -89,13 +93,14 @@ export const Button: React.FC<ButtonProps> = ({
         (disabled || loading) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
         className
       )}
+      title={title}
     >
       {loading ? (
         <Loader2 className="w-5 h-5 animate-spin"/>
       ) : (
         <>
           {icon && iconPosition === 'left' && <span>{icon}</span>}
-          {text && <span>{text}</span>}
+          {text && <span className={`p-0 ${nowrap===true ? 'block overflow-hidden text-ellipsis whitespace-nowrap max-w-full':''}`}>{text}</span>}
           {icon && iconPosition === 'right' && <span>{icon}</span>}
         </>
       )}

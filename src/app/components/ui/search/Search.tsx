@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react'
 import { Input } from '../input/Input'
 import { Button } from '../button/Button'
@@ -26,7 +28,7 @@ export const Search = () => {
           icon={<SearchIcon size={20} />}
           variant="dark"
           radius="full"
-          className="py-3! px-6! rounded-tl-none rounded-bl-none"
+          className="py-3! px-6! rounded-tl-none! rounded-bl-none!"
         />
       </div>
 

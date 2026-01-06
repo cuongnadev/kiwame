@@ -1,41 +1,48 @@
 'use client'
-import { use, useState, useEffect } from "react";
-import NavigationTabs from "./layout/NavigationTabs"
-import ProfileHeader from "./layout/ProfileHeader"
+
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
+import { useAppUser } from "@/hooks/useAppUser";
+import { NavigationTabs } from "@/app/components/ui";
+import ProfileHeader from "@/app/(main)/[channel]/layout/ProfileHeader";
+
 export default function Layout(
-  { children, params }: { children: React.ReactNode, params: Promise<{ channel: string }> }
+  { children }: { children: React.ReactNode }
 ) {
-  const channel = decodeURIComponent(use(params).channel);
   const [activeTab, setActiveTab] = useState('');
   const pathname = usePathname();
+  const { user, loading } = useAppUser();
+
+  const channelName = user?.channel?.name || null;
+
   useEffect(() => {
 
     if (!pathname) return;
 
-    if (pathname === `/${channel}`) {
+    if (pathname === `/@${channelName}`) {
       setActiveTab("home");
     }
 
-    if (pathname.startsWith(`/${channel}/posts`)) {
+    if (pathname.startsWith(`/@${channelName}/posts`)) {
       setActiveTab("posts");
     }
-  }, [pathname, channel]);
+  }, [pathname, channelName]);
+
   return (
     <div className="bg-[#0f0f0f] -translate-x-4">
-      <ProfileHeader channel={channel} />
+      <ProfileHeader channelName={channelName} loading={loading} />
       <div className="border-b border-b-gray-500 pl-12">
         <NavigationTabs
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           type="main"
-          channel={channel}
+          channelName={channelName}
         />
       </div>
-      <div className="pl-12">
+      <main className="pl-12">
         {children}
-      </div>
+      </main>
     </div>
   )
 }

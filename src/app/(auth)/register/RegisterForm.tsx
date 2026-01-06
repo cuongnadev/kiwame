@@ -1,40 +1,51 @@
 'use client';
-import React, { useState } from 'react'
+
 import Image from 'next/image';
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
-import { Button } from '@/app/components/ui/button/Button';
-import { GoogleIcon } from '@/app/components/ui/icons/GoogleIcon';
-import { Input } from '@/app/components/ui/input/Input';
 import { Facebook, LockKeyhole, LockKeyholeOpen, Mail } from 'lucide-react';
+
+import { useToast } from '@/hooks/useToast';
+import { Button, Input, GoogleIcon } from '@/app/components/ui';
+import { getFirstZodError } from '@/helper/get-first-zod-error';
 
 export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
   const router = useRouter();
 
   const handleRegister = async () => {
-    if (password !== confirmPassword) return alert("Passwords don't match");
+    if (loading) return;
     setLoading(true);
 
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, confirmPassword }),
       });
       const data = await res.json();
+      const message = getFirstZodError(data.error);
 
-      if (data.success) {
-        alert("Registration successful! Please check your email to confirm your account.");
-        router.push('/login');
-      } else {
-        alert(data.error || 'Register failed');
+      if (!res.ok) {
+        showToast(message ?? "Registration failed", "error");
+        return;
       }
+
+      showToast(
+        message ?? 'Registration successful! Please complete your profile.',
+        'success'
+      );
+      router.push('/complete-profile');
     } catch (err) {
       console.error(err);
-      alert('Something went wrong.');
+      showToast(
+        'Unable to connect to the server. Please try again later.',
+        'error'
+      );
     } finally {
       setLoading(false);
     }
@@ -69,6 +80,7 @@ export default function RegisterForm() {
           placeholder="Email address"
           prefix={<Mail className="text-gray-400" />}
           className="!border-none !outline-none bg-white/5 text-gray-100 placeholder-gray-400 focus:ring-purple-300"
+          required
         />
 
         <Input
@@ -79,6 +91,7 @@ export default function RegisterForm() {
           prefix={<LockKeyholeOpen className="text-gray-400" />}
           className="!border-none !outline-none bg-white/5 text-gray-100 placeholder-gray-400 focus:ring-purple-300"
           showPasswordToggle
+          required
         />
 
         <Input
@@ -89,6 +102,7 @@ export default function RegisterForm() {
           prefix={<LockKeyhole className="text-gray-400" />}
           className="!border-none !outline-none bg-white/5 text-gray-100 placeholder-gray-400 focus:ring-purple-300"
           showPasswordToggle
+          required
         />
       </div>
 
@@ -96,7 +110,7 @@ export default function RegisterForm() {
         onClick={handleRegister}
         text="Register"
         className="w-full bg-purple-500 hover:bg-purple-600 text-white"
-        disabled={!email || !password || password !== confirmPassword || loading}
+        disabled={!email || !password || !confirmPassword || loading}
       />
 
       <div className="flex items-center w-full gap-4 my-2">

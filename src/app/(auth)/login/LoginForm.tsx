@@ -1,22 +1,24 @@
 "use client";
-import React, { useState } from "react";
+
 import Image from "next/image";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/app/components/ui/button/Button";
-import { GoogleIcon } from "@/app/components/ui/icons/GoogleIcon";
-import { Input } from "@/app/components/ui/input/Input";
 import { Facebook, LockKeyhole, Mail } from "lucide-react";
+
+import { useToast } from "@/hooks/useToast";
+import { Button, Input, GoogleIcon } from "@/app/components/ui";
+import { getFirstZodError } from "@/helper/get-first-zod-error";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
   const router = useRouter();
 
   const handleLogin = async () => {
-    if (!email || !password) return alert("Please enter email and password");
-
+    if (loading) return;
     setLoading(true);
 
     try {
@@ -25,17 +27,19 @@ export default function LoginForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, rememberMe }),
       });
-      const data = await res.json();
 
-      if (!data.success) {
-        alert(data.error || 'Login failed');
+      if (!res.ok) {
+        const data = await res.json();
+        const message = getFirstZodError(data.error);
+        showToast(message ?? "Login failed", "error");
         return;
       }
 
+      showToast('Login successful! Redirecting...', 'success');
       router.push('/');
     } catch (err) {
       console.error(err);
-      alert('Something went wrong.');
+      showToast('Unable to connect to the server. Please try again later.', 'error');
     } finally {
       setLoading(false);
     }
@@ -101,6 +105,7 @@ export default function LoginForm() {
         onClick={handleLogin}
         text="Sign in"
         className="w-full bg-purple-500 hover:bg-purple-600 text-white"
+        disabled={!email || !password || loading}
       />
 
       <div className="flex items-center w-full gap-4 my-2">

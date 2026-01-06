@@ -31,16 +31,7 @@ export const Password: Story = {
   },
 };
 
-// 🔹 3. Search input
-export const SearchInput: Story = {
-  args: {
-    label: 'Tìm kiếm',
-    variant: 'search',
-    clearable: true,
-  },
-};
-
-// 🔹 4. Error input
+// 🔹 3. Error input
 export const ErrorInput: Story = {
   args: {
     label: 'Error Input',

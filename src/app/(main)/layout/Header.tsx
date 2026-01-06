@@ -1,165 +1,153 @@
-import {
-  Menu, Bell, CircleUserRound, Plus,
-} from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { User } from "@supabase/supabase-js"
-import { Button } from "@/app/components/ui/button/Button"
-import logo from "@/assets/images/logo.png"
-import logoText from "@/assets/images/logo_text.png"
-import { Popup } from "@/app/components/ui/popup/Popup"
-import { Search } from "@/app/components/ui/search/Search"
-import { getMenuItems, getMenuItemsWithStudio, getStudioItems } from "@/constants/menu.constants"
-import { UserMenu } from "./UserMenu"
-import clsx from "clsx"
+"use client";
+
+import clsx from "clsx";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Menu, Plus, Bell, CircleUserRound } from "lucide-react";
+
+import { useToast } from "@/hooks/useToast";
+import { AppUser } from "@/hooks/useAppUser";
+import { AppUserChannel } from "@/types/channel";
+import { UserMenu } from "@/app/(main)/layout/UserMenu";
+import { Button, Popup, Search } from "@/app/components/ui";
+import { useMenuNavigation } from "@/hooks/useMenuNavigation";
+import { getCreateMenuItems, getUserDropdownMenu } from "@/constants/menu.constants";
+import logo from "@/assets/images/logo.png";
+import logoText from "@/assets/images/logo_text.png";
 
 interface HeaderProps {
-  onMenuClick: () => void,
-  user: User | null,
-  isStudio?: boolean,
-  channel: string,
-  className?: string,
-  isLive?: boolean,
+  onMenuClick: () => void;
+  user: AppUser | null;
+  channel: AppUserChannel | null;
+  openCreateChannel?: () => void;
+  className?: string;
+  loading: boolean,
+  type: "main" | "studio";
 }
 
-export default function Header({ onMenuClick, user, isStudio = false, channel, className, isLive = true }: HeaderProps) {
+export default function Header({
+  onMenuClick,
+  user,
+  channel,
+  openCreateChannel,
+  className,
+  loading,
+  type,
+}: HeaderProps) {
   const router = useRouter();
-  const menuItems = getMenuItems(channel);
-  const menuItemsStudio = getMenuItemsWithStudio(channel);
-  const studioItems = getStudioItems(channel);
+  const { showToast } = useToast();
 
-  const handleToGoChannel = () => {
-    if (channel) {
-      router.push(`/${channel}`);
-    }
-  }
+  const navigate = useMenuNavigation(user, channel, openCreateChannel);
+
+  const createItems = getCreateMenuItems(channel);
+  const userMenuItems = getUserDropdownMenu(channel);
 
   const handleLogout = async () => {
     try {
-      const res = await fetch('/api/auth/logout', { method: 'POST' });
+      const res = await fetch('/api/auth/logout', {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST'
+      });
       const data = await res.json();
 
-      if (data.success) {
-        router.push('/login');
-      } else {
-        alert('Logout failed');
+      if (!data.success) {
+        showToast('Logout failed. Please try again.', 'error');
+        return;
       }
+
+      showToast('Logged out successfully.', 'success');
+      router.push('/login');
     } catch (err) {
       console.error(err);
-      alert('Something went wrong.');
+      showToast(
+        'Unable to log out. Please try again later.',
+        'error'
+      );
     }
   };
 
   return (
-    <header className={clsx(className, `sticky top-0 z-40 w-full bg-[#0f0f0f] px-4.5 py-3 `)}>
-      <div className="flex items-center justify-between gap-4">
-        {/* Left */}
-        <div className="flex items-center gap-4.5">
-          <Button
-            onClick={onMenuClick}
-            text=""
-            icon={<Menu size={20} />}
-            variant="ghost"
-            radius="full"
-            className="p-3!"
-          />
-          <div className="flex items-center">
-            <Link href={"/"} className="flex items-center justify-start">
-              <Image
-                src={logo}
-                width={40}
-                height={40}
-                alt="Kiwame Logo"
-              />
-              {isStudio ? (
-                <span className="text-white text-xl font-medium ml-2">Studio</span>
-              ) : (
-                <Image
-                  src={logoText}
-                  width={200}
-                  height={40}
-                  alt="Kiwame Text Logo"
-                  className="-translate-x-8"
-                />
-              )}
-            </Link>
-          </div>
-        </div>
-        {/* Center */}
-        {isLive && <Search />}
-        {/* Right */}
-        <div className="flex items-center gap-2">
-          {isLive && (
-            <>
-              <Popup
-                trigger={
-                  <Button
-                    icon={<Plus size={20} />}
-                    variant="dark"
-                    onClick={() => { }}
-                    radius="full"
-                    text="Tạo"
-                    className="py-2.5!"
-                  />
-                }
-                position="bottom"
-                className="min-w-44!"
-              >
-                <div className="p-2 text-white space-y-1">
-                  {/* Section 1 */}
-                  {studioItems.map((item, i) => (
-                    <Link
-                      key={i}
-                      href={item.href!}
-                      className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg cursor-pointer"
-                    >
-                      {item.icon}
-                      <span>{item.label}</span>
-                    </Link>
-                  ))}
-                </div>
-              </Popup>
+    <header className={clsx(className, "sticky top-0 z-50 bg-[#0f0f0f] px-4 py-3 border-b border-white/10 backdrop-blur-xl")}>
+      <div className="flex items-center justify-between gap-6">
 
-              {/* notifications */}
-              <Button
-                icon={<Bell size={20} />}
-                variant="ghost"
-                onClick={() => { }}
-                radius="full"
-                className="p-3!"
-              />
-            </>
-          )}
-          {/* user menu */}
-          {user &&
+        <div className="flex items-center gap-4">
+          <Button onClick={onMenuClick} icon={<Menu size={24} />} variant="ghost" radius="full" className="p-2.5! hover:bg-white/10" />
+          <Link href={type === "main" ? "/" : `/studio/channel/${channel?.name}`} className="flex items-center gap-4">
+            <Image src={logo} width={44} height={44} alt="Kiwame" className="drop-shadow-md" />
+            {type === "main" ? <Image src={logoText} width={200} height={40} alt="Kiwame" className="m-[-30px] hidden sm:block" /> : <span className="text-2xl font-semibold">Studio</span>}
+          </Link>
+        </div>
+
+        <div className="flex-1 max-w-3xl mx-4">
+          <Search />
+        </div>
+
+        <div className="flex items-center gap-3">
+
+          <Popup trigger={
+            <Button icon={<Plus size={22} />} text="Tạo" variant="dark" radius="full" className="px-4.5! py-2.5! font-medium shadow-lg hover:shadow-xl" />
+          } position="bottom">
+            <div className="w-64 bg-[#1a1a1a] rounded-lg border border-white/10 p-2">
+              <div className="space-y-1">
+                {createItems.map((item) => (
+                  <div
+                    key={item.label}
+                    onClick={() => navigate(item)}
+                    className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/10 cursor-pointer transition-all group"
+                  >
+                    <div className="text-white/80 group-hover:text-white">{item.icon}</div>
+                    <span className="font-medium">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Popup>
+
+          <Button icon={<Bell size={22} />} variant="ghost" radius="full" className="p-3! hover:bg-white/10" />
+
+          {loading ? (
+            <div className="w-[44px] h-[44px] rounded-full bg-white/10 animate-pulse" />
+          ) : user ? (
             <Popup
               trigger={
-                <Button
-                  icon={<CircleUserRound size={20} />}
-                  variant="dark"
-                  onClick={() => { }}
-                  radius="full"
-                  className="p-3!"
+                <Image
+                  src={
+                    type === "main"
+                      ? user.avatar_url || "https://avatar.iran.liara.run/public"
+                      : channel?.avatar_url || "https://avatar.iran.liara.run/public"
+                  }
+                  width={44}
+                  height={44}
+                  alt="Avatar"
+                  className="rounded-full w-[44px] h-[44px] ring-2 ring-white/20 hover:ring-white/40 object-cover cursor-pointer transition-all"
+                  unoptimized
                 />
               }
               position="bottom-left"
             >
-              <UserMenu menu={isStudio ? menuItemsStudio : menuItems} onLogout={handleLogout} onToGoChannel={handleToGoChannel} user={user} channel={channel} isStudio={isStudio} />
+              <UserMenu
+                items={userMenuItems}
+                onNavigate={navigate}
+                user={user}
+                channel={channel}
+                onLogout={handleLogout}
+                onToGoChannel={() => channel && navigate(`/${channel.name}`)}
+                type={type}
+              />
             </Popup>
-          }
-          {!user &&
+          ) : (
             <Button
+              text="Đăng nhập"
               icon={<CircleUserRound size={20} />}
               variant="dark"
-              onClick={() => router.push('/login')}
               radius="full"
-              text="Đăng nhập"
-              className="py-2.5!"
+              className="px-5 py-2.5 font-medium"
+              onClick={() => navigate("/login")}
             />
-          }
+          )}
         </div>
       </div>
     </header>
-  )
+  );
 }

@@ -1,59 +1,93 @@
-import { getLiveMenuItems, systemMenuItems } from '@/constants/menu.constants';
-import { User } from '@supabase/supabase-js'
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import React from 'react'
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { getLiveMenuItems, systemMenuItems } from "@/constants/menu.constants";
+import { AppUser } from "@/hooks/useAppUser";
+import { SidebarItem } from "@/app/(main)/layout/SidebarItem";
 
 interface SidebarLiveStreamingProps {
-  expanded: boolean,
-  user: User | null,
-  channel: string,
+  expanded: boolean;
+  user: AppUser | null;
+  channel: string | null;
+  channelName?: string;
 }
 
-export default function SidebarLiveStreaming({ expanded, user, channel }: SidebarLiveStreamingProps) {
-  const liveMenuItems = getLiveMenuItems(channel);
-  const pathname = usePathname();
+export default function SidebarLiveStreaming({
+  expanded,
+  user,
+  channel,
+  channelName = "Kênh của bạn",
+}: SidebarLiveStreamingProps) {
+  const liveItems = getLiveMenuItems(channel);
 
   return (
-    <aside className={`flex flex-col items-left bg-[#0f0f0f] transition-all duration-300 ease-in-out ${expanded ? 'w-64' : 'w-20'} group/sidebar border-r border-white/10`}>
-      {/* Main menu */}
-      <nav className={` items-left flex-1 ${!expanded ? "px-1" : "px-3"}  overflow-y-auto overflow-x-hidden scrollbar-hover min-h-0`}>
-        <div className={`flex-1 space-y-1 py-4`}>
-          {liveMenuItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href!}
-              className={`flex items-center ${!expanded && "justify-center"} gap-4 rounded-lg px-3 ${!expanded ? "py-4" : "py-2"} text-[#f1f1f1] hover:bg-[#222] ${(pathname === item.href) && 'bg-[#222]'} transition-colors group relative`}
+    <aside
+      className={`flex flex-col bg-[#0f0f0f] transition-all duration-300 ease-in-out ${
+        expanded ? "w-64" : "w-20"
+      } border-r border-white/10 group/sidebar`}
+    >
+      {/* Channel Info Header */}
+      <div className="p-4 flex flex-col items-center">
+        <Link href={channel ? `/${channel}` : "#"} className="block">
+          <Image
+            src={user?.avatar_url || "https://avatar.iran.liara.run/public"}
+            width={expanded ? 88 : 40}
+            height={expanded ? 88 : 40}
+            alt="Channel avatar"
+            className="rounded-full object-cover border-2 border-red-500/30 shadow-lg shadow-red-500/20"
+            priority
+          />
+        </Link>
 
-              title={expanded ? '' : item.label}
-            >
-              <div className="relative flex flex-col items-center">
-                {item.icon}
-              </div>
-              {expanded && <span className="text-base text-nowrap">{item.label}</span>}
-            </Link>
+        {expanded && (
+          <div className="mt-3 text-center">
+            <p className="font-bold text-white text-lg flex items-center gap-2">
+              {channelName}
+              <span className="inline-block w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+            </p>
+            {channel && <p className="text-xs text-red-400 font-mono">LIVE NOW</p>}
+          </div>
+        )}
+      </div>
+
+      {/* Live Streaming Menu */}
+      <nav className="flex-1 overflow-y-auto scrollbar-hover">
+        <div className={`space-y-1 py-3 ${expanded ? "px-3" : "px-1"}`}>
+          {liveItems.map((item) => (
+            <SidebarItem
+              key={item.label}
+              item={item}
+              expanded={expanded}
+              user={user}
+              channel={channel}
+            />
+          ))}
+        </div>
+
+        {/* Divider */}
+        <hr className="border-t border-white/10 mx-3 my-2" />
+
+        {/* System Menu */}
+        <div className={`space-y-1 pb-4 ${expanded ? "px-3" : "px-1"}`}>
+          {systemMenuItems.map((item) => (
+            <SidebarItem
+              key={item.label}
+              item={item}
+              expanded={expanded}
+              user={user}
+              channel={channel}
+            />
           ))}
         </div>
       </nav>
 
-      {/* System menu */}
-      <div className={`space-y-1 py-4 ${!expanded ? "px-1" : "px-3"}`}>
-        {systemMenuItems.map((item) => (
-          <Link
-            key={item.label}
-            href={item.href}
-            className={`flex items-center ${!expanded && "justify-center"} gap-4 rounded-lg px-3 ${!expanded ? "py-4" : "py-2"} text-[#f1f1f1] hover:bg-[#222] transition-colors group relative`}
-            title={expanded ? '' : item.label}
-          >
-            <div className="relative flex flex-col items-center">
-              {item.icon && (
-                <item.icon size={24} className="flex-shrink-0" />
-              )}
-            </div>
-            {expanded && <span className="text-base text-nowrap">{item.label}</span>}
-          </Link>
-        ))}
-      </div>
+      {/* Live Indicator khi thu nhỏ */}
+      {!expanded && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2">
+          <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse ring-4 ring-red-500/30" />
+        </div>
+      )}
     </aside>
-  )
+  );
 }

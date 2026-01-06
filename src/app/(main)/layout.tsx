@@ -1,44 +1,64 @@
-'use client'
-import { use, useEffect, useState } from "react"
-import Header from "@/app/(main)/layout/Header"
-import Sidebar from "@/app/(main)/layout/Sidebar"
-import { createSupabaseBrowserClient } from "@/lib/supabase/client"
-import { User } from "@supabase/supabase-js"
+"use client";
 
-export default function Layout({ children, params }: { children: React.ReactNode, params: Promise<{ channel: string }> }) {
-  const channel = decodeURIComponent(use(params).channel);
-  const [sidebarExpanded, setSidebarExpanded] = useState(true)
-  const [user, setUser] = useState<User | null>(null)
+import { useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+
+import Header from "@/app/(main)/layout/Header";
+import Sidebar from "@/app/(main)/layout/Sidebar";
+import { useAppUser } from "@/hooks/useAppUser";
+import { CreateChannelModal } from "@/app/components/ui";
+
+export default function MainLayout({ children }: { children: React.ReactNode }) {
+  const searchParams = useSearchParams();
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [showCreateChannel, setShowCreateChannel] = useState(false);
+  const { user, loading } = useAppUser();
+
+  const channel = user?.channel;
+
+  const toggleSidebar = () => setSidebarExpanded((prev) => !prev);
 
   useEffect(() => {
-    const supabase = createSupabaseBrowserClient()
+    if (loading) return;
 
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user ?? null)
+    if (
+      searchParams.get("openCreateChannel") === "true" &&
+      !channel
+    ) {
+      setShowCreateChannel(true);
     }
-
-    getUser()
-
-    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => listener.subscription.unsubscribe()
-  }, [])
-
-  const toggleSidebar = () => setSidebarExpanded(!sidebarExpanded)
+  }, [loading, channel, searchParams]);
 
   return (
-    <div className="flex flex-col h-screen bg-[#0f0f0f]">
-      <Header onMenuClick={toggleSidebar} user={user} channel={channel}/>
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar expanded={sidebarExpanded} user={user} />
+    <>
+      <div className="flex flex-col h-screen bg-[#0f0f0f]">
+        <Header
+          onMenuClick={toggleSidebar}
+          user={user}
+          channel={channel!}
+          type="main"
+          loading={loading}
+          openCreateChannel={() => setShowCreateChannel(true)}
+        />
 
-        <main className="w-full grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 px-6 py-4 bg-[#0f0f0f] overflow-y-auto overflow-x-hidden scrollbar-main">
-          {children}
-        </main>
+        <div className="flex flex-1 overflow-hidden">
+          <Sidebar
+            expanded={sidebarExpanded}
+            user={user}
+            channel={channel!}
+            openCreateChannel={() => setShowCreateChannel(true)}
+          />
+
+          <main className="flex-1 overflow-hidden">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
-  )
+
+      <CreateChannelModal
+        open={showCreateChannel}
+        onOpenChange={setShowCreateChannel}
+      />
+    </>
+  );
 }
