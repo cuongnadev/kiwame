@@ -5,11 +5,12 @@ import Link from "next/link";
 import { getLiveMenuItems, systemMenuItems } from "@/constants/menu.constants";
 import { AppUser } from "@/hooks/useAppUser";
 import { SidebarItem } from "@/app/(main)/layout/SidebarItem";
+import { AppUserChannel } from "@/types/channel";
 
 interface SidebarLiveStreamingProps {
   expanded: boolean;
   user: AppUser | null;
-  channel: string | null;
+  channel: AppUserChannel | null;
   channelName?: string;
 }
 
@@ -17,7 +18,6 @@ export default function SidebarLiveStreaming({
   expanded,
   user,
   channel,
-  channelName = "Kênh của bạn",
 }: SidebarLiveStreamingProps) {
   const liveItems = getLiveMenuItems(channel);
 
@@ -29,7 +29,7 @@ export default function SidebarLiveStreaming({
     >
       {/* Channel Info Header */}
       <div className="p-4 flex flex-col items-center">
-        <Link href={channel ? `/${channel}` : "#"} className="block">
+        <Link href={channel ? `/${channel?.name}` : "#"} className="block">
           <Image
             src={user?.avatar_url || "https://avatar.iran.liara.run/public"}
             width={expanded ? 88 : 40}
@@ -43,7 +43,7 @@ export default function SidebarLiveStreaming({
         {expanded && (
           <div className="mt-3 text-center">
             <p className="font-bold text-white text-lg flex items-center gap-2">
-              {channelName}
+              {channel ? channel?.name : "Kênh của bạn"}
               <span className="inline-block w-3 h-3 bg-red-500 rounded-full animate-pulse" />
             </p>
             {channel && <p className="text-xs text-red-400 font-mono">LIVE NOW</p>}
