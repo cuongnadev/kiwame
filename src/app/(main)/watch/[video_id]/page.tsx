@@ -352,51 +352,51 @@ export default function WatchPage() {
           )}
 
           {/* Comments Section */}
-          <div className="mt-8 pb-8">
-            <h2 className="text-lg font-bold mb-6">Bình luận ({comments.length})</h2>
+          {!isLive && (
+            <div className="mt-8 pb-8">
+              <h2 className="text-lg font-bold mb-6">Bình luận ({comments.length})</h2>
 
-            {/* Add Comment */}
-            <div className="flex items-start gap-4 mb-8">
-              <Image
-                src={user?.avatar_url || '/default-avatar.png'}
-                alt="user avatar"
-                width={40}
-                height={40}
-                className="w-10 h-10 rounded-full"
-                onClick={() => { }}
-              />
-              <div className="flex-1">
-                <TextareaAutosize
-                  value={newComment}
-                  onChange={(e) => { setNewComment(e.target.value) }}
-                  minRows={1}
-                  placeholder="Viết bình luận"
-                  className="w-full bg-transparent text-white pb-1 mt-2 resize-none border-b border-white focus:outline-1   "
+              {/* Add Comment */}
+              <div className="flex items-start gap-4 mb-8">
+                <Image
+                  src={user?.avatar_url || '/default-avatar.png'}
+                  alt="user avatar"
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 rounded-full"
+                  onClick={() => { }}
                 />
-                {newComment && (
-                  <div className="flex gap-2 mt-4 justify-end">
-                    <Button
-                      onClick={() => setNewComment("")}
-                      text='Hủy'
-                      variant="outline"
-                      radius='full'
-                    />
-                    <Button
-                      text="Bình luận"
-                      icon={<Send size={16} />}
-                      variant="primary"
-                      className="text-sm"
-                      radius="full"
-                      loading={isSubmittingComment}
-                      onClick={handleAddComment}
-                    />
-                  </div>
-                )}
+                <div className="flex-1">
+                  <TextareaAutosize
+                    value={newComment}
+                    onChange={(e) => { setNewComment(e.target.value) }}
+                    minRows={1}
+                    placeholder="Viết bình luận"
+                    className="w-full bg-transparent text-white pb-1 mt-2 resize-none border-b border-white focus:outline-1   "
+                  />
+                  {newComment && (
+                    <div className="flex gap-2 mt-4 justify-end">
+                      <Button
+                        onClick={() => setNewComment("")}
+                        text='Hủy'
+                        variant="outline"
+                        radius='full'
+                      />
+                      <Button
+                        text="Bình luận"
+                        icon={<Send size={16} />}
+                        variant="primary"
+                        className="text-sm"
+                        radius="full"
+                        loading={isSubmittingComment}
+                        onClick={handleAddComment}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Comments List */}
-            {!isLive && (
+              {/* Comments List */}
               <div className="space-y-6">
                 {comments.length === 0 ? (
                   <p className="text-neutral-500 font-bold text-md">Chưa có bình luận nào.</p>
@@ -412,8 +412,8 @@ export default function WatchPage() {
                     />
                   )))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 

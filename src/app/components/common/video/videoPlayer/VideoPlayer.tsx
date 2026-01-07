@@ -207,7 +207,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         </>
       )}
 
-      {!playing && !preview && (
+      {!playing && !preview && !isLive  && (
         <div
           onClick={togglePlay}
           className="absolute inset-0 flex items-center justify-center bg-black/20 cursor-pointer"
