@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Play, Volume2, VolumeX, Maximize2, Minimize2, Pause, Settings, ClosedCaption, Rewind } from 'lucide-react';
 
-import { Button, Popup } from '@/app/components/ui';
+import { Button, LiveIcon, Popup } from '@/app/components/ui';
 import { videoSettingsItems } from '@/constants/menu.constants';
 import { LiveKitPlayer } from '@/app/components/common';
 import { VideoPart } from '@/types/video';
@@ -218,47 +218,55 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
       {!preview && (
         <div className="absolute bottom-0 left-0 w-full p-2 bg-black/50 flex items-center justify-between gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <div className='flex items-center gap-0.5'>
-            <Button
-              variant='ghost'
-              radius='full'
-              icon={<Rewind size={20} className="text-white" />}
-              onClick={togglePlay}
-            />
-            <Button
-              variant='ghost'
-              radius='full'
-              icon={playing ? <Pause size={20} className="text-white" /> : <Play size={20} className="text-white" />}
-              onClick={togglePlay}
-            />
-            <Button
-              variant='ghost'
-              radius='full'
-              icon={<Rewind size={20} className="text-white rotate-180" />}
-              onClick={togglePlay}
-            />
-          </div>
+          {!isLive ? (
+            <>
 
-          <div className="flex items-center flex-1 mx-4">
-            <div
-              className="relative h-1 bg-gray-600 rounded-full flex-1 cursor-pointer"
-              onClick={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const percent = (x / rect.width) * 100;
-                handleSeek(Math.max(0, Math.min(100, percent))); // clamp 0-100
-              }}
-            >
-              <div
-                className="absolute h-full bg-red-600 rounded-full pointer-events-none"
-                style={{ width: `${progress}%` }}
-              />
-              <div
-                className="absolute w-3 h-3 bg-red-600 rounded-full -translate-y-1 -translate-x-1/2 pointer-events-none"
-                style={{ left: `${progress}%` }}
-              />
-            </div>
-          </div>
+              <div className='flex items-center gap-0.5'>
+                <Button
+                  variant='ghost'
+                  radius='full'
+                  icon={<Rewind size={20} className="text-white" />}
+                  onClick={togglePlay}
+                />
+                <Button
+                  variant='ghost'
+                  radius='full'
+                  icon={playing ? <Pause size={20} className="text-white" /> : <Play size={20} className="text-white" />}
+                  onClick={togglePlay}
+                />
+                <Button
+                  variant='ghost'
+                  radius='full'
+                  icon={<Rewind size={20} className="text-white rotate-180" />}
+                  onClick={togglePlay}
+                />
+              </div>
+
+              <div className="flex items-center flex-1 mx-4">
+                <div
+                  className="relative h-1 bg-gray-600 rounded-full flex-1 cursor-pointer"
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const percent = (x / rect.width) * 100;
+                    handleSeek(Math.max(0, Math.min(100, percent))); // clamp 0-100
+                  }}
+                >
+                  <div
+                    className="absolute h-full bg-red-600 rounded-full pointer-events-none"
+                    style={{ width: `${progress}%` }}
+                  />
+                  <div
+                    className="absolute w-3 h-3 bg-red-600 rounded-full -translate-y-1 -translate-x-1/2 pointer-events-none"
+                    style={{ left: `${progress}%` }}
+                  />
+                </div>
+              </div>            </>
+          ) : (
+            <span className='flex items-center gap-1 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded'>
+              <LiveIcon className='w-4 h-4 fill-white' /> LIVE
+            </span>
+          )}
 
           <div className='flex items-center gap-0.5'>
             <Button
