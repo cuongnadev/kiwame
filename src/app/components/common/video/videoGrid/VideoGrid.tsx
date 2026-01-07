@@ -10,7 +10,7 @@ export function VideoGrid({
 }) {
   const gridClass =
     videoCount <= 3
-      ? "grid-cols-[repeat(auto-fill,minmax(320px,530px))] justify-start"
+      ? "grid-cols-[repeat(auto-fill,minmax(380px,528px))] justify-start"
       : "grid-cols-[repeat(auto-fit,minmax(400px,1fr))]";
 
   return (

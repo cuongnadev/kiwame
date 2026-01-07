@@ -38,7 +38,7 @@ export async function getHomeStreams() {
     const channel: ChannelRow = stream.channels;
 
     return {
-      videoId: `live-${stream.id}`,
+      streamId: `${stream.id}`,
       title: stream.title || "Live stream",
       channel: channel?.name || "Unknown Channel",
       views: "Đang phát trực tiếp",
@@ -48,4 +48,16 @@ export async function getHomeStreams() {
       avatar: channel?.avatar_url || "https://avatar.iran.liara.run/public",
     };
   });
+}
+
+export async function getStream(streamId: string) {
+  const supabase = await createSupabaseServerClient();
+
+  const { data: stream } = await supabase
+      .from("streams")
+      .select("*")
+      .eq("id", streamId)
+      .maybeSingle();
+
+  return stream;
 }

@@ -37,7 +37,8 @@ export default function DetailVideoUpload({ uploadingVideo, formStatus, parts, t
   const [input, setInput] = useState('');
 
   const isEmpty = title.trim() === '';
-  const hasError = error === "detail"
+  const hasError = error === "detail";
+
   useEffect(() => {
     if (thumbnailUrl) {
       if (formStatus === "edit") {
@@ -46,6 +47,7 @@ export default function DetailVideoUpload({ uploadingVideo, formStatus, parts, t
       setGenerateUrl(thumbnailUrl)
     }
   }, [thumbnailUrl, formStatus]);
+  
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type.startsWith('image/')) {

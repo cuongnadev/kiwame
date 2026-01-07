@@ -2,23 +2,30 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState } from "react";
-import { ThumbsUp, ThumbsDown, Download, Bookmark,  Send,  MoreHorizontal, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ThumbsUp, ThumbsDown, Download, Bookmark, Send, MoreHorizontal, ChevronLeft, ChevronRight } from 'lucide-react'
 
-import { Button, Input, ShareIcon } from '@/app/components/ui';
+import { Button, ShareIcon } from '@/app/components/ui';
 import { VideoPlayer } from '@/app/components/common';
 import { Video, VideoItemRow, VideoPart } from "@/types/video"
-import { addComment, getComments, getVideo } from "@/app/actions"
-import { useParams } from 'next/navigation';
+import { addComment, getComments, getVideo, getStream } from "@/app/actions"
+import { useParams, useSearchParams } from 'next/navigation';
 import TextareaAutosize from "react-textarea-autosize";
 import { useAppUser } from '@/hooks/useAppUser';
 import { Comment } from '@/types/comment';
 import { CommentItem } from '@/app/components/common/comment/CommentItem';
+import { LiveChat } from '@/app/components/stream';
+import { Database } from '@/lib/supabase/database.types';
+
+export type Stream = Database['public']['Tables']['streams']['Row'];
 
 export default function WatchPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const video_id = params.video_id as string;
+  const isLive = searchParams.get('live') === '1';
   const [activeTab, setActiveTab] = useState("all");
   const [video, setVideo] = useState<Video | null>(null);
+  const [stream, setStream] = useState<Stream | null>(null);
   const [parts, setParts] = useState<VideoPart[]>([]);
   const [newComment, setNewComment] = useState("");
   const { user } = useAppUser();
@@ -42,18 +49,25 @@ export default function WatchPage() {
     { id: "watch_later", label: "Xem sau" },
   ]);
 
-
   useEffect(() => {
     if (!video_id) return;
-    const fetchVideo = async () => {
-      console.log("Video id:", video_id);
-      const data = await getVideo(video_id);
-      console.log("Video data:", data);
-      setVideo(data);
+    console.log("Video id:", video_id);
 
+    const fetchData = async () => {
+      if (isLive) {
+        const data = await getStream(video_id);
+        console.log("Video data:", data);
+        setStream(data);
+        setVideo(null);
+      } else {
+        const data = await getVideo(video_id);
+        console.log("Video data:", data);
+        setVideo(data);
+        setStream(null);
+      }
     };
 
-    fetchVideo();
+    fetchData();
   }, [video_id]);
 
   // useEffect(()=>{
@@ -117,19 +131,19 @@ export default function WatchPage() {
   const handleLikeVideo = (status: string) => {
     if (likeVideo === null && status === "like") {
       setLikeVideo(true)
-      setCountVideoLike(countVideoLike+1)
+      setCountVideoLike(countVideoLike + 1)
     } else if (likeVideo === null && status === "dislike") {
       setLikeVideo(false)
-    } else if(likeVideo === true && status === "dislike") {
-      setCountVideoLike(countVideoLike-1)
+    } else if (likeVideo === true && status === "dislike") {
+      setCountVideoLike(countVideoLike - 1)
       setLikeVideo(false)
-    }else if(likeVideo === false && status === "like") {
-      setCountVideoLike(countVideoLike+1)
+    } else if (likeVideo === false && status === "like") {
+      setCountVideoLike(countVideoLike + 1)
       setLikeVideo(true)
-    }else if(likeVideo === true && status=== "like") {
-      setCountVideoLike(countVideoLike-1)
+    } else if (likeVideo === true && status === "like") {
+      setCountVideoLike(countVideoLike - 1)
       setLikeVideo(null)
-    }else {
+    } else {
       setLikeVideo(null)
     }
     const user_id = user?.id ? user.id : "";
@@ -240,7 +254,13 @@ export default function WatchPage() {
         <div className="w-full p-4 space-y-4">
           {/* Video Player */}
           <div className="aspect-video w-full rounded-xl bg-black overflow-hidden">
-            <VideoPlayer parts={parts} />
+            {isLive && stream?.room_name ? (
+              <VideoPlayer isLive={isLive} roomName={stream?.room_name} />
+            ) : (
+              <VideoPlayer
+                parts={parts}
+              />
+            )}
           </div>
 
           {/* Video Info */}
@@ -376,80 +396,86 @@ export default function WatchPage() {
             </div>
 
             {/* Comments List */}
-            <div className="space-y-6">
-              {comments.length === 0 ? (
-                <p className="text-neutral-500 font-bold text-md">Chưa có bình luận nào.</p>
-              ) : (
-                comments.map((comment) => (
-                  <CommentItem
-                    key={comment.id}
-                    comment={comment}
-                    liked={likedComments.includes(comment.id)}
-                    handleDislike={handleDislikeComment}
-                    deleteComment={() => { }}
-                    user_id={user?.id || ''}
-                  />
-                )))}
-            </div>
+            {!isLive && (
+              <div className="space-y-6">
+                {comments.length === 0 ? (
+                  <p className="text-neutral-500 font-bold text-md">Chưa có bình luận nào.</p>
+                ) : (
+                  comments.map((comment) => (
+                    <CommentItem
+                      key={comment.id}
+                      comment={comment}
+                      liked={likedComments.includes(comment.id)}
+                      handleDislike={handleDislikeComment}
+                      deleteComment={() => { }}
+                      user_id={user?.id || ''}
+                    />
+                  )))}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Sidebar - Related Videos */}
-      <aside className="w-[400px] shrink-0 h-full flex flex-col overflow-y-auto scrollbar-hover bg-black">
-        <div className='sticky top-0 bg-black py-3 z-10'>
-          <div className="flex items-center gap-2 px-2">
-            {canScrollLeft && (
-              <Button
-                icon={<ChevronLeft size={20} />}
-                onClick={() => scroll('left')}
-                variant='outline'
-                radius='full'
-                className='p-2! border-none'
-              />
-            )}
-            <div
-              ref={tabsContainerRef}
-              className="flex-1 overflow-hidden flex items-center gap-3"
-              style={{ scrollBehavior: 'smooth' }}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-            >
-              {videoFeed.map((tab) => (
+      {isLive && stream ? (
+        <LiveChat stream={stream} />
+      ) : (
+        <aside className="w-[400px] shrink-0 h-full flex flex-col overflow-y-auto scrollbar-hover bg-black">
+          <div className='sticky top-0 bg-black py-3 z-10'>
+            <div className="flex items-center gap-2 px-2">
+              {canScrollLeft && (
                 <Button
-                  key={tab.id}
-                  text={tab.label}
-                  variant={activeTab === tab.id ? "ghost" : "outline"}
-                  radius="md"
-                  className={`text-sm py-1! px-2! border-none flex-shrink-0 ${activeTab === tab.id ? 'bg-white! text-black!' : 'bg-neutral-800! hover:bg-neutral-700!'}`}
-                  onClick={() => handleTabClick(tab.id)}
+                  icon={<ChevronLeft size={20} />}
+                  onClick={() => scroll('left')}
+                  variant='outline'
+                  radius='full'
+                  className='p-2! border-none'
                 />
-              ))}
+              )}
+              <div
+                ref={tabsContainerRef}
+                className="flex-1 overflow-hidden flex items-center gap-3"
+                style={{ scrollBehavior: 'smooth' }}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+              >
+                {videoFeed.map((tab) => (
+                  <Button
+                    key={tab.id}
+                    text={tab.label}
+                    variant={activeTab === tab.id ? "ghost" : "outline"}
+                    radius="md"
+                    className={`text-sm py-1! px-2! border-none flex-shrink-0 ${activeTab === tab.id ? 'bg-white! text-black!' : 'bg-neutral-800! hover:bg-neutral-700!'}`}
+                    onClick={() => handleTabClick(tab.id)}
+                  />
+                ))}
 
+              </div>
+              {canScrollRight && (
+                <Button
+                  icon={<ChevronRight size={20} />}
+                  onClick={() => scroll('right')}
+                  variant='outline'
+                  radius='full'
+                  className='p-2! border-none'
+                />
+              )}
             </div>
-            {canScrollRight && (
-              <Button
-                icon={<ChevronRight size={20} />}
-                onClick={() => scroll('right')}
-                variant='outline'
-                radius='full'
-                className='p-2! border-none'
-              />
+          </div>
+          <div className="p-4 space-y-4">
+            {videoList.length > 0 ? (
+              videoList.map((video) => (
+                <div key={video.id}></div>
+              ))
+            ) : (
+              <div>Chưa có video nào</div>
             )}
           </div>
-        </div>
-        <div className="p-4 space-y-4">
-          {videoList.length > 0 ? (
-            videoList.map((video) => (
-              <div key={video.id}></div>
-            ))
-          ) : (
-            <div>Chưa có video nào</div>
-          )}
-        </div>
-      </aside>
+        </aside>
+      )}
     </main >
   )
 }

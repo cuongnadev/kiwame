@@ -14,8 +14,8 @@ export default async function UserHome() {
     <VideoGrid videoCount={videoCount}>
       {liveStreams.map((stream) => (
         <VideoPreviewCard
-          key={stream.videoId}
-          videoId={stream.videoId}
+          key={stream.streamId}
+          videoId={stream.streamId}
           title={stream.title}
           channel={stream.channel}
           views={stream.views}

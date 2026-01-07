@@ -41,7 +41,11 @@ export const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/watch/${videoId}`);
+    if (isLive && roomName) {
+      router.push(`/watch/${videoId}?live=1`);
+    } else {
+      router.push(`/watch/${videoId}`);
+    }
   }
 
   const handleMouseEnter = () => {
@@ -56,7 +60,7 @@ export const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({
   return (
     <div
       onClick={handleClick}
-      className='w-full max-w-[530px] flex flex-col gap-2 cursor-pointer'
+      className='w-full max-w-[528px] flex flex-col gap-2 cursor-pointer'
     >
       <div
         className='relative w-full rounded-xl aspect-video overflow-hidden bg-black group'

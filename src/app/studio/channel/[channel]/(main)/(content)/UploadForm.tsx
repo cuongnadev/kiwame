@@ -11,13 +11,15 @@ interface UploadFormProps {
 
 const CHUNK_SIZE = 5 * 1024 * 1024
 
-export default function UploadForm({ onClose, formStatus, video}: UploadFormProps) {
+export default function UploadForm({ onClose, formStatus, video }: UploadFormProps) {
   const [selectedVideoFile, setSelectedVideoFile] = useState<File | null>(null);
   const [selectedThumbnailFile, setSelectedThumbnailFile] = useState<File | null>(null);
-  const [autoThumbnailFile, setAutoThumbnailFile] = useState<File | null>(null)
+  const [autoThumbnailFile, setAutoThumbnailFile] = useState<File | null>(null);
+
   const [isDragActive, setIsDragActive] = useState(false);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState(formStatus);
+
   const [videoFileName, setVideoFileName] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [title, setTitle] = useState('');
@@ -26,22 +28,33 @@ export default function UploadForm({ onClose, formStatus, video}: UploadFormProp
   const [forChildren, setForChildren] = useState<boolean | null>(null);
   const [privacy, setPrivacy] = useState('')
   const [tags, setTags] = useState<string[]>([]);
+
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const [schedule, setSchedule] = useState();
   const [videoId, setVideoId] = useState<string | null>(null);
   const [parts, setParts] = useState<VideoPart[]>([]);
 
+  /**
+   * Uploads a single chunk of the video file to the server
+   * @param chunkFile - The video data chunk (as a Blob)
+   * @param chunkIndex - The index of the current chunk (starting from 0)
+   * @param totalChunks - Total number of chunks for this upload
+   * @param uploadId - Unique identifier for this upload session
+   * @returns The JSON response from the server for this chunk
+  */
   const uploadChunk = async (chunkFile: Blob, chunkIndex: number, totalChunks: number, uploadId: string) => {
     const form = new FormData();
     form.append("file", chunkFile, `chunk-${chunkIndex}.mp4`);
     form.append("upload_id", uploadId);
     form.append("chunk_index", chunkIndex.toString());
     form.append("total_chunks", totalChunks.toString());
+
     try {
       const response = await fetch('/api/upload/chunk', {
         method: 'POST',
         body: form
       });
+
       if (!response.ok) {
         throw new Error(`Chunk ${chunkIndex} uplpad failed`);
       }
@@ -53,21 +66,32 @@ export default function UploadForm({ onClose, formStatus, video}: UploadFormProp
     }
   }
 
+  /**
+   * Generates a thumbnail automatically from the video file by capturing a frame
+   * at 1 second or 10% of the video duration (whichever is smaller)
+   * @param file - The original video File object
+   * @returns A Promise that resolves to a JPEG File representing the thumbnail
+  */
   const generateLocalThumbnail = (file: File): Promise<File> => {
     return new Promise((resolve, reject) => {
       const video = document.createElement("video")
       video.preload = "metadata"
       video.src = URL.createObjectURL(file)
+
+      // Jump to the desired frame once metadata is loaded
       video.onloadedmetadata = () => {
         // Seek to 1 second or 10% of video
         video.currentTime = Math.min(1, video.duration * 0.1)
       }
+
+      // When the video has seeked to the target time, capture the frame
       video.onseeked = () => {
         const canvas = document.createElement("canvas")
         canvas.width = video.videoWidth
         canvas.height = video.videoHeight
         const ctx = canvas.getContext("2d")
         ctx?.drawImage(video, 0, 0, canvas.width, canvas.height)
+
         canvas.toBlob((blob) => {
           if (blob) {
             const thumbnailFile = new File([blob], "thumbnail.jpg", { type: "image/jpeg" })
@@ -75,10 +99,11 @@ export default function UploadForm({ onClose, formStatus, video}: UploadFormProp
           } else {
             reject(new Error("Canvas to Blob failed"))
           }
+
           URL.revokeObjectURL(video.src)
-        }, "image/jpeg")
+        }, "image/jpeg");
       }
-      video.onerror = reject
+      video.onerror = reject;
     })
   }
 
@@ -88,38 +113,57 @@ export default function UploadForm({ onClose, formStatus, video}: UploadFormProp
     }
   }, [video, formStatus])
 
+  /**
+   * Handles the video upload process when a file is selected.
+   * Automatically starts after selectedVideoFile changes.
+   * Steps:
+   * 1. Generate local thumbnail
+   * 2. Create video record on server
+   * 3. Upload video in chunks
+   * 4. Merge chunks on server
+   * 5. Split video and upload segments to cloud (e.g., for HLS streaming)
+   */
   useEffect(() => {
     if (!selectedVideoFile) return;
+
     const upload = async () => {
       try {
-        const localThumb = await generateLocalThumbnail(selectedVideoFile)
-        setAutoThumbnailFile(localThumb)
-        setThumbnailUrl(URL.createObjectURL(localThumb))
+        const localThumb = await generateLocalThumbnail(selectedVideoFile);
+        setAutoThumbnailFile(localThumb);
+        setThumbnailUrl(URL.createObjectURL(localThumb));
       } catch (err) {
-        console.error("[v0] Local thumbnail generation failed:", err)
+        console.error("[v0] Local thumbnail generation failed:", err);
       }
-      setUploadingVideo(true)
-      const form = new FormData()
-      form.append("title", selectedVideoFile.name.substring(0, selectedVideoFile.name.lastIndexOf('.')))
+
+      setUploadingVideo(true);
+
+      const form = new FormData();
+      form.append("title", selectedVideoFile.name.substring(0, selectedVideoFile.name.lastIndexOf('.')));
+
       const upload_video_response = await fetch("/api/upload/video", {
         method: 'POST',
         body: form
-      })
-      const uploadVideoData = await upload_video_response.json()
-      console.log(uploadVideoData)
-      const video_id = uploadVideoData.video.id
-      setVideoId(video_id)
+      });
+
+      const uploadVideoData = await upload_video_response.json();
+      console.log(uploadVideoData);
+
+      const video_id = uploadVideoData.video.id;
+      setVideoId(video_id);
+
       try {
-        const uploadId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
-        const totalChunks = Math.ceil(selectedVideoFile.size / CHUNK_SIZE)
+        const uploadId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+        const totalChunks = Math.ceil(selectedVideoFile.size / CHUNK_SIZE);
         // const MERGE_SIZE = 10 * 1024 * 1024
         // const chunksPerPart = Math.ceil(MERGE_SIZE / CHUNK_SIZE)
+
         for (let i = 0; i < totalChunks; i++) {
           const start = i * CHUNK_SIZE;
           const end = Math.min(start + CHUNK_SIZE, selectedVideoFile.size);
           const chunk = selectedVideoFile.slice(start, end);
-          await uploadChunk(chunk, i, totalChunks, uploadId)
+          await uploadChunk(chunk, i, totalChunks, uploadId);
         }
+
         const mergeResponse = await fetch('/api/upload/merge-chunks', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -153,88 +197,87 @@ export default function UploadForm({ onClose, formStatus, video}: UploadFormProp
 
         const data = await splitAndUploadResponse.json();
         setParts(data.parts || [])
-        console.log(data)
-
+        console.log(data);
       } catch (err) {
         console.error('Upload failed:', err);
       } finally {
         setUploadingVideo(false)
       }
-      setUploadingVideo(false)
+
+      setUploadingVideo(false);
     };
 
     upload();
-  }, [selectedVideoFile])
+  }, [selectedVideoFile]);
 
   useEffect(() => {
     if (formStatus === 'edit' && video) {
-      setStatus('edit')
-      setTitle(video.title)
-      setDescription(video.description || '')
-      setThumbnailUrl(video.thumbnail_url || null)
-      setPrivacy(video.visibility || 'private')
-      setForChildren(video.for_children ?? null)
-      setVideoFileName(video.title)
-      setTags(video.tags || [])
+      setStatus('edit');
+      setTitle(video.title);
+      setDescription(video.description || '');
+      setThumbnailUrl(video.thumbnail_url || null);
+      setPrivacy(video.visibility || 'private');
+      setForChildren(video.for_children ?? null);
+      setVideoFileName(video.title);
+      setTags(video.tags || []);
       const video_parts: VideoPart[] = video?.video_items
         ? video.video_items.map((item: VideoItemRow) => ({
           url: item.cloud_url,
           duration: item.duration,
         }))
         : [];
+
       setParts(video_parts);
     }
-  }, [formStatus, video])
-
-
+  }, [formStatus, video]);
 
   const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
     if (e.type === "dragenter" || e.type === "dragover") {
-      setIsDragActive(true)
+      setIsDragActive(true);
     } else if (e.type === "dragleave") {
-      setIsDragActive(false)
+      setIsDragActive(false);
     }
   }
 
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragActive(false)
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
 
     const files = e.dataTransfer.files
     if (files && files[0]) {
-      const file = files[0]
+      const file = files[0];
       if (file.type.startsWith("video/")) {
-        setSelectedVideoFile(file)
-        setVideoUrl(URL.createObjectURL(file))
+        setSelectedVideoFile(file);
+        setVideoUrl(URL.createObjectURL(file));
         // onFileSelected(file)
         const fileName = file.name.replace(/\.[^/.]+$/, "");
-        setTitle(fileName)
-        setVideoFileName(fileName)
-        setStatus('edit')
+        setTitle(fileName);
+        setVideoFileName(fileName);
+        setStatus('edit');
       }
     }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedVideoFile(e.target.files[0])
-      setVideoUrl(URL.createObjectURL(e.target.files[0]))
+      setSelectedVideoFile(e.target.files[0]);
+      setVideoUrl(URL.createObjectURL(e.target.files[0]));
       // onFileSelected(e.target.files[0])
       const fileName = e.target.files[0].name.replace(/\.[^/.]+$/, "");
-      setTitle(fileName)
-      setVideoFileName(fileName)
-      setStatus('edit')
+      setTitle(fileName);
+      setVideoFileName(fileName);
+      setStatus('edit');
     }
   }
 
   const onSubmit = (type: string) => {
     if (type === "exit") {
-      onUpdateVideo("exit")
+      onUpdateVideo("exit");
     } else {
-      onUpdateVideo("save")
+      onUpdateVideo("save");
     }
   }
 
@@ -246,9 +289,9 @@ export default function UploadForm({ onClose, formStatus, video}: UploadFormProp
       if (selectedThumbnailFile || autoThumbnailFile) {
         const thumbForm = new FormData();
         if (selectedThumbnailFile) {
-          thumbForm.append("thumbnail", selectedThumbnailFile)
+          thumbForm.append("thumbnail", selectedThumbnailFile);
         } else if (autoThumbnailFile) {
-          thumbForm.append("thumbnail", autoThumbnailFile)
+          thumbForm.append("thumbnail", autoThumbnailFile);
         }
 
         const thumbRes = await fetch('/api/upload/thumbnail', {
