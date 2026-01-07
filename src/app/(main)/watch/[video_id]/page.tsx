@@ -254,7 +254,7 @@ export default function WatchPage() {
         <div className="w-full p-4 space-y-4">
           {/* Video Player */}
           <div className="aspect-video w-full rounded-xl bg-black overflow-hidden">
-            {isLive && stream?.room_name ? (
+            {(isLive && stream?.room_name) ? (
               <VideoPlayer isLive={isLive} roomName={stream?.room_name} />
             ) : (
               <VideoPlayer
@@ -419,7 +419,9 @@ export default function WatchPage() {
 
       {/* Sidebar - Related Videos */}
       {isLive && stream ? (
-        <LiveChat stream={stream} />
+        <div className='w-[400px] shrink-0 h-full flex flex-col overflow-y-auto scrollbar-hover bg-black'>
+          <LiveChat stream={stream} />
+        </div>
       ) : (
         <aside className="w-[400px] shrink-0 h-full flex flex-col overflow-y-auto scrollbar-hover bg-black">
           <div className='sticky top-0 bg-black py-3 z-10'>
