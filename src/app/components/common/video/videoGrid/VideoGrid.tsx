@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React from 'react'
+import React from 'react';
 
 export function VideoGrid({
   children,
@@ -8,20 +8,25 @@ export function VideoGrid({
   children: React.ReactNode;
   videoCount: number;
 }) {
-  const gridClass =
-    videoCount <= 3
-      ? "grid-cols-[repeat(auto-fill,minmax(320px,530px))] justify-start"
-      : "grid-cols-[repeat(auto-fit,minmax(400px,1fr))]";
+  const getColsClass = () => {
+    if (videoCount <= 1) return 'grid-cols-1';
+    if (videoCount === 2) return 'grid-cols-1 md:grid-cols-2';
+    if (videoCount === 3) return 'grid-cols-1 md:grid-cols-3';
+    return 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4';
+  };
 
   return (
-    <div
-      className={clsx(
-        "w-full h-full grid gap-6 px-6 py-4 bg-[#0f0f0f] overflow-y-auto overflow-x-hidden scrollbar-main",
-        gridClass
-      )}
-    >
-      {children}
+    <div className="w-full h-full overflow-y-auto overflow-x-hidden scrollbar-main bg-[#0f0f0f]">
+      <div className="w-full px-6 py-4">
+        <div
+          className={clsx(
+            'grid gap-x-4 gap-y-8',
+            getColsClass()
+          )}
+        >
+          {children}
+        </div>
+      </div>
     </div>
-  )
+  );
 }
-

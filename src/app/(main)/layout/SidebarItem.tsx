@@ -36,8 +36,8 @@ export function SidebarItem({ item, expanded, user, channel, openCreateChannel }
       href={allowed && item.href ? item.href : "#"}
       aria-disabled={!item.href}
       onClick={handleClick}
-      className={`flex items-center gap-4 rounded-lg px-3 transition-all group relative
-        ${expanded ? "py-2 justify-start" : "py-4 justify-center"}
+      className={`flex items-center gap-4 rounded-lg transition-all group relative
+        ${expanded ? "px-3 py-2 justify-start" : "py-4 justify-center"}
         ${isActive ? "bg-[#222]" : "hover:bg-[#222]"}
         text-[#f1f1f1] ${!allowed ? "opacity-60" : ""}
       `}

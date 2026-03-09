@@ -22,7 +22,13 @@ export default function Sidebar({ expanded, user, channel, openCreateChannel }: 
   const userMenuItems = getUserMenuItems(channel);
 
   return (
-    <aside className={`flex flex-col bg-[#0f0f0f] transition-all duration-300 ${expanded ? 'w-64' : 'w-20'} group/sidebar`}>
+    <aside
+      className={`
+        z-40 flex h-full flex-col bg-[#0f0f0f] transition-[width] duration-300
+        ${expanded ? "w-64" : "w-[72px]"}
+        group/sidebar
+      `}
+    >
       <nav className={`flex-1 overflow-y-auto scrollbar-hover ${expanded ? 'px-3' : 'px-1'} py-4 space-y-6`}>
         <div className="space-y-1">
           {mainMenuItems.map((item) => (

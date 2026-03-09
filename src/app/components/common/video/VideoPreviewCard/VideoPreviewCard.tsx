@@ -56,7 +56,7 @@ export const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({
   return (
     <div
       onClick={handleClick}
-      className='w-full max-w-[530px] flex flex-col gap-2 cursor-pointer'
+      className='w-full min-w-[280px] flex flex-col gap-2 cursor-pointer'
     >
       <div
         className='relative w-full rounded-xl aspect-video overflow-hidden bg-black group'
